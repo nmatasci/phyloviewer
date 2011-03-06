@@ -360,4 +360,29 @@ public class CanvasGraphics extends Graphics
 			canvas.setLineWidth(1.0);
 		}
 	}
+
+	@Override
+	protected void setFillStyle(String style)
+	{
+		canvas.setFillStyle(style);
+		textColor = style;
+	}
+
+	@Override
+	protected void setLineWidth(double d)
+	{
+		canvas.setLineWidth(d);
+	}
+
+	@Override
+	protected void setPointSize(double pointSize)
+	{
+		this.pointSize = pointSize;
+	}
+
+	@Override
+	protected void setStrokeStyle(String style)
+	{
+		canvas.setStrokeStyle(style);
+	}
 }
