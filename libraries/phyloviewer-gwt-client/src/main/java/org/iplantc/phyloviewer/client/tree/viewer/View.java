@@ -20,6 +20,7 @@ import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.render.Camera;
+import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
@@ -166,6 +167,7 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 	public abstract void resize(int width, int height);
 
 	public abstract void render();
+	public abstract void renderTo(IGraphics g);
 
 	/**
 	 * This gets called by TreeWidget before every render, so it must return quickly

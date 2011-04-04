@@ -37,6 +37,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.render.Camera;
 import org.iplantc.phyloviewer.shared.render.CameraCladogram;
 import org.iplantc.phyloviewer.shared.render.Defaults;
+import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.RenderTree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
@@ -202,6 +203,22 @@ public class DetailView extends AnimatedView implements Broadcaster
 		{
 			Logger.getLogger("").log(Level.WARNING,
 					"An exception was caught in DetailView.render: " + e.getMessage());
+		}
+	}
+	
+	public void renderTo(IGraphics g)
+	{
+		if(this.isReady())
+		{
+			Matrix33 viewMatrix = new Matrix33();
+
+			Camera camera = getCamera();
+			if(camera != null)
+			{
+				viewMatrix = camera.getMatrix(g.getWidth(), g.getHeight());
+			}
+
+			renderer.renderTree(g, viewMatrix);			
 		}
 	}
 

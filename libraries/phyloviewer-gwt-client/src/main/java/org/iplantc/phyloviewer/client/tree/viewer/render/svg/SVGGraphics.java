@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.Graphics;
 import org.iplantc.phyloviewer.shared.scene.Text;
 
+/**
+ * SVGGraphics... embrace the redundancy.
+ */
 public class SVGGraphics extends Graphics
 {
 	static final String PROLOG = "<?xml version=\"1.0\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
@@ -118,7 +121,6 @@ public class SVGGraphics extends Graphics
 		}
 		
 		//TODO hide text elements that overlap previously added text elements. Need to estimate bounding boxes.
-		//TODO handle angle
 
 		Vector2 p = objectToScreenMatrix.transform(position);
 		Vector2 startingPosition = new Vector2(p.getX() + offset.getX(), p.getY() + offset.getY());

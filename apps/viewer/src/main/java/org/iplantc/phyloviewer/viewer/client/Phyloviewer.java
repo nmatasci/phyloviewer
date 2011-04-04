@@ -6,6 +6,7 @@
 
 package org.iplantc.phyloviewer.viewer.client;
 
+import org.iplantc.phyloviewer.client.tree.viewer.render.svg.SVGGraphics;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.render.Defaults;
@@ -113,6 +114,17 @@ public class Phyloviewer implements EntryPoint {
 		};
 		
 		fileMenu.addItem("Get image (opens in a popup window)", openURL);
+		
+		Command showSVG = new Command() {
+			@Override
+			public void execute()
+			{
+				String svg = getSVG();
+				String url = "data:image/svg+xml;charset=utf-8," + svg;
+				Window.open(url, "_blank", "");				
+			}
+		};
+		fileMenu.addItem("Export to SVG", showSVG);
 	
 		MenuBar layoutMenu = new MenuBar(true);
 		layoutMenu.addItem("Rectangular", new Command() {
@@ -357,10 +369,12 @@ public class Phyloviewer implements EntryPoint {
 	
 	private class TextInputPopup extends PopupPanel implements HasValueChangeHandlers<String>
 	{	
+		final TextArea textBox = new TextArea();
+		
 		public TextInputPopup()
 		{
 			VerticalPanel vPanel = new VerticalPanel();
-			final TextArea textBox = new TextArea();
+			
 			textBox.setVisibleLines(20);
 			textBox.setCharacterWidth(80);
 			Button okButton = new Button("OK", new ClickHandler()
@@ -382,6 +396,19 @@ public class Phyloviewer implements EntryPoint {
 		public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler)
 		{
 			return addHandler(handler, ValueChangeEvent.getType());
-		}		
+		}
+		
+		public void setText(String text)
+		{
+			textBox.setText(text);
+		}
+	}
+	
+	private String getSVG()
+	{
+		SVGGraphics graphics = new SVGGraphics();
+		graphics.setSize(widget.getView().getOffsetWidth(), widget.getView().getOffsetHeight());
+		widget.getView().renderTo(graphics);
+		return graphics.toString();
 	}
 }
