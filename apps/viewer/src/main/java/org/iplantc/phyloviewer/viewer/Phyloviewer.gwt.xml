@@ -53,5 +53,7 @@
   <!-- disable default logging handlers -->
   <set-property name="gwt.logging.popupHandler" value="DISABLED" />
   <set-property name="gwt.logging.simpleRemoteHandler" value="DISABLED" />
+  
+  <script src="jscolor/jscolor.js" /> 
 
 </module>
