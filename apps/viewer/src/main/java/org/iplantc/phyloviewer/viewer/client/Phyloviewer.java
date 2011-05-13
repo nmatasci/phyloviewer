@@ -252,11 +252,18 @@ public class Phyloviewer implements EntryPoint
 
 		initColorPicker();
 
-		String treeIdString = Window.Location.getParameter("treeId");
+		String[] splitPath = Window.Location.getPath().split("/");
+		String treeIdString = null;
+		for(int i = 0; i < splitPath.length; i++) {
+			if (splitPath[i].equalsIgnoreCase("treeId")) {
+				treeIdString = splitPath[i+1];
+			}
+		}
+		
 		if(treeIdString != null && !treeIdString.equals(""))
 		{
 			int treeId = Integer.parseInt(treeIdString);
-			this.loadTree(null, treeId);
+			this.loadTree(null, treeId); //TODO throw an exception from loadTree if the treeId doesn't exist, and notify the user
 		}
 		else
 		{

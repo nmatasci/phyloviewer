@@ -96,6 +96,16 @@
     <url-pattern>/phyloviewer/treeIntersect</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>view</servlet-name>
+    <jsp-file>/phyloviewer/View.jsp</jsp-file>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>view</servlet-name>
+    <url-pattern>/view/*</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Phyloviewer.html</welcome-file>
