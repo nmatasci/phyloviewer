@@ -6,12 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 
 public class ImportTree {
+	static final ExecutorService executor = Executors.newCachedThreadPool();
 
 	Connection connection;
 	PreparedStatement addTreeStmt = null;
@@ -43,6 +48,84 @@ public class ImportTree {
 		ConnectionUtil.close(addAltLabelStmt);
 	}
 	
+	public Future<Void> addTreeAsync(final Tree tree, final String name) throws SQLException 
+	{
+		final INode root = tree.getRootNode();
+		final int treeId;
+		
+		//do the minimum necessary to get the tree ID
+		try
+		{
+			addNode(root);
+			
+			treeId = addTreeRoot(tree, name);
+			addChildStmt.setInt(3, treeId);
+		}
+		catch(SQLException e)
+		{
+			throw e;
+		}
+		
+		//Finish importing the tree in another thread
+		Callable<Void> task = new Callable<Void>()
+		{
+			@Override
+			public Void call() throws SQLException
+			{
+				try
+				{
+					addChildStmt.setInt(3, treeId);
+
+					if (root instanceof RemoteNode)
+					{
+						//add the tree root to the topology table
+						addChild(null, (RemoteNode) root, addChildStmt);
+						
+						// add the children of the root.
+						if (root.getChildren() != null)
+						{
+							for (RemoteNode child : (RemoteNode[]) root.getChildren())
+							{
+								addSubtree(child, root.getId(), addNodeStmt, addChildStmt);
+							}
+						}
+					}
+					else
+					{
+						//if not RemoteNode, the depth and left and right indices have to be calculated in the traversal
+						int left = 1;
+						int right = 2 * root.getNumberOfNodes();
+						int depth = 0;
+						addChild(null, root, left, right, depth, addChildStmt);
+						
+						// add the children of the root.
+						if (root.getChildren() != null)
+						{
+							for (INode child : root.getChildren())
+							{
+								addSubtree(child, root.getId(), left + 1, depth + 1, addNodeStmt, addChildStmt);
+							}
+						}
+					}
+					
+					addChildStmt.executeBatch();
+				}
+				catch(SQLException e)
+				{
+					throw e;
+				}
+				finally
+				{
+					ImportTree.this.close();
+				}
+				
+				return null;
+			}
+		};
+		
+		return executor.submit(task);		
+	}
+	
 	public void addTree(Tree tree,String name) throws SQLException
 	{		
 		INode root = tree.getRootNode();
@@ -52,19 +135,8 @@ public class ImportTree {
 			// We need to add the root first to meet the key constraints of the database.
 			addNode(root);
 			
-			addTreeStmt.setInt(1, tree.getRootNode().getId());
-			addTreeStmt.setString(2, name != null ? name : "No name");
-			addTreeStmt.execute();
-			
-			{
-				Statement statement = connection.createStatement();
-				ResultSet rs = statement.executeQuery("select currval('trees_tree_id') as result" );
-				if (rs.next()) {
-					tree.setId(rs.getInt("result"));
-				}
-			}
-			
-			addChildStmt.setInt(3, tree.getId());
+			int treeId = addTreeRoot(tree, name);
+			addChildStmt.setInt(3, treeId);
 			
 
 			if (root instanceof RemoteNode)
@@ -110,6 +182,21 @@ public class ImportTree {
 		{
 			this.close();
 		}
+	}
+	
+	private int addTreeRoot(Tree tree,String name) throws SQLException
+	{
+		addTreeStmt.setInt(1, tree.getRootNode().getId());
+		addTreeStmt.setString(2, name != null ? name : "No name");
+		addTreeStmt.execute();
+		
+		Statement statement = connection.createStatement();
+		ResultSet rs = statement.executeQuery("select currval('trees_tree_id') as result" );
+		if (rs.next()) {
+			tree.setId(rs.getInt("result"));
+		}
+		
+		return tree.getId();
 	}
 	
 	private int addSubtree(INode node, int parentID, int traversalCount, int depth, PreparedStatement addNodeStmt, PreparedStatement addChildStmt) throws SQLException 

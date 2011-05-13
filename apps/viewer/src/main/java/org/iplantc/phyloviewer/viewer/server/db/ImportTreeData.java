@@ -8,6 +8,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 import javax.sql.DataSource;
@@ -28,7 +33,7 @@ import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 
 public class ImportTreeData implements IImportTreeData {
-	
+	static final ExecutorService executor = Executors.newCachedThreadPool();
 	private DataSource pool;
 	private String imageDirectory;
 
@@ -87,54 +92,75 @@ public class ImportTreeData implements IImportTreeData {
 		return graphics.getImage();
 	}
 	
-	public int importTreeData(RemoteNode root, String name) throws SQLException {
-		
-		Tree tree = new Tree();
+	public int importTreeData(RemoteNode root, String name) throws Exception {
+		Connection connection = null;
+		final Tree tree = new Tree();
 		tree.setRootNode(root);
 
-		Connection connection = null;
-		ImportLayout layoutImporter = null;
 		try
 		{
 			connection = pool.getConnection();
+			final Connection conn = connection; //for the Callable
 			
 			// The tree and all associated data will be added in a single transaction.
 			connection.setAutoCommit(false);
-			
 			ImportTree importer = new ImportTree(connection);
-			importer.addTree(tree, name);
+			final Future<Void> futureAddTree = importer.addTreeAsync(tree, name);
 			
-			layoutImporter = new ImportLayout(connection);
-
-			LayoutCladogram cladogramLayout = new LayoutCladogram(0.8,1.0);
-			cladogramLayout.layout(tree);
-			
+			Callable<Void> doImportLayout = new Callable<Void>() 
 			{
-				String uuid = "LAYOUT_TYPE_CLADOGRAM";
-				layoutImporter.addLayout(uuid, cladogramLayout, tree);
-				
-				BufferedImage image = renderTreeImage(tree,cladogramLayout,256,1024);
-				this.putOverviewImage(connection,tree.getId(), uuid, image);
-			}
+				@Override
+				public Void call() throws SQLException, ExecutionException, InterruptedException
+				{
+					futureAddTree.get(); //wait for addTreeAsync thread to finish
+					importLayout(conn, tree);
+					conn.commit();
+					ConnectionUtil.close(conn);
+					return null;
+				}
+			};	
 			
-			connection.commit();
+			executor.submit(doImportLayout);
 		}
-		catch(SQLException e)
+		catch(Exception e)
 		{
-			//rolls back entire tree transaction on exception anywhere in the tree
-			ConnectionUtil.rollback(connection);
-			throw(e);
-		}
-		finally
-		{
-			ConnectionUtil.close(connection);
-			
-			if(layoutImporter != null) {
-				layoutImporter.close();
+			if (connection != null) {
+				//rolls back entire tree transaction on exception anywhere in the tree
+				ConnectionUtil.rollback(connection);
+				ConnectionUtil.close(connection);
+				throw(e);
 			}
 		}
 		
 		return tree.getId();
+	}
+	
+	private void importLayout(Connection connection, Tree tree) throws SQLException {
+		ImportLayout layoutImporter = null;
+		
+		try
+		{
+			layoutImporter = new ImportLayout(connection);
+
+			LayoutCladogram cladogramLayout = new LayoutCladogram(0.8,1.0);
+			cladogramLayout.layout(tree);
+
+			String uuid = "LAYOUT_TYPE_CLADOGRAM";
+			layoutImporter.addLayout(uuid, cladogramLayout, tree);
+			
+			BufferedImage image = renderTreeImage(tree,cladogramLayout,256,1024);
+			ImportTreeData.this.putOverviewImage(connection,tree.getId(), uuid, image);
+		}
+		catch(SQLException e)
+		{
+			throw e;
+		}
+		finally
+		{
+			if(layoutImporter != null) {
+				layoutImporter.close();
+			}
+		}
 	}
 	
 	private void putOverviewImage(Connection connection, int treeId, String layoutId,
@@ -208,7 +234,7 @@ public class ImportTreeData implements IImportTreeData {
 	}
 
 	@Override
-	public int importFromNewick(String newick, String name) throws SQLException
+	public int importFromNewick(String newick, String name) throws Exception
 	{
 		RemoteNode root = rootNodeFromNewick(newick, name);
 		return this.importTreeData(root, name);
