@@ -87,7 +87,7 @@ public class ImportTreeData implements IImportTreeData {
 		return graphics.getImage();
 	}
 	
-	public int importTreeData(RemoteNode root, String name) {
+	public int importTreeData(RemoteNode root, String name) throws SQLException {
 		
 		Tree tree = new Tree();
 		tree.setRootNode(root);
@@ -123,7 +123,7 @@ public class ImportTreeData implements IImportTreeData {
 		{
 			//rolls back entire tree transaction on exception anywhere in the tree
 			ConnectionUtil.rollback(connection);
-			e.printStackTrace();
+			throw(e);
 		}
 		finally
 		{
@@ -208,7 +208,7 @@ public class ImportTreeData implements IImportTreeData {
 	}
 
 	@Override
-	public int importFromNewick(String newick, String name)
+	public int importFromNewick(String newick, String name) throws SQLException
 	{
 		RemoteNode root = rootNodeFromNewick(newick, name);
 		return this.importTreeData(root, name);
