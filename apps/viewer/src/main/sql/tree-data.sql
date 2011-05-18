@@ -29,6 +29,7 @@ create table tree (
 	tree_id integer DEFAULT nextval('trees_tree_id'::regclass) primary key, 
 	root_id integer not null, 
 	Name varchar, 
+	import_complete boolean DEFAULT FALSE not null,
 	foreign key(root_id) references node(node_id)
 );
 
