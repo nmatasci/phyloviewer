@@ -102,10 +102,15 @@ public class ImportTreeData implements IImportTreeData {
 			connection = pool.getConnection();
 			final Connection conn = connection; //for the Callable
 			
-			// The tree and all associated data will be added in a single transaction.
+			/* The tree and all associated data will be added in a two transactions: 
+			 * First the tree and root node records, so that the tree service can 
+			 * check whether the import has been started for a given tree request,
+			 * then the rest of the tree and layout.
+			 */
 			connection.setAutoCommit(false);
 			ImportTree importer = new ImportTree(connection);
 			final Future<Void> futureAddTree = importer.addTreeAsync(tree, name);
+			conn.commit();
 			
 			Callable<Void> doImportLayout = new Callable<Void>() 
 			{
@@ -128,13 +133,17 @@ public class ImportTreeData implements IImportTreeData {
 				//rolls back entire tree transaction on exception anywhere in the tree
 				ConnectionUtil.rollback(connection);
 				ConnectionUtil.close(connection);
+				
+				//also delete the tree and root node records, which were already committed.  
+				deleteTree(tree);
+				
 				throw(e);
 			}
 		}
 		
 		return tree.getId();
 	}
-	
+
 	private void importLayout(Connection connection, Tree tree) throws SQLException {
 		ImportLayout layoutImporter = null;
 		
@@ -238,5 +247,22 @@ public class ImportTreeData implements IImportTreeData {
 	{
 		RemoteNode root = rootNodeFromNewick(newick, name);
 		return this.importTreeData(root, name);
+	}
+	
+	/** Deletes the given tree from the database */
+	private void deleteTree(Tree tree)
+	{
+		Connection connection = null;
+
+		try
+		{
+			connection = pool.getConnection();
+			connection.createStatement().execute("delete from node using topology where node.node_id = topology.node_id and topology.tree_id = " + tree.getId()); //node deletes cascade to related tables
+		}
+		catch(SQLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
