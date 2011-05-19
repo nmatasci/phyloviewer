@@ -29,8 +29,8 @@ create table tree (
 	tree_id integer DEFAULT nextval('trees_tree_id'::regclass) primary key, 
 	root_id integer not null, 
 	Name varchar, 
-	import_complete boolean DEFAULT FALSE not null,
-	foreign key(root_id) references node(node_id)
+	import_complete boolean default FALSE not null,
+	foreign key(root_id) references node(node_id) on delete cascade
 );
 
 create table topology (
@@ -44,9 +44,9 @@ create table topology (
 	NumChildren int, 
 	NumLeaves int, 
 	NumNodes int, 
-	foreign key(node_id) references node(node_id), 
-	foreign key(parent_id) references node(node_id), 
-	foreign key(tree_id) references tree(tree_id)
+	foreign key(node_id) references node(node_id) on delete cascade, 
+	foreign key(parent_id) references node(node_id) on delete cascade, 
+	foreign key(tree_id) references tree(tree_id) on delete cascade
 );
 
 
