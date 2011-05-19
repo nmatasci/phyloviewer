@@ -38,6 +38,8 @@ public class ImportTree {
 		getNodeIdStmt = conn.prepareStatement("select currval('nodes_node_id') as result"); //TODO: I think PreparedStatement can return the sequence number without a query, using Statement.RETURN_GENERATED_KEYS
 		
 		addAltLabelStmt = conn.prepareStatement("insert into node_label_lookup(node_id,alt_label) values(?, ?)");
+		
+		
 	}
 	
 	public void close() {
@@ -57,9 +59,7 @@ public class ImportTree {
 		try
 		{
 			addNode(root);
-			
 			treeId = addTreeRoot(tree, name);
-			addChildStmt.setInt(3, treeId);
 		}
 		catch(SQLException e)
 		{
@@ -109,6 +109,7 @@ public class ImportTree {
 					}
 					
 					addChildStmt.executeBatch();
+					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + treeId);
 				}
 				catch(SQLException e)
 				{
@@ -172,6 +173,7 @@ public class ImportTree {
 			}
 			
 			addChildStmt.executeBatch();
+			connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + treeId);
 		}
 		catch(SQLException e)
 		{
