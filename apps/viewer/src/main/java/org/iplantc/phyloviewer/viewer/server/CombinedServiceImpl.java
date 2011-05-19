@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.viewer.server;
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService;
+import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -23,7 +24,7 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 	}
 
 	@Override
-	public NodeResponse getRootNode(int treeId) throws Exception
+	public NodeResponse getRootNode(int treeId) throws TreeNotAvailableException 
 	{
 		ITreeData treeData = this.getTreeData();
 		RemoteNode node = treeData.getRootNode(treeId);
@@ -34,11 +35,11 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 		return response;
 	}
 
-	public LayoutResponse getLayout(INode node) throws Exception {		
+	public LayoutResponse getLayout(INode node) {		
 		return this.getLayoutData().getLayout(node);
 	}
 	
-	public LayoutResponse[] getLayout(INode[] nodes) throws Exception {
+	public LayoutResponse[] getLayout(INode[] nodes) {
 		LayoutResponse[] response = new LayoutResponse[nodes.length];
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -49,7 +50,7 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 	}
 
 	@Override
-	public CombinedResponse getChildrenAndLayout(int parentID) throws Exception
+	public CombinedResponse getChildrenAndLayout(int parentID)
 	{
 		CombinedResponse response = new CombinedResponse();
 	
@@ -61,11 +62,8 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 	}
 
 	@Override
-	public CombinedResponse[] getChildrenAndLayout(int[] parentIDs) throws Exception
+	public CombinedResponse[] getChildrenAndLayout(int[] parentIDs)
 	{
-//		Util.simulateDelay(this.getThreadLocalRequest(), 100);
-		//System.out.println("Getting children and layouts for " + parentIDs.length + " parents");
-		
 		CombinedResponse[] responses = new CombinedResponse[parentIDs.length];
 		for (int i = 0; i < parentIDs.length; i++) {
 			responses[i] = getChildrenAndLayout(parentIDs[i]);

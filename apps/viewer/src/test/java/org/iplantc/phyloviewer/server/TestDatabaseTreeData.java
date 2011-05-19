@@ -19,6 +19,7 @@ import java.util.zip.GZIPInputStream;
 import javax.sql.DataSource;
 
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.server.DatabaseTreeData;
 import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
@@ -116,7 +117,7 @@ public class TestDatabaseTreeData
 	}
 
 	@Test
-	public void testGetTree()
+	public void testGetTree() throws TreeNotAvailableException
 	{
 		Tree returnedTree = treeData.getTree(tree.getId(), 1);
 		assertEquals(tree, returnedTree);

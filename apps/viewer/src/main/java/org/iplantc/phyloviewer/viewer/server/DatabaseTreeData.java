@@ -12,6 +12,8 @@ import javax.sql.DataSource;
 
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.services.TreeImportInProgressException;
+import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -191,13 +193,13 @@ public class DatabaseTreeData implements ITreeData
 	
 
 	@Override
-	public RemoteNode getRootNode(int treeId)
+	public RemoteNode getRootNode(int treeId) throws TreeNotAvailableException
 	{
 		Tree tree = this.getTree(treeId,0);
 		return (RemoteNode) tree.getRootNode();
 	}
 
-	public Tree getTree(int id, int depth)
+	public Tree getTree(int id, int depth) throws TreeNotAvailableException
 	{
 		Tree tree = null;
 		Connection conn = null;
@@ -213,11 +215,20 @@ public class DatabaseTreeData implements ITreeData
 			
 			rs = statement.executeQuery();
 			if (rs.next()) {
+				if (!rs.getBoolean("import_complete")) 
+				{
+					throw new TreeImportInProgressException(id);
+				}
+				
 				tree = new Tree();
 				tree.setId(rs.getInt("tree_id"));
 				int rootId = rs.getInt("root_id");
 				RemoteNode node = getSubtree(rootId, depth);
 				tree.setRootNode(node);
+			}
+			else 
+			{
+				throw new TreeNotAvailableException(id);
 			}
 		}
 		catch(SQLException e)
@@ -333,8 +344,9 @@ public class DatabaseTreeData implements ITreeData
 				
 				int uuid = rs.getInt("tree_id");
 				String name = rs.getString("Name");
+				boolean complete = rs.getBoolean("import_complete");
 				
-				trees.put(buildJSONForTree(uuid,name));
+				trees.put(buildJSONForTree(uuid, name, complete));
 	
 			}
 			
@@ -356,10 +368,11 @@ public class DatabaseTreeData implements ITreeData
 		return result.toString();
 	}
 	
-	private JSONObject buildJSONForTree(int id, String name) throws JSONException {
+	private JSONObject buildJSONForTree(int id, String name, boolean complete) throws JSONException {
 		JSONObject tree = new JSONObject();
 		tree.put("id", id);
 		tree.put("name", name);
+		tree.put("importComplete", complete);
 		return tree;
 	}
 }

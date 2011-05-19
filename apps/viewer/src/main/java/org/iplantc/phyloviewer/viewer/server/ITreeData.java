@@ -1,6 +1,7 @@
 package org.iplantc.phyloviewer.viewer.server;
 
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 
 public interface ITreeData
 {
@@ -10,7 +11,7 @@ public interface ITreeData
 	 * @param the id of the tree to get the root node.
 	 * @return the node.
 	 */
-	public abstract RemoteNode getRootNode(int treeID);
+	public abstract RemoteNode getRootNode(int treeID) throws TreeNotAvailableException;
 	
 	/** 
 	 * Get a list of loaded trees.

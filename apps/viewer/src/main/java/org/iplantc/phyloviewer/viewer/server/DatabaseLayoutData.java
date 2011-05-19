@@ -24,7 +24,7 @@ public class DatabaseLayoutData implements ILayoutData {
 		this.pool = pool;
 	}
 	
-	public LayoutResponse getLayout(INode node) throws Exception {
+	public LayoutResponse getLayout(INode node) {
 		LayoutResponse response = new LayoutResponse();
 		
 		response.nodeID = node.getId();

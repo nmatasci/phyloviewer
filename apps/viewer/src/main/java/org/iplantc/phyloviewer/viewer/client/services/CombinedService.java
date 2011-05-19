@@ -11,8 +11,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("nodeLayout")
 public interface CombinedService extends RemoteService
 {	
-	CombinedResponse getChildrenAndLayout(int parentID) throws Exception;
-	CombinedResponse[] getChildrenAndLayout(int[] parentIDs) throws Exception;
+	CombinedResponse getChildrenAndLayout(int parentID);
+	CombinedResponse[] getChildrenAndLayout(int[] parentIDs);
 	
 	public class CombinedResponse implements IsSerializable
 	{
@@ -25,8 +25,9 @@ public interface CombinedService extends RemoteService
 	 * @param id
 	 * @return the tree with the given ID. On the client, the tree will only have a root node and the
 	 *         rest must be fetched using RemoteNode.getChildrenAsync()
+	 * @throws TreeNotAvailableException 
 	 */
-	NodeResponse getRootNode(int treeId) throws Exception;
+	NodeResponse getRootNode(int treeId) throws TreeNotAvailableException;
 	
 	public class LayoutResponse implements IsSerializable {
 		public int nodeID;
