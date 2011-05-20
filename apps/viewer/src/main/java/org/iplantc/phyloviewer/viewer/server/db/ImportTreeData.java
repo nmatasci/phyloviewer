@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.sql.DataSource;
@@ -29,11 +31,12 @@ import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
+import org.iplantc.phyloviewer.viewer.client.model.PhyloparserTreeAdapter;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 
 public class ImportTreeData implements IImportTreeData {
-	static final ExecutorService executor = Executors.newCachedThreadPool();
+	static final ExecutorService executor = Executors.newSingleThreadExecutor();
 	private DataSource pool;
 	private String imageDirectory;
 
@@ -44,15 +47,21 @@ public class ImportTreeData implements IImportTreeData {
 		new File(imageDirectory).mkdir();
 	}
 	
-	public static RemoteNode rootNodeFromNewick(String newick, String name) {
+	public static RemoteNode rootNodeFromNewick(String newick, String name) throws ParserException {
+		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name);
+		
+		int depth = 0;
+		int nextTraversalIndex = 1; //starts with 1 to avoid ambiguity, because JDBC ResultSet.getInt() returns 0 for null values 
+		return convertDataModels(tree.getRoot(), depth, nextTraversalIndex);
+	}
+	
+	public static org.iplantc.phyloparser.model.Tree treeFromNewick(String newick, String name) throws ParserException
+	{
 		org.iplantc.phyloparser.parser.NewickParser parser = new org.iplantc.phyloparser.parser.NewickParser();
 		FileData data = null;
 		try {
 			data = parser.parse(newick);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -67,9 +76,7 @@ public class ImportTreeData implements IImportTreeData {
 			}
 		}
 		
-		int depth = 0;
-		int nextTraversalIndex = 1; //starts with 1 to avoid ambiguity, because JDBC ResultSet.getInt() returns 0 for null values 
-		return convertDataModels(tree.getRoot(), depth, nextTraversalIndex);
+		return tree;
 	}
 	
 	private static BufferedImage renderTreeImage(Tree tree, ILayoutData layout,
@@ -92,57 +99,149 @@ public class ImportTreeData implements IImportTreeData {
 		return graphics.getImage();
 	}
 	
-	public int importTreeData(RemoteNode root, String name) throws Exception {
-		Connection connection = null;
+	public int importTreeData(RemoteNode root, String name) throws SQLException
+	{
+		final Connection connection;
 		final Tree tree = new Tree();
 		tree.setRootNode(root);
+		final Future<Void> futureAddTree;
+		
+		/* The tree and all associated data will be added in a two transactions: 
+		 * First the tree and root node records, so that the tree service can 
+		 * check whether the import has been started for a given tree request,
+		 * then the rest of the tree and layout.
+		 */
 
 		try
 		{
 			connection = pool.getConnection();
-			final Connection conn = connection; //for the Callable
-			
-			/* The tree and all associated data will be added in a two transactions: 
-			 * First the tree and root node records, so that the tree service can 
-			 * check whether the import has been started for a given tree request,
-			 * then the rest of the tree and layout.
-			 */
+		}
+		catch(SQLException e)
+		{
+			throw(e);
+		}
+
+		try
+		{
 			connection.setAutoCommit(false);
-			ImportTree importer = new ImportTree(connection);
-			final Future<Void> futureAddTree = importer.addTreeAsync(tree, name);
-			conn.commit();
+			ImportRemoteNodeTree importer = new ImportRemoteNodeTree(connection, executor);
+			futureAddTree = importer.addTreeAsync(tree, name);
+			connection.commit();
+		}
+		catch(SQLException e)
+		{
+			ConnectionUtil.rollback(connection);
+			ConnectionUtil.close(connection);
 			
-			Callable<Void> doImportLayout = new Callable<Void>() 
+			throw(e);
+		}
+			
+		Callable<Void> doImportLayout = new Callable<Void>() 
+		{
+			@Override
+			public Void call() throws SQLException, ExecutionException, InterruptedException
 			{
-				@Override
-				public Void call() throws SQLException, ExecutionException, InterruptedException
+				try
 				{
 					futureAddTree.get(); //wait for addTreeAsync thread to finish
-					importLayout(conn, tree);
-					conn.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + tree.getId());
-					conn.commit();
-					ConnectionUtil.close(conn);
-					return null;
+					importLayout(connection, tree);
+					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + tree.getId());
+					connection.commit();
 				}
-			};	
-			
-			executor.submit(doImportLayout);
-		}
-		catch(Exception e)
-		{
-			if (connection != null) {
-				//rolls back entire tree transaction on exception anywhere in the tree
-				ConnectionUtil.rollback(connection);
-				ConnectionUtil.close(connection);
+				catch(SQLException e)
+				{
+					ConnectionUtil.rollback(connection);
+					deleteTree(tree.getId());
+					
+					throw(e);
+				}
+				finally
+				{
+					ConnectionUtil.close(connection);
+				}
 				
-				//also delete the tree and root node records, which were already committed.  
-				deleteTree(tree);
-				
-				throw(e);
+				return null;
 			}
+		};	
+			
+		executor.submit(doImportLayout);
+
+		return tree.getId();
+	}
+	
+	public int importTreeData(final org.iplantc.phyloparser.model.Tree tree, String name) throws SQLException
+	{
+		final Connection connection;
+		final Future<Void> futureAddTree;
+		final PhyloparserTreeAdapter adaptedTree = new PhyloparserTreeAdapter(tree);
+
+		/* The tree and all associated data will be added in a two transactions: 
+		 * First the tree and root node records, so that the tree service can 
+		 * check whether the import has been started for a given tree request,
+		 * then the rest of the tree and layout.
+		 */
+		
+		try
+		{
+			connection = pool.getConnection();
+		}
+		catch(SQLException e)
+		{
+			throw(e);
 		}
 		
-		return tree.getId();
+		try
+		{
+			connection.setAutoCommit(false);
+			ImportNodeTree importer = new ImportNodeTree(connection, executor);
+			futureAddTree = importer.addTreeAsync(adaptedTree, name);
+			connection.commit();
+		}
+		catch(SQLException e)
+		{
+			ConnectionUtil.rollback(connection);
+			ConnectionUtil.close(connection);
+			
+			throw(e);
+		}
+		 
+		Runnable doImportLayout = new Runnable() 
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					futureAddTree.get(); //wait for addTreeAsync thread to finish
+				}
+				catch(Exception e)
+				{
+					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportPhyloparserTree.addTreeAsync()", e);
+				}
+				
+				try
+				{
+					importLayout(connection, adaptedTree);
+					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + adaptedTree.getId());
+					connection.commit();
+				}
+				catch(SQLException e)
+				{
+					ConnectionUtil.rollback(connection);
+					deleteTree(adaptedTree.getId());
+					
+					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importLayout()", e);
+				}
+				finally
+				{
+					ConnectionUtil.close(connection);
+				}
+			}
+		};	
+			
+		executor.submit(doImportLayout);
+
+		return adaptedTree.getId();
 	}
 
 	private void importLayout(Connection connection, Tree tree) throws SQLException {
@@ -244,21 +343,21 @@ public class ImportTreeData implements IImportTreeData {
 	}
 
 	@Override
-	public int importFromNewick(String newick, String name) throws Exception
+	public int importFromNewick(String newick, String name) throws ParserException, SQLException
 	{
-		RemoteNode root = rootNodeFromNewick(newick, name);
-		return this.importTreeData(root, name);
+		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name);
+		return this.importTreeData(tree, name);
 	}
-	
+
 	/** Deletes the given tree from the database */
-	private void deleteTree(Tree tree)
+	private void deleteTree(int treeId)
 	{
 		Connection connection = null;
 
 		try
 		{
 			connection = pool.getConnection();
-			connection.createStatement().execute("delete from node using topology where node.node_id = topology.node_id and topology.tree_id = " + tree.getId()); //node deletes cascade to related tables
+			connection.createStatement().execute("delete from node using topology where node.node_id = topology.node_id and topology.tree_id = " + treeId); //node deletes cascade to related tables
 		}
 		catch(SQLException e)
 		{

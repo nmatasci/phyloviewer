@@ -1,6 +1,9 @@
 package org.iplantc.phyloviewer.server;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,12 +21,13 @@ import java.util.zip.GZIPInputStream;
 
 import javax.sql.DataSource;
 
+import org.iplantc.phyloparser.exception.ParserException;
+import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
-import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.server.DatabaseTreeData;
 import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
-import org.iplantc.phyloviewer.viewer.server.db.ImportTree;
+import org.iplantc.phyloviewer.viewer.server.db.ImportRemoteNodeTree;
 import org.iplantc.phyloviewer.viewer.server.db.ImportTreeData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -64,8 +68,12 @@ public class TestDatabaseTreeData
 			tree.setRootNode(parent);
 			
 			Connection conn2 = pool.getConnection();
-			ImportTree it = new ImportTree(conn2);
+			ImportRemoteNodeTree it = new ImportRemoteNodeTree(conn2);
 			it.addTree(tree,"");
+			
+			//manually mark the tree as import_complete, since this is not being done through ImportTreeData
+			conn2.createStatement().execute("update tree set import_complete = TRUE");
+			
 			it.close();
 			conn2.close();
 		}
@@ -174,7 +182,8 @@ public class TestDatabaseTreeData
 		}
 	}
 	
-	private Tree loadBenchmarkTree() throws FileNotFoundException, IOException, SQLException {
+	@SuppressWarnings("unused")
+	private Tree loadBenchmarkTree() throws FileNotFoundException, IOException, SQLException, ParserException {
 		File file = new File("./src/test/resources/data/ncbi-taxonomy.nwk.gz");
 		BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
 		StringBuffer newick = new StringBuffer();
@@ -192,7 +201,7 @@ public class TestDatabaseTreeData
 		
 		Connection conn = pool.getConnection();
 		conn.setAutoCommit(false);
-		ImportTree it = new ImportTree(conn);
+		ImportRemoteNodeTree it = new ImportRemoteNodeTree(conn);
 		it.addTree(tree, "ncbi");
 		conn.commit();
 		it.close();

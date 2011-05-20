@@ -28,6 +28,7 @@ public class DatabaseTreeData implements ITreeData
 
 	public DatabaseTreeData(DataSource pool) {
 		this.pool = pool;
+		//TODO create all of the PreparedStatements once, here.  And then check the SUBTREE_QUERY_THRESHOLD again.
 	}
 	
 	@Override
