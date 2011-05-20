@@ -109,7 +109,6 @@ public class ImportTree {
 					}
 					
 					addChildStmt.executeBatch();
-					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + treeId);
 				}
 				catch(SQLException e)
 				{
@@ -173,7 +172,6 @@ public class ImportTree {
 			}
 			
 			addChildStmt.executeBatch();
-			connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + treeId);
 		}
 		catch(SQLException e)
 		{

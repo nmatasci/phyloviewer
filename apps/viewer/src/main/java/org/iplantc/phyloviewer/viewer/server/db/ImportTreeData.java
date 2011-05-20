@@ -119,6 +119,7 @@ public class ImportTreeData implements IImportTreeData {
 				{
 					futureAddTree.get(); //wait for addTreeAsync thread to finish
 					importLayout(conn, tree);
+					conn.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + tree.getId());
 					conn.commit();
 					ConnectionUtil.close(conn);
 					return null;
