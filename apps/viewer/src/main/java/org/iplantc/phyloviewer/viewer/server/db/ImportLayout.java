@@ -33,6 +33,7 @@ public class ImportLayout {
 	public void addLayout(String layoutID, ILayoutData layout, ITree tree) throws SQLException {
 		addNodeLayoutStmt.setString(3, layoutID);
 		this.addNode(layout,tree.getId(),tree.getRootNode());
+		addNodeLayoutStmt.executeBatch();
 	}
 	
 	private void addNode(ILayoutData layout, int treeId, INode node) throws SQLException {
@@ -62,7 +63,7 @@ public class ImportLayout {
 		
 		addNodeLayoutStmt.setString(5,"SRID=-1;" + polygon.toString());
 		
-		addNodeLayoutStmt.executeUpdate();
+		addNodeLayoutStmt.addBatch();
 		
 		for(int i=0; i<node.getNumberOfChildren(); ++i) {
 			addNode(layout,treeId,node.getChild(i));
