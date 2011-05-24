@@ -8,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -99,7 +97,7 @@ public class ImportTreeData implements IImportTreeData {
 		return graphics.getImage();
 	}
 	
-	public int importTreeData(RemoteNode root, String name) throws SQLException
+	public int importTreeData(RemoteNode root, final String name) throws SQLException
 	{
 		final Connection connection;
 		final Tree tree = new Tree();
@@ -118,6 +116,7 @@ public class ImportTreeData implements IImportTreeData {
 		}
 		catch(SQLException e)
 		{
+			Logger.getLogger("").log(Level.SEVERE, "Unable to open database connection.", e);
 			throw(e);
 		}
 
@@ -136,10 +135,10 @@ public class ImportTreeData implements IImportTreeData {
 			throw(e);
 		}
 			
-		Callable<Void> doImportLayout = new Callable<Void>() 
+		Runnable doImportLayout = new Runnable() 
 		{
 			@Override
-			public Void call() throws SQLException, ExecutionException, InterruptedException
+			public void run()
 			{
 				try
 				{
@@ -147,20 +146,19 @@ public class ImportTreeData implements IImportTreeData {
 					importLayout(connection, tree);
 					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + tree.getId());
 					connection.commit();
+					Logger.getLogger("").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + tree.getId());
 				}
-				catch(SQLException e)
+				catch(Exception e)
 				{
 					ConnectionUtil.rollback(connection);
 					deleteTree(tree.getId());
 					
-					throw(e);
+					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
 				}
 				finally
 				{
 					ConnectionUtil.close(connection);
 				}
-				
-				return null;
 			}
 		};	
 			
@@ -169,7 +167,7 @@ public class ImportTreeData implements IImportTreeData {
 		return tree.getId();
 	}
 	
-	public int importTreeData(final org.iplantc.phyloparser.model.Tree tree, String name) throws SQLException
+	public int importTreeData(org.iplantc.phyloparser.model.Tree tree, final String name) throws SQLException
 	{
 		final Connection connection;
 		final Future<Void> futureAddTree;
@@ -187,6 +185,7 @@ public class ImportTreeData implements IImportTreeData {
 		}
 		catch(SQLException e)
 		{
+			Logger.getLogger("").log(Level.SEVERE, "Unable to open database connection.", e);
 			throw(e);
 		}
 		
@@ -213,24 +212,17 @@ public class ImportTreeData implements IImportTreeData {
 				try
 				{
 					futureAddTree.get(); //wait for addTreeAsync thread to finish
-				}
-				catch(Exception e)
-				{
-					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportPhyloparserTree.addTreeAsync()", e);
-				}
-				
-				try
-				{
 					importLayout(connection, adaptedTree);
 					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + adaptedTree.getId());
 					connection.commit();
+					Logger.getLogger("").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + adaptedTree.getId());
 				}
-				catch(SQLException e)
+				catch(Exception e)
 				{
 					ConnectionUtil.rollback(connection);
 					deleteTree(adaptedTree.getId());
 					
-					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importLayout()", e);
+					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
 				}
 				finally
 				{
@@ -262,6 +254,7 @@ public class ImportTreeData implements IImportTreeData {
 		}
 		catch(SQLException e)
 		{
+			Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importLayout()", e);
 			throw e;
 		}
 		finally
@@ -345,7 +338,12 @@ public class ImportTreeData implements IImportTreeData {
 	@Override
 	public int importFromNewick(String newick, String name) throws ParserException, SQLException
 	{
-		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name);
+		/*
+		 * TODO treeFromNewick is taking about 2.5 seconds for the ncbi tree, and the parseTree call
+		 * doesn't return until it's done. Move the parse to after a dummy tree/root insert? Would need
+		 * to go back and update the root node label when the real import happens.
+		 */
+		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name); 
 		return this.importTreeData(tree, name);
 	}
 
