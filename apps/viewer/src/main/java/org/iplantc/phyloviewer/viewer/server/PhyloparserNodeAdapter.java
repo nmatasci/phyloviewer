@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.client.model;
+package org.iplantc.phyloviewer.viewer.server;
 
 import java.util.Comparator;
 import java.util.Set;

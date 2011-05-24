@@ -29,9 +29,9 @@ import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
-import org.iplantc.phyloviewer.viewer.client.model.PhyloparserTreeAdapter;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
+import org.iplantc.phyloviewer.viewer.server.PhyloparserTreeAdapter;
 
 public class ImportTreeData implements IImportTreeData {
 	static final ExecutorService executor = Executors.newSingleThreadExecutor();

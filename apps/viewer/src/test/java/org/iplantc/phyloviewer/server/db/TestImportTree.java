@@ -14,7 +14,7 @@ import org.iplantc.phyloparser.model.FileData;
 import org.iplantc.phyloparser.model.block.Block;
 import org.iplantc.phyloparser.model.block.TreesBlock;
 import org.iplantc.phyloviewer.shared.model.Tree;
-import org.iplantc.phyloviewer.viewer.client.model.PhyloparserTreeAdapter;
+import org.iplantc.phyloviewer.viewer.server.PhyloparserTreeAdapter;
 import org.iplantc.phyloviewer.viewer.server.db.ImportNodeTree;
 import org.junit.AfterClass;
 import org.junit.Before;
