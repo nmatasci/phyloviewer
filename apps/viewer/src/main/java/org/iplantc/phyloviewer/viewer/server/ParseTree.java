@@ -91,10 +91,17 @@ public class ParseTree extends HttpServlet {
 	
 	private String getViewURL(int id, HttpServletRequest request)
 	{
-		String viewURL =  request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-		if (request.getContextPath().length() > 0) {
-			viewURL += "/" + request.getContextPath();
+		String viewURL =  request.getScheme() + "://" + request.getServerName();
+		
+		if (request.getServerPort() != 80)
+		{
+			viewURL += ":" + request.getServerPort();
 		}
+		
+//		if (request.getContextPath().length() > 0) {
+//			viewURL += request.getContextPath();
+//		}
+		
 		viewURL += "/view/treeId/" + id;
 		
 		return viewURL;
