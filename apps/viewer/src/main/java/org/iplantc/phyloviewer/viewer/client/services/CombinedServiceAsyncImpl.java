@@ -83,8 +83,6 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 				parentIDs[i] = parentList.get(i);
 			}
 			
-			// Is this logging needed?
-			//Logger.getLogger("").log(Level.INFO, "Making a combined request for the children and layouts of " + parentIDs.length + " parent nodes");
 			service.getChildrenAndLayout(parentIDs, new AsyncCallback<CombinedResponse[]>()
 			{
 

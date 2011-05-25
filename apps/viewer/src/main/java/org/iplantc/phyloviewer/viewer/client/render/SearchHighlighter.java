@@ -71,8 +71,6 @@ public class SearchHighlighter implements SearchResultListener, NodeListener
 			highlightSubtree((RemoteNode)tree.getRootNode());
 		}
 
-		Logger.getLogger("").log(Level.INFO, "Rendering: new set of search results were highlighted");
-
 		if(view != null)
 		{
 			view.requestRender();
@@ -90,8 +88,6 @@ public class SearchHighlighter implements SearchResultListener, NodeListener
 				highlightSubtree(child);
 			}
 
-			Logger.getLogger("").log(Level.INFO,
-					"Rendering: new nodes were fetched and highlighting was updated");
 			view.requestRender();
 		}
 	}

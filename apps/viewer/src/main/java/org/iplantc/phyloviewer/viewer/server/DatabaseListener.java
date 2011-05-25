@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.viewer.server;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -14,6 +17,7 @@ public class DatabaseListener implements ServletContextListener
 	@Override
 	public void contextInitialized(ServletContextEvent contextEvent)
 	{
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "contextInitialized: Getting database connection pool");
 		ServletContext servletContext = contextEvent.getServletContext();
 		
 		String server = servletContext.getInitParameter("db.server");
@@ -46,6 +50,7 @@ public class DatabaseListener implements ServletContextListener
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0)
 	{
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "contextDestroyed: Closing database connection pool");
 		pool.close();
 	}
 }

@@ -34,7 +34,7 @@ import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 import org.iplantc.phyloviewer.viewer.server.PhyloparserTreeAdapter;
 
 public class ImportTreeData implements IImportTreeData {
-	static final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private ExecutorService executor;
 	private DataSource pool;
 	private String imageDirectory;
 
@@ -43,6 +43,8 @@ public class ImportTreeData implements IImportTreeData {
 		this.imageDirectory = imageDirectory;
 		
 		new File(imageDirectory).mkdir();
+		
+		executor = Executors.newSingleThreadExecutor();
 	}
 	
 	public static RemoteNode rootNodeFromNewick(String newick, String name) throws ParserException {
@@ -55,6 +57,7 @@ public class ImportTreeData implements IImportTreeData {
 	
 	public static org.iplantc.phyloparser.model.Tree treeFromNewick(String newick, String name) throws ParserException
 	{
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Parsing newick string");
 		org.iplantc.phyloparser.parser.NewickParser parser = new org.iplantc.phyloparser.parser.NewickParser();
 		FileData data = null;
 		try {
@@ -116,7 +119,7 @@ public class ImportTreeData implements IImportTreeData {
 		}
 		catch(SQLException e)
 		{
-			Logger.getLogger("").log(Level.SEVERE, "Unable to open database connection.", e);
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to open database connection.", e);
 			throw(e);
 		}
 
@@ -146,14 +149,14 @@ public class ImportTreeData implements IImportTreeData {
 					importLayout(connection, tree);
 					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + tree.getId());
 					connection.commit();
-					Logger.getLogger("").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + tree.getId());
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + tree.getId());
 				}
 				catch(Exception e)
 				{
 					ConnectionUtil.rollback(connection);
 					deleteTree(tree.getId());
 					
-					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
 				}
 				finally
 				{
@@ -185,7 +188,7 @@ public class ImportTreeData implements IImportTreeData {
 		}
 		catch(SQLException e)
 		{
-			Logger.getLogger("").log(Level.SEVERE, "Unable to open database connection.", e);
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to open database connection.", e);
 			throw(e);
 		}
 		
@@ -215,14 +218,14 @@ public class ImportTreeData implements IImportTreeData {
 					importLayout(connection, adaptedTree);
 					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + adaptedTree.getId());
 					connection.commit();
-					Logger.getLogger("").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + adaptedTree.getId());
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + adaptedTree.getId());
 				}
 				catch(Exception e)
 				{
 					ConnectionUtil.rollback(connection);
 					deleteTree(adaptedTree.getId());
 					
-					Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
 				}
 				finally
 				{
@@ -243,18 +246,21 @@ public class ImportTreeData implements IImportTreeData {
 		{
 			layoutImporter = new ImportLayout(connection);
 
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Doing layout");
 			LayoutCladogram cladogramLayout = new LayoutCladogram(0.8,1.0);
 			cladogramLayout.layout(tree);
 
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Writing layout to DB");
 			String uuid = "LAYOUT_TYPE_CLADOGRAM";
 			layoutImporter.addLayout(uuid, cladogramLayout, tree);
 			
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Rendering overview image");
 			BufferedImage image = renderTreeImage(tree,cladogramLayout,256,1024);
 			ImportTreeData.this.putOverviewImage(connection,tree.getId(), uuid, image);
 		}
 		catch(SQLException e)
 		{
-			Logger.getLogger("").log(Level.SEVERE, "Exception in ImportTreeData.importLayout()", e);
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Exception in ImportTreeData.importLayout()", e);
 			throw e;
 		}
 		finally

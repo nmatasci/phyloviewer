@@ -6,6 +6,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Tree;
@@ -28,6 +30,7 @@ public abstract class ImportTree<N extends INode>
 
 	public Future<Void> addTreeAsync(final Tree tree, final String name) throws SQLException
 	{	
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Adding tree and root node to database");
 		//do the minimum necessary to set the tree ID
 		initTree(tree, name);
 		
@@ -39,6 +42,7 @@ public abstract class ImportTree<N extends INode>
 			{
 				try
 				{
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Adding remaining nodes and topology to database");
 					addSubtree((N) tree.getRootNode(), null);
 					
 					treeWriter.executeTopologyBatch();

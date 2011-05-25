@@ -7,6 +7,8 @@
 package org.iplantc.phyloviewer.viewer.server;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ public class ParseTree extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	{
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Received tree post request");
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		String newick = null;
 		String name = request.getParameter("name");
@@ -49,6 +52,7 @@ public class ParseTree extends HttpServlet {
 			{
 				int id = loadNewickString(newick, name);
 
+				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Returning response");
 				String viewURL = getViewURL(id, request);
 				response.setStatus(HttpServletResponse.SC_CREATED);
 				response.setHeader("Location", viewURL);
@@ -61,6 +65,7 @@ public class ParseTree extends HttpServlet {
 	}
 	
 	private int loadNewickString(String newick, String name ) throws Exception {
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
 		IImportTreeData importer = (IImportTreeData) this.getServletContext().getAttribute(Constants.IMPORT_TREE_DATA_KEY);
 		
 		if(importer != null) {
