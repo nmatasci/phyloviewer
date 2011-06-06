@@ -1,8 +1,8 @@
 package org.iplantc.phyloviewer.viewer.client.services;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class TreeNotAvailableException extends Exception implements Serializable
+public class TreeNotAvailableException extends Exception implements IsSerializable
 {
 	private static final long serialVersionUID = -2930713523317228373L;
 	private int treeId;
