@@ -13,6 +13,10 @@ public class BranchStyle implements IBranchStyle, IsSerializable
 		this.strokeWidth = strokeWidth;
 	}
 
+	public BranchStyle()
+	{
+	}
+
 	@Override
 	public String getStrokeColor()
 	{

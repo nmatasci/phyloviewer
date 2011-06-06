@@ -15,6 +15,10 @@ public class GlyphStyle implements IGlyphStyle, IsSerializable
 		this.strokeWidth = strokeWidth;
 	}
 
+	public GlyphStyle()
+	{
+	}
+
 	@Override
 	public String getFillColor()
 	{
