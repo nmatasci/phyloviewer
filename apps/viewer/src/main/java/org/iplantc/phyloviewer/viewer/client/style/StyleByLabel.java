@@ -17,6 +17,7 @@ import org.iplantc.phyloviewer.shared.render.style.ILabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.INodeStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
+import org.iplantc.phyloviewer.shared.render.style.Style;
 
 /**
  * Stores node styles indexed by label
@@ -170,7 +171,7 @@ public class StyleByLabel implements IStyleMap
 		IStyle style = map.get(label);
 		if (style == null)
 		{
-			style = new CompositeStyle(label, Defaults.DEFAULT_STYLE);
+			style = new Style(label);
 			map.put(label, style);
 		}
 		
