@@ -262,6 +262,8 @@ public class CanvasGraphics extends Graphics
 	@Override
 	public void setStyle(IBranchStyle style)
 	{
+		resetBranchStyle();
+		
 		try
 		{
 			if(style != null)
@@ -279,14 +281,15 @@ public class CanvasGraphics extends Graphics
 		}
 		catch(Exception e)
 		{
-			canvas.setStrokeStyle(Defaults.LINE_COLOR);
-			canvas.setLineWidth(1.0);
+			resetBranchStyle();
 		}
 	}
 
 	@Override
 	public void setStyle(IGlyphStyle style)
 	{
+		resetGlyphStyle();
+		
 		try
 		{
 			if(style != null)
@@ -309,15 +312,15 @@ public class CanvasGraphics extends Graphics
 		}
 		catch(Exception e)
 		{
-			canvas.setFillStyle(Defaults.TRIANGLE_FILL_COLOR);
-			canvas.setStrokeStyle(Defaults.TRIANGLE_OUTLINE_COLOR);
-			canvas.setLineWidth(1.0);
+			resetGlyphStyle();
 		}
 	}
 
 	@Override
 	public void setStyle(ILabelStyle style)
 	{
+		resetLabelStyle();
+		
 		try
 		{
 			if(style != null)
@@ -330,13 +333,15 @@ public class CanvasGraphics extends Graphics
 		}
 		catch(Exception e)
 		{
-			canvas.setFillStyle(Defaults.TEXT_COLOR);
+			resetLabelStyle();
 		}
 	}
 
 	@Override
 	public void setStyle(INodeStyle style)
 	{
+		resetNodeStyle();
+		
 		try
 		{
 			if(style != null)
@@ -355,9 +360,32 @@ public class CanvasGraphics extends Graphics
 		}
 		catch(Exception e)
 		{
-			canvas.setFillStyle(Defaults.LINE_COLOR);
-			canvas.setStrokeStyle(Defaults.LINE_COLOR);
-			canvas.setLineWidth(1.0);
+			resetNodeStyle();
 		}
+	}
+	
+	private void resetBranchStyle()
+	{
+		canvas.setStrokeStyle(Defaults.LINE_COLOR);
+		canvas.setLineWidth(1.0);
+	}
+	
+	private void resetGlyphStyle()
+	{
+		canvas.setFillStyle(Defaults.TRIANGLE_FILL_COLOR);
+		canvas.setStrokeStyle(Defaults.TRIANGLE_OUTLINE_COLOR);
+		canvas.setLineWidth(1.0);
+	}
+	
+	private void resetLabelStyle()
+	{
+		canvas.setFillStyle(Defaults.TEXT_COLOR);
+	}
+	
+	private void resetNodeStyle()
+	{
+		canvas.setFillStyle(Defaults.LINE_COLOR);
+		canvas.setStrokeStyle(Defaults.LINE_COLOR);
+		canvas.setLineWidth(1.0);
 	}
 }
