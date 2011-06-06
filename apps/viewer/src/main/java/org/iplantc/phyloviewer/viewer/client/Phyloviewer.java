@@ -22,6 +22,7 @@ import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListServiceAsync;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.RemoteNodeSuggestion;
+import org.iplantc.phyloviewer.viewer.client.style.StyleByCSV;
 import org.iplantc.phyloviewer.viewer.client.style.StyleByLabel;
 import org.iplantc.phyloviewer.viewer.client.ui.BranchStyleWidget;
 import org.iplantc.phyloviewer.viewer.client.ui.ColorBox;
@@ -142,8 +143,9 @@ public class Phyloviewer implements EntryPoint
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event)
 			{
-				StyleByLabel styleMap = new StyleByLabel();
-				styleMap.put(event.getValue());
+				String style = event.getValue();
+				
+				StyleByCSV styleMap = new StyleByCSV(style);
 				widget.getView().getDocument().setStyleMap(styleMap);
 				widget.render();
 			}
