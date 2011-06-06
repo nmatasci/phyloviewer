@@ -1,6 +1,7 @@
 package org.iplantc.phyloviewer.viewer.client.style;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,7 +18,7 @@ import org.iplantc.phyloviewer.shared.render.style.Style;
 public class StyleByCSV extends StyleByLabel
 {
 
-	public StyleByCSV(String csv)
+	public StyleByCSV(String csv) throws ParseException
 	{
 		put(csv);
 	}
@@ -33,8 +34,9 @@ public class StyleByCSV extends StyleByLabel
 	 * 		WIDTH values should be a positive number
 	 * 		any value that contains a comma should be quoted
 	 * </pre>
+	 * @throws ParseException 
 	 */
-	public void put(String csv)
+	public void put(String csv) throws ParseException
 	{
 		if (csv == null || csv.isEmpty())
 		{
@@ -45,17 +47,18 @@ public class StyleByCSV extends StyleByLabel
 		List<String[]> rows = new ArrayList<String[]>();
 		CSVParser parser = new CSVParser();
 		String[] lines = csv.split("\n");
-		
+		int line = 0;
 		try
 		{
-			for (String line : lines)
+			
+			for (; line < lines.length; line++)
 			{
-				rows.add(parser.parseLine(line));
+				rows.add(parser.parseLine(lines[line]));
 			}
 		}
 		catch(IOException e1)
 		{
-			throw new IllegalArgumentException("Unable to parse CSV string.", e1);
+			throw new ParseException("Unable to parse CSV string. Error on line " + line + ".", line);
 		}
 		
 		for (int i = 0; i < rows.size(); i++)
