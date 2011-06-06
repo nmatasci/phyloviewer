@@ -54,7 +54,7 @@ public class ParseTree extends HttpServlet {
 
 				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Returning response");
 				String viewURL = getViewURL(id, request);
-				response.setStatus(HttpServletResponse.SC_CREATED);
+				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setHeader("Location", viewURL);
 			}
 			catch(Exception e)
