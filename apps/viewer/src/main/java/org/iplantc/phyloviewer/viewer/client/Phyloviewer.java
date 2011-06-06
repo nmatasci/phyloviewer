@@ -12,6 +12,7 @@ import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.style.BranchStyle;
 import org.iplantc.phyloviewer.shared.render.style.CompositeStyle;
 import org.iplantc.phyloviewer.shared.render.style.GlyphStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.LabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.NodeStyle;
 import org.iplantc.phyloviewer.viewer.client.TreeWidget.ViewType;
@@ -22,7 +23,8 @@ import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListServiceAsync;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.RemoteNodeSuggestion;
-import org.iplantc.phyloviewer.viewer.client.style.StyleByLabel;
+import org.iplantc.phyloviewer.viewer.client.style.StyleMapFactory;
+import org.iplantc.phyloviewer.viewer.client.style.StyleMapFactory.StyleParseException;
 import org.iplantc.phyloviewer.viewer.client.ui.BranchStyleWidget;
 import org.iplantc.phyloviewer.viewer.client.ui.ColorBox;
 import org.iplantc.phyloviewer.viewer.client.ui.ContextMenu;
@@ -142,16 +144,24 @@ public class Phyloviewer implements EntryPoint
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event)
 			{
-				StyleByLabel styleMap = new StyleByLabel();
-				styleMap.put(event.getValue());
-				widget.getView().getDocument().setStyleMap(styleMap);
-				widget.render();
+				String style = event.getValue();
+				
+				try
+				{
+					IStyleMap styleMap = StyleMapFactory.createStyleMap(style);
+					widget.getView().getDocument().setStyleMap(styleMap);
+					widget.render();
+				}
+				catch(StyleParseException e)
+				{
+					//TODO show the user an error message
+				}
 			}
 		});
 
 		styleTextPopup.setModal(true);
 
-		styleMenu.addItem("Style by CSV", new Command()
+		styleMenu.addItem("Import Tree Styling", new Command()
 		{
 			@Override
 			public void execute()

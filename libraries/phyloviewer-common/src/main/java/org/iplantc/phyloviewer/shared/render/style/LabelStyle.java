@@ -11,6 +11,10 @@ public class LabelStyle implements ILabelStyle, IsSerializable
 		this.color = color;
 	}
 
+	public LabelStyle()
+	{
+	}
+
 	@Override
 	public String getColor()
 	{

@@ -14,6 +14,10 @@ public class NodeStyle implements INodeStyle, IsSerializable
 		this.pointSize = pointSize;
 	}
 
+	public NodeStyle()
+	{
+	}
+
 	@Override
 	public String getColor()
 	{

@@ -17,27 +17,29 @@ public class JsStyleMap extends JavaScriptObject implements IStyleMap
 	{
 		if(node != null)
 		{
-			return getStyleById(node.getId());
-		}
-		return null;
-	}
+			String styleId = this.getStyleIdForNodeId(node.getId());
+			if (styleId == null) {
+				styleId = this.getStyleIdForNodeLabel(node.getLabel());
+			}
 
-	private final IStyle getStyleById(int nodeId)
-	{
-		String styleId = this.getStyleIdForNode(nodeId);
-		if(styleId != null)
-		{
 			return this.getStyleNative(styleId);
 		}
-
 		return null;
 	}
 
-	private final native String getStyleIdForNode(int nodeId) /*-{
+	private final native String getStyleIdForNodeId(int nodeId) /*-{
 		if(this.nodeStyleMappings != null) {
 			return this.nodeStyleMappings[nodeId];
 		}
 		
+		return null;
+	}-*/;
+	
+	private final native String getStyleIdForNodeLabel(String nodeLabel) /*-{
+		if(this.nameStyleMappings != null) {
+			return this.nameStyleMappings[nodeLabel];
+		}
+	
 		return null;
 	}-*/;
 
@@ -58,4 +60,5 @@ public class JsStyleMap extends JavaScriptObject implements IStyleMap
 	
 		return false;
 	}-*/;
+
 }
