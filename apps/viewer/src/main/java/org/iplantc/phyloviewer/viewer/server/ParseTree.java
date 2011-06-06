@@ -7,6 +7,7 @@
 package org.iplantc.phyloviewer.viewer.server;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +57,10 @@ public class ParseTree extends HttpServlet {
 				String viewURL = getViewURL(id, request);
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setHeader("Location", viewURL);
+				
+				PrintWriter writer = response.getWriter();
+				writer.print(viewURL);
+				writer.flush();
 			}
 			catch(Exception e)
 			{
