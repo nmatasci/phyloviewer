@@ -22,7 +22,10 @@ public class JsStyleMap extends JavaScriptObject implements IStyleMap
 				styleId = this.getStyleIdForNodeLabel(node.getLabel());
 			}
 
-			return this.getStyleNative(styleId);
+			if (styleId != null)
+			{
+				return this.getStyleNative(styleId);
+			}
 		}
 		return null;
 	}
