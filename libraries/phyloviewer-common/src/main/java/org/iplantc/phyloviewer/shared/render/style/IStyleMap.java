@@ -8,4 +8,5 @@ public interface IStyleMap
 	public void put(INode node, IStyle style);
 	
 	public boolean hasBranchDecoration(int nodeId);
+	public String getBranchLabel(INode node);
 }

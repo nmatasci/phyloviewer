@@ -12,6 +12,7 @@ import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 public class StyleByLabel implements IStyleMap
 {
 	protected HashMap<String, IStyle> map = new HashMap<String,IStyle>();
+	private HashMap<String, String> branchLabels = new HashMap<String, String>(); 
 
 	@Override
 	public IStyle get(INode node)
@@ -35,5 +36,16 @@ public class StyleByLabel implements IStyleMap
 	{
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public String getBranchLabel(INode node)
+	{
+		return branchLabels.get(node.getLabel());
+	}
+	
+	public void setBranchLabel(INode node, String label)
+	{
+		branchLabels.put(node.getLabel(), label);
 	}
 }

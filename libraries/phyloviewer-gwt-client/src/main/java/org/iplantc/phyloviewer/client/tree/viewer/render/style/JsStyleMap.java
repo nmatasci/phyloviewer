@@ -64,4 +64,17 @@ public class JsStyleMap extends JavaScriptObject implements IStyleMap
 		return false;
 	}-*/;
 
+	@Override 
+	public final String getBranchLabel(INode node)
+	{
+		return getBranchLabel(node.getId());
+	}
+	
+	public final native String getBranchLabel(int nodeId) /*-{
+		if(this.branchLabels != null) {
+			return this.branchLabels[nodeId];
+		}
+	
+		return null;
+	}-*/;
 }

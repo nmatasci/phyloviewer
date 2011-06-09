@@ -11,6 +11,7 @@ public class StyleById implements IStyleMap
 	private HashMap<String,IStyle> map = new HashMap<String,IStyle>();
 	private HashMap<Integer,String> nodeStyleMappings = new HashMap<Integer,String>(); 
 	private Set<Integer> decoratedBranches = new HashSet<Integer>();
+	private HashMap<Integer, String> branchLabels = new HashMap<Integer, String>(); 
 	
 	@Override
 	public IStyle get(INode node)
@@ -61,5 +62,16 @@ public class StyleById implements IStyleMap
 		{
 			decoratedBranches.remove(nodeId);
 		}
+	}
+
+	@Override
+	public String getBranchLabel(INode node)
+	{
+		return branchLabels.get(node.getId());
+	}
+	
+	public void setBranchLabel(INode node, String label)
+	{
+		branchLabels.put(node.getId(), label);
 	}
 }
