@@ -1,12 +1,14 @@
 package org.iplantc.phyloviewer.shared.scene;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 public class DrawableBuilderCladogram implements IDrawableBuilder
 {
@@ -42,22 +44,65 @@ public class DrawableBuilderCladogram implements IDrawableBuilder
 		ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 		drawables.add(line);
 
-		if(document != null && document.hasBranchDecoration(child.getId()))
-		{
-			double halfBase = 0.015;
-			Vector2 horizontalLine = end.subtract(vertices[1]);
-			double halfLength = horizontalLine.length() / 2.0;
-			Vector2 midPoint = new Vector2(start.getX() + halfLength, end.getY());
-			Vector2 v0 = midPoint.subtract(new Vector2(halfBase, -halfBase));
-			Vector2 v1 = midPoint.add(new Vector2(0.0, -halfBase));
-			Vector2 v2 = midPoint.add(new Vector2(halfBase, halfBase));
-
-			Polygon triangle = Polygon.createTriangle(v0, v1, v2);
-			triangle.setContext(Drawable.Context.CONTEXT_BRANCH);
-			drawables.add(triangle);
-		}
-
+		Collection<Drawable> decorations = buildBranchDecorations(document, child, line);
+		drawables.addAll(decorations);
+		
 		return (Drawable[])drawables.toArray(new Drawable[drawables.size()]);
+	}
+	
+	private Collection<Drawable> buildBranchDecorations(IDocument document, INode child, Line line)
+	{
+		ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+		
+		if(document != null)
+		{
+			String label = null;
+			
+			IStyleMap styleMap = document.getStyleMap();
+			if(styleMap != null)
+			{
+				label = styleMap.getBranchLabel(child);
+			}
+			
+			if (label != null)
+			{
+				Drawable drawableLabel = buildBranchLabel(label, line.vertices[1], line.vertices[2]);
+				drawables.add(drawableLabel);
+			}
+			else if (document.hasBranchDecoration(child.getId()))
+			{
+				Polygon triangle = buildBranchTriangleDecoration(line.vertices[1], line.vertices[2]);
+				drawables.add(triangle);
+			}
+		}
+		
+		return drawables;
+	}
+
+	private Drawable buildBranchLabel(String text, Vector2 middle, Vector2 end)
+	{
+		Vector2 midPoint = decorationLocation(middle, end);
+		Label label = new Label(text, midPoint);
+		label.setContext(Drawable.Context.CONTEXT_BRANCH);
+		return label;
+	}
+
+	private Polygon buildBranchTriangleDecoration(Vector2 middle, Vector2 end)
+	{
+		double halfBase = 0.015;
+		Vector2 midPoint = decorationLocation(middle, end);
+		Vector2 v0 = midPoint.subtract(new Vector2(halfBase, -halfBase));
+		Vector2 v1 = midPoint.add(new Vector2(0.0, -halfBase));
+		Vector2 v2 = midPoint.add(new Vector2(halfBase, halfBase));
+
+		Polygon triangle = Polygon.createTriangle(v0, v1, v2);
+		triangle.setContext(Drawable.Context.CONTEXT_BRANCH);
+		return triangle;
+	}
+	
+	private Vector2 decorationLocation(Vector2 middle, Vector2 end) {
+		Box2D box = new Box2D(middle, end);
+		return box.getCenter();
 	}
 
 	@Override
