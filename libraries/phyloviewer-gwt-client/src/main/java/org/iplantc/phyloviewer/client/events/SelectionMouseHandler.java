@@ -156,8 +156,7 @@ public class SelectionMouseHandler extends BaseMouseHandler implements HasNodeSe
 	{
 		if (box != null)
 		{
-			selectionBox.setMin(box.getMin());
-			selectionBox.setMax(box.getMax());
+			selectionBox.setBoundingBox(box);
 			view.addOverlay(selectionBox);
 		}
 		else

@@ -7,7 +7,7 @@ import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
 public class Polygon extends Drawable
 {
-	Vector2 vertices[];
+	protected Vector2 vertices[];
 
 	public Polygon(Vector2 vertices[])
 	{
@@ -18,6 +18,11 @@ public class Polygon extends Drawable
 			box.expandBy(v);
 		}
 		this.setBoundingBox(box);
+	}
+	
+	protected Polygon(int numVertices) {
+		this.vertices = new Vector2[numVertices];
+		this.setBoundingBox(null);
 	}
 
 	/**

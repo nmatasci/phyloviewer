@@ -5,52 +5,37 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 
 public class Rectangle extends Polygon
 {
-	public Rectangle()
-	{
-		super(new Vector2[] {new Vector2(), new Vector2(), new Vector2(), new Vector2()});
-	}
-	
-	public Rectangle(Vector2 min, Vector2 max)
-	{
-		this();
-		setMin(min);
-		setMax(max);
-	}
 	
 	public Rectangle(Box2D box)
 	{
-		this(box.getMin(), box.getMax());
+		super(4);
+		this.setBoundingBox(box);
 	}
 	
-	public Vector2 getMax()
+	public Rectangle()
 	{
-		return vertices[2];
+		super(4);
 	}
-
-	public Vector2 getMin()
+	
+	@Override
+	public void setBoundingBox(Box2D boundingBox)
 	{
-		return vertices[0];
-	}
-
-	public void setMax(Vector2 max)
-	{
-		//vertices[0] is min
-		vertices[1] = new Vector2(max.getX(), getMin().getY());
-		vertices[2] = max;
-		vertices[3] = new Vector2(getMin().getX(), max.getY());
-	}
-
-	public void setMin(Vector2 min)
-	{
-		vertices[0] = min;
-		vertices[1] = new Vector2(getMax().getX(), min.getY());
-		//vertices[2] is max
-		vertices[3] = new Vector2(min.getX(), getMax().getY());
+		this.boundingBox = boundingBox;
+		
+		if (boundingBox != null)
+		{
+			vertices[0] = boundingBox.getMin();
+			vertices[1] = new Vector2(boundingBox.getMax().getX(), boundingBox.getMin().getY());
+			vertices[2] = boundingBox.getMax();
+			vertices[3] = new Vector2(boundingBox.getMin().getX(), boundingBox.getMax().getY());
+		}
 	}
 
 	@Override
-	public int getDrawableType()
+	public boolean intersect(Vector2 position, double distanceSquared)
 	{
-		return TYPE_POLYGON;
+		Box2D pickBox = new Box2D(position, position);
+		pickBox.expandBy(distanceSquared);
+		return this.boundingBox.intersects(pickBox);
 	}
 }

@@ -86,7 +86,7 @@ public class Box2D implements IsSerializable
 	{
 		if(min == this.max)
 		{
-			// we don't want these to be the same object, or mutators with change both at once
+			// we don't want these to be the same object, or mutators will change both at once
 			min = new Vector2(min.getX(), min.getY());
 		}
 
@@ -102,7 +102,7 @@ public class Box2D implements IsSerializable
 	{
 		if(max == this.min)
 		{
-			// we don't want these to be the same object, or mutators with change both at once
+			// we don't want these to be the same object, or mutators will change both at once
 			max = new Vector2(max.getX(), max.getY());
 		}
 
