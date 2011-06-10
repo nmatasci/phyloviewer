@@ -17,16 +17,12 @@ public class Node implements INode, IsSerializable
 	private Vector<Node> children = null;
 	private Double branchLength;
 	private transient ArrayList<NodeListener> listeners = new ArrayList<NodeListener>();
+	private INode parent;
 
 	public Node(int id, String label)
 	{
 		this.id = id;
 		this.label = label;
-	}
-
-	public Node(Node[] children)
-	{
-		this.setChildren(children);
 	}
 
 	public Node()
@@ -77,6 +73,7 @@ public class Node implements INode, IsSerializable
 		}
 
 		children.add(node);
+		node.setParent(this);
 	}
 
 	@Override
@@ -214,6 +211,7 @@ public class Node implements INode, IsSerializable
 			for(Node node : children)
 			{
 				this.children.add(node);
+				node.setParent(this);
 			}
 			notifyNodeListeners(children);
 		}
@@ -318,5 +316,16 @@ public class Node implements INode, IsSerializable
 		 * reference to do this with any kind of efficiency
 		 */
 		return null;
+	}
+
+	@Override
+	public INode getParent()
+	{
+		return this.parent;
+	}
+	
+	void setParent(INode node)
+	{
+		this.parent = node;
 	}
 }

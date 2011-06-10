@@ -32,6 +32,10 @@ public class JsNode extends JavaScriptObject implements INode
 	public final native void setLabel(String label) /*-{ this.name = label; }-*/;
 
 	private final native <T extends JavaScriptObject> JsArray<T> getNativeChildren() /*-{ return this.children; }-*/;
+	
+	final native void setParent(JsNode parent) /*-{ this.parent = parent; }-*/;
+	
+	public final native JsNode getParent() /*-{ return this.parent }-*/;
 
 	public final int getNumberOfChildren()
 	{
@@ -42,7 +46,14 @@ public class JsNode extends JavaScriptObject implements INode
 
 	public final JsNode getChild(int index)
 	{
-		return (JsNode)this.getNativeChildren().get(index);
+		JsNode child = (JsNode)this.getNativeChildren().get(index);
+		
+		if (child.getParent() == null)
+		{
+			child.setParent(this);
+		}
+		
+		return child;
 	}
 
 	public final INode[] getChildren()

@@ -23,6 +23,8 @@ public interface INode
 	public abstract INode[] getChildren();
 
 	public abstract INode getChild(int index);
+	
+	public abstract INode getParent();
 
 	public abstract Boolean isLeaf();
 
