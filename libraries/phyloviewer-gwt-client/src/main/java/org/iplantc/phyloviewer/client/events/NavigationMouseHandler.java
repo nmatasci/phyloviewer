@@ -1,6 +1,5 @@
 package org.iplantc.phyloviewer.client.events;
 
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,12 +16,9 @@ import com.google.gwt.event.dom.client.MouseWheelEvent;
 
 public class NavigationMouseHandler extends BaseMouseHandler
 {
-	// TODO listen for tree changes on the view and clear nodeHistory and currentNodeShown
+	// TODO listen for tree changes on the view and clear currentNodeShown
 	private final DetailView view;
 
-	private Stack<INode> nodeHistory = new Stack<INode>(); // tried LinkedList here and the compiler
-															// complained that LinkedList.push() and
-															// LinkedList.pop() are undefined...
 	private INode currentNodeShown = null;
 
 	public NavigationMouseHandler(DetailView view)
@@ -97,8 +93,7 @@ public class NavigationMouseHandler extends BaseMouseHandler
 		{
 			//show the clicked node
 			INode node = view.getNodeAt(event.getX(), event.getY());
-			nodeHistory.push(currentNodeShown);
-			
+
 			// Only show if the node is not null.
 			// Otherwise, if the user double clicks on the background, the viewer zooms to the root.
 			// (I don't think that behavior is expected.)
@@ -125,24 +120,21 @@ public class NavigationMouseHandler extends BaseMouseHandler
 		Logger.getLogger("").log(Level.FINEST, "gestureX() " + dx);
 		if(dx > 0)
 		{
-			// TODO pan right one 'step'. Where to? Keep forward history? Go to highest child?
+			// TODO pan right one 'step'. Where to? Go to highest child?
 		}
 		else
 		{
-			INode nodeToShow = null;
-			if(!nodeHistory.isEmpty())
+			if (currentNodeShown != null && currentNodeShown.getParent() != null)
 			{
-				nodeToShow = nodeHistory.pop();
+				show(currentNodeShown.getParent());
 			}
-
-			show(nodeToShow);
 		}
 	}
 
 	private void gestureY(double dy)
 	{
 		Logger.getLogger("").log(Level.FINEST, "gestureY() " + dy);
-		// TODO?
+		// TODO? go to sibling?
 	}
 
 	/**
