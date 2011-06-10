@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.client.tree.viewer.render.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.Graphics;
@@ -20,6 +23,7 @@ public class SVGGraphics extends Graphics
 	private Object[] lineWidth = {"stroke-width", 1.0};
 	private String[] fontFamily = {"font-family", "Arial Unicode MS, Arial, sans-serif"};
 	private String[] fontSize = {"font-size", "small"};
+	private List<Box2D> drawnTextExtents = new ArrayList<Box2D>();
 	
 	protected double pointSize;
 
@@ -119,20 +123,30 @@ public class SVGGraphics extends Graphics
 		{
 			return;
 		}
-		
-		//TODO hide text elements that overlap previously added text elements. Need to estimate bounding boxes.
-
+	
 		Vector2 p = objectToScreenMatrix.transform(position);
-		Vector2 startingPosition = new Vector2(p.getX() + offset.getX(), p.getY() + offset.getY());
+		p = p.add(offset);
 		
-		Object[] x = {"x", startingPosition.getX()};
-		Object[] y = {"y", startingPosition.getY()};
+		float height = 10; //FIXME get actual height
+		double width = 10; //FIXME get actual width
+		Box2D bbox = new Box2D(new Vector2(p.getX(), p.getY() - height / 2), new Vector2(p.getX() + width, p.getY() + height / 2));
+
+		for(Box2D box : drawnTextExtents)
+		{
+			if(box.intersects(bbox))
+			{
+				return;
+			}
+		}
+		
+		Object[] x = {"x", p.getX()};
+		Object[] y = {"y", p.getY()};
 		Object[] transform = null;
 		
 		if (angle != 0)
 		{
 			double degrees = angle * 180 / Math.PI;
-			String string = "rotate(" + degrees + ", " + startingPosition.getX() + "," + startingPosition.getY() + ")";
+			String string = "rotate(" + degrees + ", " + p.getX() + "," + p.getY() + ")";
 			//FIXME flip labels on left.  Needs a way to get text bounds in order to rotate about center.
 			transform = new Object[] {"transform", string};
 		}
@@ -140,6 +154,7 @@ public class SVGGraphics extends Graphics
 		open("text", x, y, fill, fontFamily, fontSize, transform);
 		svg.append(text);
 		close("text");
+		drawnTextExtents.add(bbox);
 	}
 
 	@Override
