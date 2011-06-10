@@ -131,12 +131,18 @@ public class SVGGraphics extends Graphics
 		double width = 10; //FIXME get actual width
 		Box2D bbox = new Box2D(new Vector2(p.getX(), p.getY() - height / 2), new Vector2(p.getX() + width, p.getY() + height / 2));
 
+		Object[] display = null;
 		for(Box2D box : drawnTextExtents)
 		{
 			if(box.intersects(bbox))
 			{
-				return;
+				display = new Object[] {"display", "none"};
 			}
+		}
+		
+		if (display == null)
+		{
+			drawnTextExtents.add(bbox);
 		}
 		
 		Object[] x = {"x", p.getX()};
@@ -151,10 +157,11 @@ public class SVGGraphics extends Graphics
 			transform = new Object[] {"transform", string};
 		}
 		
-		open("text", x, y, fill, fontFamily, fontSize, transform);
+		open("text", x, y, fill, fontFamily, fontSize, transform, display);
 		svg.append(text);
 		close("text");
-		drawnTextExtents.add(bbox);
+		
+
 	}
 
 	@Override
