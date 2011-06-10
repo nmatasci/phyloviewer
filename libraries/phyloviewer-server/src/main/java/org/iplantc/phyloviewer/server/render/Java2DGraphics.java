@@ -14,10 +14,6 @@ import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.Graphics;
-import org.iplantc.phyloviewer.shared.render.style.IBranchStyle;
-import org.iplantc.phyloviewer.shared.render.style.IGlyphStyle;
-import org.iplantc.phyloviewer.shared.render.style.ILabelStyle;
-import org.iplantc.phyloviewer.shared.render.style.INodeStyle;
 import org.iplantc.phyloviewer.shared.scene.Text;
 
 public class Java2DGraphics extends Graphics
@@ -134,42 +130,6 @@ public class Java2DGraphics extends Graphics
 				box.getHeight());
 	}
 
-	@Override
-	public void setStyle(IBranchStyle style)
-	{
-		if(style != null)
-		{
-			g2d.setColor(getColorFromHtmlString(style.getStrokeColor()));
-		}
-	}
-
-	@Override
-	public void setStyle(IGlyphStyle style)
-	{
-		if(style != null)
-		{
-			g2d.setColor(getColorFromHtmlString(style.getFillColor()));
-		}
-	}
-
-	@Override
-	public void setStyle(ILabelStyle style)
-	{
-		if(style != null)
-		{
-			g2d.setColor(getColorFromHtmlString(style.getColor()));
-		}
-	}
-
-	@Override
-	public void setStyle(INodeStyle style)
-	{
-		if(style != null)
-		{
-			g2d.setColor(getColorFromHtmlString(style.getColor()));
-		}
-	}
-
 	public static Color getColorFromHtmlString(String colorString)
 	{
 		if(colorString != null)
@@ -229,5 +189,31 @@ public class Java2DGraphics extends Graphics
 	public Box2D calculateBoundingBox(Text text)
 	{
 		return text.getBoundingBox();
+	}
+
+	@Override
+	protected void setFillStyle(String style)
+	{
+		g2d.setColor(getColorFromHtmlString(style));
+	}
+
+	@Override
+	protected void setLineWidth(double d)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void setPointSize(double pointSize)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void setStrokeStyle(String style)
+	{
+		g2d.setColor(getColorFromHtmlString(style));
 	}
 }

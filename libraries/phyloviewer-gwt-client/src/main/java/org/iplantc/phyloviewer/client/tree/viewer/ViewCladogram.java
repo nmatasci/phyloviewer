@@ -5,6 +5,7 @@ import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.render.Camera;
 import org.iplantc.phyloviewer.shared.render.CameraCladogram;
+import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -76,6 +77,12 @@ public class ViewCladogram extends AnimatedView
 	{
 		overviewView.render();
 		detailView.render();
+	}
+	
+	@Override
+	public void renderTo(IGraphics g)
+	{
+		detailView.renderTo(g);
 	}
 
 	/**

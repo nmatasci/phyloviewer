@@ -23,6 +23,7 @@ import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.render.Camera;
 import org.iplantc.phyloviewer.shared.render.Defaults;
+import org.iplantc.phyloviewer.shared.render.IGraphics;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
@@ -272,6 +273,12 @@ public class OverviewView extends AnimatedView
 			Logger.getLogger("").log(Level.WARNING,
 					"An exception was caught in OverviewView.render: " + e.getMessage());
 		}
+	}
+	
+	@Override
+	public void renderTo(IGraphics g)
+	{
+		//TODO?
 	}
 
 	private void showStatusMessage(String message)

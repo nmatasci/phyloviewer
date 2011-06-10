@@ -3,6 +3,10 @@ package org.iplantc.phyloviewer.shared.render;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.math.Vector2;
+import org.iplantc.phyloviewer.shared.render.style.IBranchStyle;
+import org.iplantc.phyloviewer.shared.render.style.IGlyphStyle;
+import org.iplantc.phyloviewer.shared.render.style.ILabelStyle;
+import org.iplantc.phyloviewer.shared.render.style.INodeStyle;
 
 public abstract class Graphics implements IGraphics
 {
@@ -14,6 +18,11 @@ public abstract class Graphics implements IGraphics
 	protected Matrix33 screenToObjectMatrix = new Matrix33();
 
 	private Box2D screenBounds = new Box2D();
+	
+	protected abstract void setPointSize(double pointSize);
+	protected abstract void setLineWidth(double d);
+	protected abstract void setStrokeStyle(String style);
+	protected abstract void setFillStyle(String style);
 
 	private static Matrix33 createProjectionMatrix(double left, double right, double bottom, double top)
 	{
@@ -123,4 +132,104 @@ public abstract class Graphics implements IGraphics
 
 		return !screenBounds.intersects(bbox);
 	}
+	@Override
+	public void setStyle(IBranchStyle style)
+	{
+		try
+		{
+			if(style != null)
+			{
+				if(style.getStrokeColor() != null)
+				{
+					setStrokeStyle(style.getStrokeColor());
+				}
+	
+				if(!Double.isNaN(style.getLineWidth()))
+				{
+					setLineWidth(style.getLineWidth());
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			setStrokeStyle(Defaults.LINE_COLOR);
+			setLineWidth(1.0);
+		}
+	}
+	@Override
+	public void setStyle(IGlyphStyle style)
+	{
+		try
+		{
+			if(style != null)
+			{
+				if(style.getFillColor() != null)
+				{
+					setFillStyle(style.getFillColor());
+				}
+	
+				if(style.getStrokeColor() != null)
+				{
+					setStrokeStyle(style.getStrokeColor());
+				}
+	
+				if(!Double.isNaN(style.getLineWidth()))
+				{
+					setLineWidth(style.getLineWidth());
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			setFillStyle(Defaults.TRIANGLE_FILL_COLOR);
+			setStrokeStyle(Defaults.TRIANGLE_OUTLINE_COLOR);
+			setLineWidth(1.0);
+		}
+	}
+	@Override
+	public void setStyle(ILabelStyle style)
+	{
+		try
+		{
+			if(style != null)
+			{
+				if(style.getColor() != null)
+				{
+					setFillStyle(style.getColor());
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			setFillStyle(Defaults.TEXT_COLOR);
+		}
+	}
+	@Override
+	public void setStyle(INodeStyle style)
+	{
+		try
+		{
+			if(style != null)
+			{
+				if(style.getColor() != null)
+				{
+					setFillStyle(style.getColor());
+					setStrokeStyle(style.getColor());
+				}
+	
+				if(!Double.isNaN(style.getPointSize()))
+				{
+					setPointSize(style.getPointSize());
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			setFillStyle(Defaults.LINE_COLOR);
+			setStrokeStyle(Defaults.LINE_COLOR);
+			setLineWidth(1.0);
+		}
+	}
+	
+	
 }
