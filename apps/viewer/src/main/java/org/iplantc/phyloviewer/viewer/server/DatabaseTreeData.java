@@ -247,7 +247,38 @@ public class DatabaseTreeData implements ITreeData
 		
 		return tree;
 	}
-
+	
+	/**
+	 * Gets the tree id for the given tree hash value.
+	 * @param hash
+	 * @return the tree id. -1 if the hash value is not found.
+	 */
+	public int getTreeId(byte[] hash)
+	{
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		int treeId = -1;
+		
+		try
+		{
+			statement = pool.getConnection().prepareStatement("select * from tree where hash = ?");
+			statement.setBytes(1, hash);
+			statement.execute();
+			rs = statement.getResultSet();
+			
+			if (rs.next())
+			{
+				treeId = rs.getInt("tree_id");
+			}
+		}
+		catch(SQLException e)
+		{
+			//TODO log
+			e.printStackTrace();
+		}
+		
+		return treeId;
+	}
 
 	/**
 	 * Takes the ResultSet from getSubtree and builds a subtree from it. 

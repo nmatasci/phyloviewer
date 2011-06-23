@@ -30,6 +30,7 @@ import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.server.DatabaseTreeData;
 import org.iplantc.phyloviewer.viewer.server.HashTree;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 import org.iplantc.phyloviewer.viewer.server.PhyloparserTreeAdapter;
@@ -39,10 +40,12 @@ public class ImportTreeData implements IImportTreeData {
 	private DataSource pool;
 	private String imageDirectory;
 	private HashTree hashTree = new HashTree();
+	private DatabaseTreeData treeDataReader;
 
 	public ImportTreeData(DataSource pool,String imageDirectory) {
 		this.pool = pool;
 		this.imageDirectory = imageDirectory;
+		this.treeDataReader = new DatabaseTreeData(pool);
 		
 		new File(imageDirectory).mkdir();
 		
@@ -346,13 +349,20 @@ public class ImportTreeData implements IImportTreeData {
 	@Override
 	public int importFromNewick(String newick, String name) throws ParserException, SQLException
 	{
+		byte[] hash = hashTree.hash(newick);
+		int id = treeDataReader.getTreeId(hash);
+		if (id != -1)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Hash of newick string found.  Returning ID of existing tree.");
+			return id;
+		}
+		
 		/*
 		 * TODO treeFromNewick is taking about 2.5 seconds for the ncbi tree, and the parseTree call
 		 * doesn't return until it's done. Move the parse to after a dummy tree/root insert? Would need
 		 * to go back and update the root node label when the real import happens.
 		 */
 		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name); 
-		byte[] hash = hashTree.hash(newick);
 		return this.importTreeData(tree, name, hash);
 	}
 
