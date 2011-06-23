@@ -28,11 +28,11 @@ public abstract class ImportTree<N extends INode>
 		this.executor = executor;
 	}
 
-	public Future<Void> addTreeAsync(final Tree tree, final String name) throws SQLException
+	public Future<Void> addTreeAsync(final Tree tree, final String name, byte[] hash) throws SQLException
 	{	
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Adding tree and root node to database");
 		//do the minimum necessary to set the tree ID
-		initTree(tree, name);
+		initTree(tree, name, hash);
 		
 		//Finish importing the tree in another thread
 		Callable<Void> task = new Callable<Void>()
@@ -63,11 +63,11 @@ public abstract class ImportTree<N extends INode>
 		return executor.submit(task);		
 	}
 
-	public void addTree(Tree tree, String name) throws SQLException
+	public void addTree(Tree tree, String name, byte[] hash) throws SQLException
 	{
 		try
 		{
-			initTree(tree, name);
+			initTree(tree, name, hash);
 			
 			addSubtree((N) tree.getRootNode(), null);
 			
@@ -84,10 +84,10 @@ public abstract class ImportTree<N extends INode>
 		treeWriter.close();
 	}
 	
-	private void initTree(Tree tree, String treeName) throws SQLException
+	private void initTree(Tree tree, String treeName, byte[] hash) throws SQLException
 	{
 		INode root = tree.getRootNode();
-		int[] ids = treeWriter.initTree(treeName, root.getLabel());
+		int[] ids = treeWriter.initTree(treeName, root.getLabel(), hash);
 		tree.setId(ids[0]);
 		root.setId(ids[1]);
 	}

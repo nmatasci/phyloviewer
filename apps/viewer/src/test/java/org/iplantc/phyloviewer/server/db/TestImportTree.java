@@ -56,7 +56,7 @@ public class TestImportTree
 		
 		//tree1
 		ImportNodeTree it = new ImportNodeTree(conn);
-		it.addTree(tree1, "name1");
+		it.addTree(tree1, "name1", "A;".getBytes()); //TODO test importing tree with same hash twice, should throw exception
 		it.close();
 	
 		ResultSet rs = conn.createStatement().executeQuery("select * from tree");
@@ -87,7 +87,7 @@ public class TestImportTree
 		
 		//tree2
 		it = new ImportNodeTree(conn);
-		it.addTree(tree2, "name2");
+		it.addTree(tree2, "name2", "((A,B),((C,D),E));".getBytes());
 		it.close();
 		
 		rs = conn.createStatement().executeQuery("select * from tree order by tree_id");

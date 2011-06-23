@@ -30,6 +30,7 @@ import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.server.HashTree;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 import org.iplantc.phyloviewer.viewer.server.PhyloparserTreeAdapter;
 
@@ -37,6 +38,7 @@ public class ImportTreeData implements IImportTreeData {
 	private ExecutorService executor;
 	private DataSource pool;
 	private String imageDirectory;
+	private HashTree hashTree = new HashTree();
 
 	public ImportTreeData(DataSource pool,String imageDirectory) {
 		this.pool = pool;
@@ -100,7 +102,7 @@ public class ImportTreeData implements IImportTreeData {
 		return graphics.getImage();
 	}
 	
-	public int importTreeData(RemoteNode root, final String name) throws SQLException
+	public int importTreeData(RemoteNode root, final String name, byte[] hash) throws SQLException
 	{
 		final Connection connection;
 		final Tree tree = new Tree();
@@ -127,7 +129,7 @@ public class ImportTreeData implements IImportTreeData {
 		{
 			connection.setAutoCommit(false);
 			ImportRemoteNodeTree importer = new ImportRemoteNodeTree(connection, executor);
-			futureAddTree = importer.addTreeAsync(tree, name);
+			futureAddTree = importer.addTreeAsync(tree, name, hash);
 			connection.commit();
 		}
 		catch(SQLException e)
@@ -170,7 +172,7 @@ public class ImportTreeData implements IImportTreeData {
 		return tree.getId();
 	}
 	
-	public int importTreeData(org.iplantc.phyloparser.model.Tree tree, final String name) throws SQLException
+	public int importTreeData(org.iplantc.phyloparser.model.Tree tree, final String name, byte[] hash) throws SQLException
 	{
 		final Connection connection;
 		final Future<Void> futureAddTree;
@@ -196,7 +198,7 @@ public class ImportTreeData implements IImportTreeData {
 		{
 			connection.setAutoCommit(false);
 			ImportNodeTree importer = new ImportNodeTree(connection, executor);
-			futureAddTree = importer.addTreeAsync(adaptedTree, name);
+			futureAddTree = importer.addTreeAsync(adaptedTree, name, hash);
 			connection.commit();
 		}
 		catch(SQLException e)
@@ -350,7 +352,8 @@ public class ImportTreeData implements IImportTreeData {
 		 * to go back and update the root node label when the real import happens.
 		 */
 		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name); 
-		return this.importTreeData(tree, name);
+		byte[] hash = hashTree.hash(newick);
+		return this.importTreeData(tree, name, hash);
 	}
 
 	/** Deletes the given tree from the database */

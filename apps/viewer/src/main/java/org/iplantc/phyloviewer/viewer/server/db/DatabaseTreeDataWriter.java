@@ -14,29 +14,29 @@ public class DatabaseTreeDataWriter {
 	private PreparedStatement addChildStmt;
 	private PreparedStatement addAltLabelStmt;
 	
-	private int treeId;
-	
 	public DatabaseTreeDataWriter(Connection conn) throws SQLException {
 		this.connection = conn;
 	
 		// prepare insert statements
 		addNodeStmt = conn.prepareStatement("insert into node(Label) values (?)", Statement.RETURN_GENERATED_KEYS);
 		addChildStmt = conn.prepareStatement("insert into topology (node_id, parent_id, tree_id, NumNodes, NumLeaves, Height, LeftNode, RightNode, Depth, NumChildren) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-		addTreeStmt = conn.prepareStatement("insert into tree(root_id,Name) values(?, ?)");
+		addTreeStmt = conn.prepareStatement("insert into tree(root_id, Name, hash) values(?, ?, ?)");
 		addAltLabelStmt = conn.prepareStatement("insert into node_label_lookup(node_id,alt_label) values(?, ?)");	
 	}
-	
+
 	/**
 	 * Adds the tree and root node records. Must be done before adding other nodes, topologies.
+	 * 
 	 * @param treeName
 	 * @param rootLabel
+	 * @param hash a hash of the tree, to try to avoid importing the same tree twice.
 	 * @return IDs for the inserted tree and node: [treeId, rootId]
 	 * @throws SQLException
 	 */
-	public int[] initTree(String treeName, String rootLabel) throws SQLException
+	public int[] initTree(String treeName, String rootLabel, byte[] hash) throws SQLException
 	{
 		int rootId = addNode(rootLabel);
-		treeId = addTreeRoot(rootId, treeName);
+		int treeId = addTreeRoot(rootId, treeName, hash);
 		
 		return new int[] {treeId, rootId};
 	}
@@ -110,15 +110,17 @@ public class DatabaseTreeDataWriter {
 	 * Adds a record to the trees table. This has to be done after the root node is added and before any topology is added.
 	 * @param rootId the root node ID
 	 * @param name the name of the tree
+	 * @param hash a hash of the tree, to try to avoid importing the same tree twice.
 	 * @return the tree ID
 	 * @throws SQLException
 	 */
-	private int addTreeRoot(int rootId, String name) throws SQLException
+	private int addTreeRoot(int rootId, String name, byte[] hash) throws SQLException
 	{
 		int id; 
 		
 		addTreeStmt.setInt(1, rootId);
 		addTreeStmt.setString(2, name != null ? name : "No name");
+		addTreeStmt.setBytes(3, hash);
 		addTreeStmt.execute();
 		
 		Statement statement = connection.createStatement();
@@ -131,14 +133,8 @@ public class DatabaseTreeDataWriter {
 			throw new SQLException("unable to get generated tree id");
 		}
 		
-		this.treeId = id;
 		addChildStmt.setInt(3, id);
 		
 		return id;
-	}
-	
-	public int getTreeId()
-	{
-		return this.treeId;
 	}
 }

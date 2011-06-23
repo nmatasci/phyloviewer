@@ -30,6 +30,7 @@ create table tree (
 	root_id integer not null, 
 	Name varchar, 
 	import_complete boolean default FALSE not null,
+	hash bytea not null,
 	foreign key(root_id) references node(node_id) on delete cascade
 );
 

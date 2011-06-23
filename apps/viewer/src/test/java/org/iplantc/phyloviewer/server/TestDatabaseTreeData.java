@@ -69,7 +69,7 @@ public class TestDatabaseTreeData
 			
 			Connection conn2 = pool.getConnection();
 			ImportRemoteNodeTree it = new ImportRemoteNodeTree(conn2);
-			it.addTree(tree,"");
+			it.addTree(tree,"", new byte[] {});
 			
 			//manually mark the tree as import_complete, since this is not being done through ImportTreeData
 			conn2.createStatement().execute("update tree set import_complete = TRUE");
@@ -202,7 +202,7 @@ public class TestDatabaseTreeData
 		Connection conn = pool.getConnection();
 		conn.setAutoCommit(false);
 		ImportRemoteNodeTree it = new ImportRemoteNodeTree(conn);
-		it.addTree(tree, "ncbi");
+		it.addTree(tree, "ncbi", new byte[] {});
 		conn.commit();
 		it.close();
 		conn.close();
