@@ -363,6 +363,13 @@ public class ImportTreeData implements IImportTreeData {
 		 * to go back and update the root node label when the real import happens.
 		 */
 		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name); 
+		
+		if (tree == null)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "No trees found in newick string: " + newick);
+			throw new ParserException("No trees found");
+		}
+		
 		return this.importTreeData(tree, name, hash);
 	}
 

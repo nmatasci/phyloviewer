@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.iplantc.phyloparser.exception.ParserException;
 
 public class ParseTree extends HttpServlet {
 	private static final long serialVersionUID = -2532260393364629170L;
@@ -30,6 +31,16 @@ public class ParseTree extends HttpServlet {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		String newick = null;
 		String name = request.getParameter("name");
+		
+		PrintWriter writer = null;
+		try
+		{
+			writer = response.getWriter();
+		}
+		catch(IOException e1)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to write response");
+		}
 
 		if (isMultipart) 
 		{
@@ -58,8 +69,14 @@ public class ParseTree extends HttpServlet {
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setHeader("Location", viewURL);
 				
-				PrintWriter writer = response.getWriter();
 				writer.print(viewURL);
+				writer.flush();
+			}
+			catch (ParserException e) 
+			{
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				writer.println(e.getMessage());
+				e.printStackTrace(writer);
 				writer.flush();
 			}
 			catch(Exception e)
