@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.client.services.TreeImportInProgressException;
 import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
@@ -25,14 +28,14 @@ public class DatabaseTreeData implements ITreeData
 	public static final int SUBTREE_QUERY_THRESHOLD = 4; //recalculated for NCBI tree on postgres database 
 	
 	private DataSource pool;
+	private final String getChildren = "select * from node natural join topology where parent_id = ?";
 
 	public DatabaseTreeData(DataSource pool) {
 		this.pool = pool;
-		//TODO create all of the PreparedStatements once, here.  And then check the SUBTREE_QUERY_THRESHOLD again.
 	}
 	
 	@Override
-	public RemoteNode getSubtree(int rootID, int depth)
+	public RemoteNode getSubtree(int rootID, int depth) throws TreeDataException
 	{
 		if (depth >= SUBTREE_QUERY_THRESHOLD) 
 		{
@@ -45,17 +48,19 @@ public class DatabaseTreeData implements ITreeData
 		
 	}
 	
-	public RemoteNode getSubtreeRecursive(int rootID, int depth)
+	public RemoteNode getSubtreeRecursive(int rootID, int depth) throws TreeDataException
 	{
 		RemoteNode node = null;
 		Connection conn = null;
 		PreparedStatement rootNodeStmt = null;
+		PreparedStatement getChildrenStmt = null;
 		ResultSet rs = null;
 		
 		try
 		{
 			conn = pool.getConnection();
 			rootNodeStmt = conn.prepareStatement("select * from node natural join topology where node.node_id = ?");
+			getChildrenStmt = conn.prepareStatement(getChildren);
 			
 			rootNodeStmt.setInt(1, rootID);
 			
@@ -66,18 +71,20 @@ public class DatabaseTreeData implements ITreeData
 				node = createNode(rs,pool,true);
 			
 				if (depth > 0 && node.getNumberOfChildren() > 0) {
-					RemoteNode[] children = getChildren(node.getId(), depth - 1, conn);
+					RemoteNode[] children = getChildren(node.getId(), depth - 1, getChildrenStmt);
 					node.setChildren(children);
 				}
 			}
 		}
 		catch(SQLException e)
 		{
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
 		}
 		finally
 		{
 			ConnectionUtil.close(rootNodeStmt);
+			ConnectionUtil.close(getChildrenStmt);
 			ConnectionUtil.close(rs);
 			ConnectionUtil.close(conn);
 		}
@@ -85,7 +92,7 @@ public class DatabaseTreeData implements ITreeData
 		return node;
 	}
 
-	public RemoteNode getSubtreeInTwoQueries(int rootID, int depth)
+	public RemoteNode getSubtreeInTwoQueries(int rootID, int depth) throws TreeDataException
 	{
 		RemoteNode subtree = null;
 		Connection conn = null;
@@ -124,8 +131,8 @@ public class DatabaseTreeData implements ITreeData
 		}
 		catch(SQLException e)
 		{
-			//Auto-generated catch block
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
 		}
 		finally
 		{
@@ -140,34 +147,36 @@ public class DatabaseTreeData implements ITreeData
 	}
 
 	@Override
-	public RemoteNode[] getChildren(int parentID)
+	public RemoteNode[] getChildren(int parentID) throws TreeDataException
 	{
 		RemoteNode[] children = null;
 		Connection conn = null;
+		PreparedStatement getChildrenStmt = null;
 		
 		try
 		{
 			conn = pool.getConnection();
+			getChildrenStmt = conn.prepareStatement(getChildren);
 			int depth = 0;
-			children = getChildren(parentID, depth, conn);
+			children = getChildren(parentID, depth, getChildrenStmt);
 		}
-		catch(SQLException e)
+		catch(SQLException e) 
 		{
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
 		}
 		finally 
 		{
 			ConnectionUtil.close(conn);
+			ConnectionUtil.close(getChildrenStmt);
 		}
 		
 		return children;
 	}
 	
-	public RemoteNode[] getChildren(int parentID, int depth, Connection conn) throws SQLException
+	public RemoteNode[] getChildren(int parentID, int depth, PreparedStatement getChildrenStmt) throws SQLException
 	{
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>();
-		String sql = "select * from node natural join topology where parent_id = ?";
-		PreparedStatement getChildrenStmt = conn.prepareStatement(sql);
 		getChildrenStmt.setInt(1, parentID);
 		
 		ResultSet rs = getChildrenStmt.executeQuery();
@@ -177,7 +186,7 @@ public class DatabaseTreeData implements ITreeData
 			
 			if (depth > 0 && child.getNumberOfChildren() > 0) 
 			{
-				child.setChildren(getChildren(child.getId(), depth - 1, conn));
+				child.setChildren(getChildren(child.getId(), depth - 1, getChildrenStmt));
 			}
 			
 			children.add(child);
@@ -194,13 +203,13 @@ public class DatabaseTreeData implements ITreeData
 	
 
 	@Override
-	public RemoteNode getRootNode(int treeId) throws TreeNotAvailableException
+	public RemoteNode getRootNode(int treeId) throws TreeDataException
 	{
 		Tree tree = this.getTree(treeId,0);
 		return (RemoteNode) tree.getRootNode();
 	}
 
-	public Tree getTree(int id, int depth) throws TreeNotAvailableException
+	public Tree getTree(int id, int depth) throws TreeDataException
 	{
 		Tree tree = null;
 		Connection conn = null;
@@ -234,8 +243,8 @@ public class DatabaseTreeData implements ITreeData
 		}
 		catch(SQLException e)
 		{
-			//Auto-generated catch block
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
 		}
 		finally 
 		{
@@ -252,16 +261,19 @@ public class DatabaseTreeData implements ITreeData
 	 * Gets the tree id for the given tree hash value.
 	 * @param hash
 	 * @return the tree id. -1 if the hash value is not found.
+	 * @throws SQLException 
 	 */
-	public int getTreeId(byte[] hash)
+	public int getTreeId(byte[] hash) throws TreeDataException
 	{
+		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		int treeId = -1;
 		
 		try
 		{
-			statement = pool.getConnection().prepareStatement("select * from tree where hash = ?");
+			connection = pool.getConnection();
+			statement = connection.prepareStatement("select * from tree where hash = ?");
 			statement.setBytes(1, hash);
 			statement.execute();
 			rs = statement.getResultSet();
@@ -273,8 +285,14 @@ public class DatabaseTreeData implements ITreeData
 		}
 		catch(SQLException e)
 		{
-			//TODO log
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
+		}
+		finally
+		{
+			ConnectionUtil.close(rs);
+			ConnectionUtil.close(statement);
+			ConnectionUtil.close(connection);
 		}
 		
 		return treeId;
@@ -359,8 +377,8 @@ public class DatabaseTreeData implements ITreeData
 	
 
 	@Override
-	public String getTrees() {
-		
+	public String getTrees() throws TreeDataException 
+	{
 		JSONObject result = new JSONObject();
 		JSONArray trees = new JSONArray();
 		
@@ -388,14 +406,17 @@ public class DatabaseTreeData implements ITreeData
 			ConnectionUtil.close(conn);
 			ConnectionUtil.close(rs);
 			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} 
+		catch(SQLException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
 		}
-
+		catch(JSONException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage(), e);
+			throw new TreeDataException(e);
+		}
 		
 		return result.toString();
 	}

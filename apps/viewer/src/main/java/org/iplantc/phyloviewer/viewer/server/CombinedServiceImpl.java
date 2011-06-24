@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.viewer.server;
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService;
+import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -19,12 +20,12 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 		return (ILayoutData) this.getServletContext().getAttribute(Constants.LAYOUT_DATA_KEY);
 	}
 
-	public RemoteNode[] getChildren(int parentID) {
+	public RemoteNode[] getChildren(int parentID) throws TreeDataException {
 		return this.getTreeData().getChildren(parentID);
 	}
 
 	@Override
-	public NodeResponse getRootNode(int treeId) throws TreeNotAvailableException 
+	public NodeResponse getRootNode(int treeId) throws TreeDataException 
 	{
 		ITreeData treeData = this.getTreeData();
 		RemoteNode node = treeData.getRootNode(treeId);
@@ -50,7 +51,7 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 	}
 
 	@Override
-	public CombinedResponse getChildrenAndLayout(int parentID)
+	public CombinedResponse getChildrenAndLayout(int parentID) throws TreeDataException
 	{
 		CombinedResponse response = new CombinedResponse();
 	
@@ -62,7 +63,7 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 	}
 
 	@Override
-	public CombinedResponse[] getChildrenAndLayout(int[] parentIDs)
+	public CombinedResponse[] getChildrenAndLayout(int[] parentIDs) throws TreeDataException
 	{
 		CombinedResponse[] responses = new CombinedResponse[parentIDs.length];
 		for (int i = 0; i < parentIDs.length; i++) {

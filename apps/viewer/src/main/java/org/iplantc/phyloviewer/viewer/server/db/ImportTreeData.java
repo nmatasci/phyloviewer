@@ -30,6 +30,7 @@ import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.DatabaseTreeData;
 import org.iplantc.phyloviewer.viewer.server.HashTree;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
@@ -68,8 +69,10 @@ public class ImportTreeData implements IImportTreeData {
 		try {
 			data = parser.parse(newick);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "IOException parsing tree string: " + newick);
+		} catch (ParserException e) {
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "ParserException parsing tree string: " + newick);
+			throw e;
 		}
 		
 		org.iplantc.phyloparser.model.Tree tree = null;
@@ -347,7 +350,7 @@ public class ImportTreeData implements IImportTreeData {
 	}
 
 	@Override
-	public int importFromNewick(String newick, String name) throws ParserException, SQLException
+	public int importFromNewick(String newick, String name) throws ParserException, SQLException, TreeDataException
 	{
 		byte[] hash = hashTree.hash(newick);
 		int id = treeDataReader.getTreeId(hash);

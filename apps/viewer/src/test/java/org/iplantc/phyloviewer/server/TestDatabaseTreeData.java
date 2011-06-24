@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
-import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
+import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.DatabaseTreeData;
 import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
 import org.iplantc.phyloviewer.viewer.server.db.ImportRemoteNodeTree;
@@ -87,7 +87,7 @@ public class TestDatabaseTreeData
 	}
 	
 	@Test
-	public void testGetRemoteNode() {
+	public void testGetRemoteNode() throws TreeDataException {
 		RemoteNode returned = treeData.getSubtree(parent.getId(),1);
 		assertNotNull(returned);
 		assertEquals(parent.getNumberOfChildren(), returned.getNumberOfChildren());
@@ -97,7 +97,7 @@ public class TestDatabaseTreeData
 	}
 
 	@Test
-	public void testGetChildren()
+	public void testGetChildren() throws TreeDataException
 	{
 		RemoteNode[] returnedChildren = treeData.getChildren(parent.getId());
 		assertNotNull(returnedChildren);
@@ -125,14 +125,14 @@ public class TestDatabaseTreeData
 	}
 
 	@Test
-	public void testGetTree() throws TreeNotAvailableException
+	public void testGetTree() throws TreeDataException
 	{
 		Tree returnedTree = treeData.getTree(tree.getId(), 1);
 		assertEquals(tree, returnedTree);
 	}
 	
 	@Test
-	public void testGetSubtree() {
+	public void testGetSubtree() throws TreeDataException {
 		RemoteNode subtree = treeData.getSubtree(parent.getId(), 0);
 		assertNull(subtree.getChildren());
 		assertEquals(2, subtree.getNumberOfChildren());
@@ -146,7 +146,7 @@ public class TestDatabaseTreeData
 		assertEquals(0, subtree.getChild(1).getNumberOfChildren());
 	}
 	
-	public static void main(String[] args) throws SQLException, ClassNotFoundException, FileNotFoundException, IOException {
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, FileNotFoundException, IOException, TreeDataException {
 //		classSetUp(); //creates new empty testdb database
 //		Tree tree = loadBenchmarkTree(); //loads NCBI tree
 		

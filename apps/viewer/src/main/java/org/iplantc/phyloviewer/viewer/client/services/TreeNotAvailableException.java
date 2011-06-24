@@ -2,7 +2,7 @@ package org.iplantc.phyloviewer.viewer.client.services;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class TreeNotAvailableException extends Exception implements IsSerializable
+public class TreeNotAvailableException extends TreeDataException implements IsSerializable
 {
 	private static final long serialVersionUID = -2930713523317228373L;
 	private int treeId;

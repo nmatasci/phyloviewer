@@ -1,5 +1,6 @@
 package org.iplantc.phyloviewer.viewer.server;
 
+import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -12,7 +13,7 @@ public class TreeListServiceImpl extends RemoteServiceServlet implements TreeLis
 	private static final long serialVersionUID = 1593366473133954060L;
 
 	@Override
-	public String getTreeList() {
+	public String getTreeList() throws TreeDataException {
 		
 		ITreeData data = (ITreeData) this.getServletContext().getAttribute(Constants.TREE_DATA_KEY);
 		return data.getTrees();
