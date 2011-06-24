@@ -219,13 +219,13 @@ public class TestDatabaseTreeData
 		@Override
 		public Connection getConnection() throws SQLException
 		{
-			return DriverManager.getConnection("jdbc:postgresql:" + DB, "phyloviewer", "phyloviewer");
+			return DriverManager.getConnection("jdbc:postgresql:phyloviewer", "phyloviewer", "phyloviewer");
 		}
 
 		@Override
 		public Connection getConnection(String username, String password) throws SQLException
 		{
-			return DriverManager.getConnection("jdbc:postgresql:" + DB, "phyloviewer", "phyloviewer");
+			return DriverManager.getConnection("jdbc:postgresql:phyloviewer", "phyloviewer", "phyloviewer");
 		}
 
 		@Override public PrintWriter getLogWriter() throws SQLException { return null; }

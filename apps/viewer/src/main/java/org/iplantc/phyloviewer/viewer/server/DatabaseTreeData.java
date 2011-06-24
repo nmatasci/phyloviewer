@@ -25,7 +25,7 @@ import org.json.JSONObject;
 public class DatabaseTreeData implements ITreeData
 
 {
-	public static final int SUBTREE_QUERY_THRESHOLD = 4; //recalculated for NCBI tree on postgres database 
+	public static final int SUBTREE_QUERY_THRESHOLD = 4; //recalculated for NCBI tree on postgres database (at depth = 4, getSubtreeInTwoQueries becomes faster than getSubtreeRecursive)
 	
 	private DataSource pool;
 	private final String getChildren = "select * from node natural join topology where parent_id = ?";
@@ -183,16 +183,21 @@ public class DatabaseTreeData implements ITreeData
 		
 		while (rs.next()) {
 			RemoteNode child = createNode(rs,pool,true);
-			
-			if (depth > 0 && child.getNumberOfChildren() > 0) 
-			{
-				child.setChildren(getChildren(child.getId(), depth - 1, getChildrenStmt));
-			}
-			
 			children.add(child);
 		}
 		
 		ConnectionUtil.close(rs);
+		
+		if (depth > 0)
+		{
+			for (RemoteNode child : children)
+			{
+				if (child.getNumberOfChildren() > 0) 
+				{
+					child.setChildren(getChildren(child.getId(), depth - 1, getChildrenStmt));
+				}
+			}
+		}
 		
 		if (children.size() > 0) {
 			return children.toArray(new RemoteNode[children.size()]);
