@@ -21,6 +21,16 @@
     <param-name>db.password</param-name>
     <param-value>phyloviewer</param-value>
   </context-param>
+  
+  <context-param>
+    <param-name>image.path</param-name>
+    <param-value>/images/</param-value>
+  </context-param>
+  <context-param>
+    <param-name>treefile.path</param-name>
+    <param-value>/tree-uploads/</param-value>
+  </context-param>
+  
   <listener>
     <listener-class>org.iplantc.phyloviewer.viewer.server.DatabaseListener</listener-class>
   </listener>

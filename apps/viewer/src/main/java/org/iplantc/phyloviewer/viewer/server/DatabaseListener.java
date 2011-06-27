@@ -43,7 +43,11 @@ public class DatabaseListener implements ServletContextListener
 		DatabaseOverviewImage overviewData = new DatabaseOverviewImage(pool);
 		servletContext.setAttribute(Constants.OVERVIEW_DATA_KEY, overviewData);
 		
-		ImportTreeData importer = new ImportTreeData(pool,servletContext.getRealPath("/images/"));
+		String imagePath = servletContext.getInitParameter("image.path");
+		imagePath = servletContext.getRealPath(imagePath);
+		String treeBackupPath = servletContext.getInitParameter("treefile.path");
+		treeBackupPath = servletContext.getRealPath(treeBackupPath);
+		ImportTreeData importer = new ImportTreeData(pool, imagePath, treeBackupPath);
 		servletContext.setAttribute(Constants.IMPORT_TREE_DATA_KEY, importer);
 	}
 

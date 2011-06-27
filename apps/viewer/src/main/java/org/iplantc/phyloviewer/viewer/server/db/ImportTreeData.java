@@ -1,8 +1,15 @@
 package org.iplantc.phyloviewer.viewer.server.db;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -41,15 +48,18 @@ public class ImportTreeData implements IImportTreeData {
 	private ExecutorService executor;
 	private DataSource pool;
 	private String imageDirectory;
+	private String treeBackupDirectory;
 	private HashTree hashTree = new HashTree();
 	private DatabaseTreeData treeDataReader;
 
-	public ImportTreeData(DataSource pool,String imageDirectory) {
+	public ImportTreeData(DataSource pool, String imageDirectory, String treeBackupDirectory) {
 		this.pool = pool;
 		this.imageDirectory = imageDirectory;
+		this.treeBackupDirectory = treeBackupDirectory;
 		this.treeDataReader = new DatabaseTreeData(pool);
 		
 		new File(imageDirectory).mkdir();
+		new File(treeBackupDirectory).mkdir();
 		
 		executor = Executors.newSingleThreadExecutor();
 	}
@@ -313,7 +323,56 @@ public class ImportTreeData implements IImportTreeData {
 		
 		PhyloparserTreeAdapter adaptedTree = new PhyloparserTreeAdapter(tree);
 		id = importTreeData(adaptedTree, name, hash);
+		
+		saveNewickBackup(id, name, newick);
+		
 		return id;
+	}
+
+	private void saveNewickBackup(int id, String name, String newick)
+	{
+		//TODO make backups retrievable by name?
+		String path = treeBackupDirectory + "/" + id;
+		File file = new File(path);
+		try
+		{
+			Writer writer = new BufferedWriter(new FileWriter(file));
+			writer.write(newick);
+			writer.close();
+		}
+		catch(IOException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to save backup of newick string to file system", e);
+		}
+	}
+	
+	public String loadNewickBackup(int id) throws IOException
+	{
+		String newick = "";
+		String path = treeBackupDirectory + "/" + id;
+		File file = new File(path);
+		
+		try
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			while (reader.ready())
+			{
+				newick += reader.readLine();
+			}
+
+		}
+		catch(FileNotFoundException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Backup file not found for tree id " + id, e);
+			throw e;
+		}
+		catch(IOException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "IOException for tree id " + id, e);
+			throw e;
+		}
+		
+		return newick;
 	}
 
 	/** Deletes the given tree from the database */
