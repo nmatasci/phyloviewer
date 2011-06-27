@@ -12,14 +12,15 @@ import org.iplantc.phyloviewer.shared.model.INode;
  */
 public class ImportNodeTree extends ImportTree<INode>
 {
+	@Deprecated
 	public ImportNodeTree(Connection conn) throws SQLException
 	{
 		super(conn);
 	}
 
-	public ImportNodeTree(Connection conn, ExecutorService executor) throws SQLException
+	public ImportNodeTree(DatabaseTreeDataWriter treeWriter, ExecutorService executor)
 	{
-		super(conn, executor);
+		super(treeWriter, executor);
 	}
 
 	@Override

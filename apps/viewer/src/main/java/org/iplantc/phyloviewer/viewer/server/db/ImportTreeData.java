@@ -131,15 +131,8 @@ public class ImportTreeData implements IImportTreeData {
 			throw(e);
 		}
 		
-		ImportTree<? extends INode> importer;
-		if (tree.getRootNode() instanceof RemoteNode)
-		{
-			importer = new ImportRemoteNodeTree(connection, executor);
-		}
-		else 
-		{
-			importer = new ImportNodeTree(connection, executor);
-		}
+		DatabaseTreeDataWriter writer = new DatabaseTreeDataWriter(connection);
+		ImportTree<? extends INode> importer = ImportTree.create(tree, writer, executor);
 		
 		/* The tree and all associated data will be added in a two transactions: 
 		 * First the tree and root node records, so that the tree service can 

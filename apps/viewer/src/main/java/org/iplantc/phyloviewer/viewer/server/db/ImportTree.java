@@ -10,21 +10,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.model.Tree;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 
 public abstract class ImportTree<N extends INode>
 {
 	private ExecutorService executor;
 	protected DatabaseTreeDataWriter treeWriter;
-
+	
+	@Deprecated
 	public ImportTree(Connection conn) throws SQLException
 	{
-		this(conn, Executors.newSingleThreadExecutor());
+		this(new DatabaseTreeDataWriter(conn), Executors.newSingleThreadExecutor());
 	}
 	
-	public ImportTree(Connection conn, ExecutorService executor) throws SQLException
+	public ImportTree(DatabaseTreeDataWriter treeWriter, ExecutorService executor)
 	{
-		treeWriter = new DatabaseTreeDataWriter(conn);
+		this.treeWriter = treeWriter;
 		this.executor = executor;
 	}
 
@@ -112,5 +115,23 @@ public abstract class ImportTree<N extends INode>
 		}
 		
 		node.setId(id);
+	}
+	
+	/**
+	 * @return an appropriate importer for the given tree
+	 */
+	public static ImportTree<? extends INode> create(ITree tree, DatabaseTreeDataWriter writer, ExecutorService executor)
+	{
+		ImportTree<? extends INode> importer;
+		if (tree.getRootNode() instanceof RemoteNode)
+		{
+			importer = new ImportRemoteNodeTree(writer, executor);
+		}
+		else 
+		{
+			importer = new ImportNodeTree(writer, executor);
+		}
+		
+		return importer;
 	}
 }

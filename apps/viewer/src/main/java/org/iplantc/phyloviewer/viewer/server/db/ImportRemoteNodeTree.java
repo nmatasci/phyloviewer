@@ -8,16 +8,17 @@ import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 
 public class ImportRemoteNodeTree extends ImportTree<RemoteNode>
 {
-	public ImportRemoteNodeTree(Connection conn, ExecutorService executor) throws SQLException
-	{
-		super(conn, executor);
-	}
-
+	@Deprecated
 	public ImportRemoteNodeTree(Connection conn) throws SQLException
 	{
 		super(conn);
 	}
-	
+
+	public ImportRemoteNodeTree(DatabaseTreeDataWriter treeWriter, ExecutorService executor)
+	{
+		super(treeWriter, executor);
+	}
+
 	protected void addSubtree(RemoteNode node, Integer parentId) throws SQLException
 	{
 		addTopology(parentId, node);
