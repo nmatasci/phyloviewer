@@ -8,6 +8,9 @@ package org.iplantc.phyloviewer.viewer.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,21 +18,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.iplantc.phyloparser.exception.ParserException;
 
 public class ParseTree extends HttpServlet {
 	private static final long serialVersionUID = -2532260393364629170L;
+	private ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	{
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Received tree post request");
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		String newick = null;
+		String newick = request.getParameter("newickData");
 		String name = request.getParameter("name");
 		
 		PrintWriter writer = null;
@@ -46,17 +49,15 @@ public class ParseTree extends HttpServlet {
 		{
 			try
 			{
-				newick = getNewickFilePost(request);
+				Map<String, FileItem> parameters = getParameters(request);
+				name = parameters.get("name").getString();
+				newick = parameters.get("newickData").getString();
 			}
-			catch(Exception e)
+			catch(FileUploadException e)
 			{
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
 		} 
-		else 
-		{
-			newick = request.getParameter("newickData");
-		}
 		
 		if (newick != null) 
 		{
@@ -84,6 +85,12 @@ public class ParseTree extends HttpServlet {
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
+		else
+		{
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			writer.println("Bad request: No newick data found.");
+			writer.flush();
+		}
 	}
 	
 	private int loadNewickString(String newick, String name ) throws Exception {
@@ -98,22 +105,31 @@ public class ParseTree extends HttpServlet {
 		return -1;
 	}
 	
-	private String getNewickFilePost(HttpServletRequest request) throws FileUploadException, IOException
+	private Map<String, FileItem> getParameters(HttpServletRequest request) throws FileUploadException
 	{
-		String newick = null;
-		
+		HashMap<String, FileItem> parameters = new HashMap<String, FileItem>();
 
-		ServletFileUpload upload = new ServletFileUpload();
-		
-		FileItemIterator iter = upload.getItemIterator(request);
-		while (iter.hasNext()) {
-		    FileItemStream item = iter.next();
-		    if (item.getFieldName().equals("newickData")) {
-		    	newick = Streams.asString(item.openStream());
-		    }
+		List items = null;
+		try
+		{
+			items = upload.parseRequest(request);
+		}
+		catch(FileUploadException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to parse request", e);
+			throw e;
 		}
 		
-		return newick;
+		for (Object obj : items)
+		{
+			if (obj instanceof FileItem)
+			{
+				FileItem item = (FileItem) obj;
+				parameters.put(item.getFieldName(), item);
+			}
+		}
+		
+		return parameters;
 	}
 	
 	private String getViewURL(int id, HttpServletRequest request)
