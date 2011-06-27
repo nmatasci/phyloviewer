@@ -27,6 +27,7 @@ import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.layout.LayoutCladogram;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.Document;
+import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
@@ -108,19 +109,18 @@ public class ImportTreeData implements IImportTreeData {
 		return graphics.getImage();
 	}
 	
-	public int importTreeData(RemoteNode root, final String name, byte[] hash) throws SQLException
+	/**
+	 * Imports a tree, returning the id immediately and finishing the import in another thread. Future
+	 * imports will check the hash value to avoid importing the same tree twice.
+	 * 
+	 * @return the id given to the tree.  (The input tree will also have its id set to this value.)
+	 * @throws SQLException
+	 */
+	public int importTreeData(final Tree tree, final String name, byte[] hash) throws SQLException
 	{
 		final Connection connection;
-		final Tree tree = new Tree();
-		tree.setRootNode(root);
 		final Future<Void> futureAddTree;
 		
-		/* The tree and all associated data will be added in a two transactions: 
-		 * First the tree and root node records, so that the tree service can 
-		 * check whether the import has been started for a given tree request,
-		 * then the rest of the tree and layout.
-		 */
-
 		try
 		{
 			connection = pool.getConnection();
@@ -130,11 +130,25 @@ public class ImportTreeData implements IImportTreeData {
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to open database connection.", e);
 			throw(e);
 		}
-
+		
+		ImportTree<? extends INode> importer;
+		if (tree.getRootNode() instanceof RemoteNode)
+		{
+			importer = new ImportRemoteNodeTree(connection, executor);
+		}
+		else 
+		{
+			importer = new ImportNodeTree(connection, executor);
+		}
+		
+		/* The tree and all associated data will be added in a two transactions: 
+		 * First the tree and root node records, so that the tree service can 
+		 * check whether the import has been started for a given tree request,
+		 * then the rest of the tree and layout.
+		 */
 		try
 		{
 			connection.setAutoCommit(false);
-			ImportRemoteNodeTree importer = new ImportRemoteNodeTree(connection, executor);
 			futureAddTree = importer.addTreeAsync(tree, name, hash);
 			connection.commit();
 		}
@@ -145,7 +159,7 @@ public class ImportTreeData implements IImportTreeData {
 			
 			throw(e);
 		}
-			
+		 
 		Runnable doImportLayout = new Runnable() 
 		{
 			@Override
@@ -176,75 +190,6 @@ public class ImportTreeData implements IImportTreeData {
 		executor.submit(doImportLayout);
 
 		return tree.getId();
-	}
-	
-	public int importTreeData(org.iplantc.phyloparser.model.Tree tree, final String name, byte[] hash) throws SQLException
-	{
-		final Connection connection;
-		final Future<Void> futureAddTree;
-		final PhyloparserTreeAdapter adaptedTree = new PhyloparserTreeAdapter(tree);
-
-		/* The tree and all associated data will be added in a two transactions: 
-		 * First the tree and root node records, so that the tree service can 
-		 * check whether the import has been started for a given tree request,
-		 * then the rest of the tree and layout.
-		 */
-		
-		try
-		{
-			connection = pool.getConnection();
-		}
-		catch(SQLException e)
-		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to open database connection.", e);
-			throw(e);
-		}
-		
-		try
-		{
-			connection.setAutoCommit(false);
-			ImportNodeTree importer = new ImportNodeTree(connection, executor);
-			futureAddTree = importer.addTreeAsync(adaptedTree, name, hash);
-			connection.commit();
-		}
-		catch(SQLException e)
-		{
-			ConnectionUtil.rollback(connection);
-			ConnectionUtil.close(connection);
-			
-			throw(e);
-		}
-		 
-		Runnable doImportLayout = new Runnable() 
-		{
-			@Override
-			public void run()
-			{
-				try
-				{
-					futureAddTree.get(); //wait for addTreeAsync thread to finish
-					importLayout(connection, adaptedTree);
-					connection.createStatement().execute("update tree set import_complete=TRUE where tree_id=" + adaptedTree.getId());
-					connection.commit();
-					Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Completed import of tree name: " + name + ", id: " + adaptedTree.getId());
-				}
-				catch(Exception e)
-				{
-					ConnectionUtil.rollback(connection);
-					deleteTree(adaptedTree.getId());
-					
-					Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Exception in ImportTreeData.importTreeData(). Unable to complete import.  Rolling back.", e);
-				}
-				finally
-				{
-					ConnectionUtil.close(connection);
-				}
-			}
-		};	
-			
-		executor.submit(doImportLayout);
-
-		return adaptedTree.getId();
 	}
 
 	private void importLayout(Connection connection, Tree tree) throws SQLException {
@@ -373,7 +318,9 @@ public class ImportTreeData implements IImportTreeData {
 			throw new ParserException("No trees found");
 		}
 		
-		return this.importTreeData(tree, name, hash);
+		PhyloparserTreeAdapter adaptedTree = new PhyloparserTreeAdapter(tree);
+		id = importTreeData(adaptedTree, name, hash);
+		return id;
 	}
 
 	/** Deletes the given tree from the database */
