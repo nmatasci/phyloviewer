@@ -50,8 +50,16 @@ public class ParseTree extends HttpServlet {
 			try
 			{
 				Map<String, FileItem> parameters = getParameters(request);
-				name = parameters.get("name").getString();
-				newick = parameters.get("newickData").getString();
+				
+				if (parameters.containsKey("name"))
+				{
+					name = parameters.get("name").getString();
+				}
+				
+				if (parameters.containsKey("newickData"))
+				{
+					newick = parameters.get("newickData").getString();
+				}
 			}
 			catch(FileUploadException e)
 			{
