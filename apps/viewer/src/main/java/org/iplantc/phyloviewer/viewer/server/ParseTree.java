@@ -91,6 +91,9 @@ public class ParseTree extends HttpServlet {
 			catch(Exception e)
 			{
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				writer.println(e.getMessage());
+				e.printStackTrace(writer);
+				writer.flush();
 			}
 		}
 		else
