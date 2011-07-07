@@ -331,9 +331,10 @@ public class ImportTreeData implements IImportTreeData {
 
 	private void saveNewickBackup(int id, String name, String newick)
 	{
-		//TODO make backups retrievable by name?
-		String path = treeBackupDirectory + "/" + id;
-		File file = new File(path);
+		String path = treeBackupDirectory + "/" + id + "/";
+		new File(path).mkdir();
+		File file = new File(path + name);
+		
 		try
 		{
 			Writer writer = new BufferedWriter(new FileWriter(file));
@@ -346,34 +347,34 @@ public class ImportTreeData implements IImportTreeData {
 		}
 	}
 	
-	public String loadNewickBackup(int id) throws IOException
-	{
-		String newick = "";
-		String path = treeBackupDirectory + "/" + id;
-		File file = new File(path);
-		
-		try
-		{
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			while (reader.ready())
-			{
-				newick += reader.readLine();
-			}
-
-		}
-		catch(FileNotFoundException e)
-		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Backup file not found for tree id " + id, e);
-			throw e;
-		}
-		catch(IOException e)
-		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "IOException for tree id " + id, e);
-			throw e;
-		}
-		
-		return newick;
-	}
+//	public String loadNewickBackup(int id) throws IOException
+//	{
+//		String newick = "";
+//		String path = treeBackupDirectory + "/" + id;
+//		File file = new File(path);
+//		
+//		try
+//		{
+//			BufferedReader reader = new BufferedReader(new FileReader(file));
+//			while (reader.ready())
+//			{
+//				newick += reader.readLine();
+//			}
+//
+//		}
+//		catch(FileNotFoundException e)
+//		{
+//			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Backup file not found for tree id " + id, e);
+//			throw e;
+//		}
+//		catch(IOException e)
+//		{
+//			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "IOException for tree id " + id, e);
+//			throw e;
+//		}
+//		
+//		return newick;
+//	}
 
 	/** Deletes the given tree from the database */
 	private void deleteTree(int treeId)
