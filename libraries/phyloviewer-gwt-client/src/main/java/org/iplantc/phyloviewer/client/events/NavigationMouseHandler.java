@@ -120,14 +120,14 @@ public class NavigationMouseHandler extends BaseMouseHandler
 		Logger.getLogger("").log(Level.FINEST, "gestureX() " + dx);
 		if(dx > 0)
 		{
-			// TODO pan right one 'step'. Where to? Go to highest child?
-		}
-		else
-		{
 			if (currentNodeShown != null && currentNodeShown.getParent() != null)
 			{
 				show(currentNodeShown.getParent());
 			}
+		}
+		else
+		{
+			// TODO pan left one 'step'. Where to? Go to highest child?
 		}
 	}
 
