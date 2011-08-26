@@ -8,6 +8,7 @@ package org.iplantc.phyloviewer.viewer.client;
 import org.iplantc.phyloviewer.client.tree.viewer.render.svg.SVGGraphics;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.model.Document;
+import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.style.BranchStyle;
@@ -20,6 +21,7 @@ import org.iplantc.phyloviewer.viewer.client.TreeWidget.ViewType;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsync;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsyncImpl;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl;
+import org.iplantc.phyloviewer.viewer.client.services.StyleServiceClient;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListServiceAsync;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
@@ -48,6 +50,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -160,9 +163,7 @@ public class Phyloviewer implements EntryPoint
 				
 				try
 				{
-					IStyleMap styleMap = StyleMapFactory.createStyleMap(style);
-					widget.getView().getDocument().setStyleMap(styleMap);
-					widget.render();
+					setStyle(style);
 				}
 				catch(StyleParseException e)
 				{
@@ -192,6 +193,7 @@ public class Phyloviewer implements EntryPoint
 		});
 
 		// Make a search box
+		//TODO it would be nice to update the highlighting as the user hovers over items in the autocomplete results pop-up
 		final SuggestBox searchBox = new SuggestBox(searchService);
 		searchBox.setLimit(10); // TODO make scrollable?
 		searchBox.addSelectionHandler(new SelectionHandler<Suggestion>()
@@ -200,7 +202,12 @@ public class Phyloviewer implements EntryPoint
 			public void onSelection(SelectionEvent<Suggestion> event)
 			{
 				Box2D box = ((RemoteNodeSuggestion)event.getSelectedItem()).getResult().layout.boundingBox;
-				widget.show(box);
+				widget.show(box); 
+				/*
+				 * TODO Try to do this through NavigationMouseHandler.show(node), or at least set
+				 * NavigationMouseHandler.currentNodeShown, so the parent navigation gesture works.
+				 * Also, selecting a leaf node here makes it zoom in way too tight to be useful.
+				 */
 			}
 		});
 
@@ -292,6 +299,15 @@ public class Phyloviewer implements EntryPoint
 			// Present the user the dialog to load a tree.
 			this.displayTrees();
 		}
+		
+		updateStyle();
+		History.addValueChangeHandler(new ValueChangeHandler<String>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event)
+			{
+				updateStyle();
+			}
+		});
 	}
 
 	private ColorBox createColorBox()
@@ -429,6 +445,49 @@ public class Phyloviewer implements EntryPoint
 				lb.setVisible(true);
 			}
 		});
+	}
+	
+	private void setStyle(String style) throws StyleParseException {
+		IStyleMap styleMap = StyleMapFactory.createStyleMap(style);
+		
+		//tree may not have been loaded yet, so document may be null 
+		IDocument document = widget.getView().getDocument();
+		if (document != null) {
+			document.setStyleMap(styleMap);
+			widget.render();
+		}
+	}
+	
+	private void updateStyle() {
+		final String styleID = Window.Location.getParameter("styleID");
+		
+		if (styleID == null) {
+			return;
+		}
+		
+		AsyncCallback<String> callback = new AsyncCallback<String>()
+		{
+			@Override
+			public void onFailure(Throwable caught)
+			{
+				Window.alert("Failed to get style " + styleID);
+			}
+
+			@Override
+			public void onSuccess(String style)
+			{
+				try
+				{
+					setStyle(style);
+				}
+				catch(StyleParseException e)
+				{
+					Window.alert("Unable to parse style " + styleID);
+				}
+			}
+		};
+		
+		StyleServiceClient.getStyle(styleID, callback);
 	}
 
 	private class TextInputPopup extends PopupPanel implements HasValueChangeHandlers<String>
