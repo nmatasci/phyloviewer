@@ -23,9 +23,10 @@ public class PagedDocument extends Document
 	CombinedServiceAsync combinedService;
 	EventBus eventBus;
 	Set<Integer> pendingRequests = new HashSet<Integer>();
+	String layoutID;
 
 	public PagedDocument(CombinedServiceAsync combinedService, EventBus eventBus, int treeId,
-			NodeResponse nodeData)
+			NodeResponse nodeData, String layoutID)
 	{
 		super();
 
@@ -44,6 +45,8 @@ public class PagedDocument extends Document
 		remoteLayout.setPositionAndBounds(nodeData.layout.nodeID, nodeData.layout.position,
 				nodeData.layout.boundingBox);
 		this.setLayout(remoteLayout);
+		
+		this.layoutID = layoutID;
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class PagedDocument extends Document
 			{
 				pendingRequests.add(rNode.getId());
 
-				combinedService.getChildrenAndLayout(rNode.getId(),
+				combinedService.getChildrenAndLayout(rNode.getId(), layoutID,
 						new AsyncCallback<CombinedResponse>()
 						{
 

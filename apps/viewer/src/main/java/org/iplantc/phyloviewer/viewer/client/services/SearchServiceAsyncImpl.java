@@ -21,11 +21,12 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	private String lastQuery;
 	private SearchResult[] lastResult = new SearchResult[0];
 	private ITree tree;
+	private String layoutID; //TODO I don't think this search service should have to fetch the layout too.  The client knows what layoutID to use and can fetch it when they get the search result.
 	
 	private ArrayList<SearchResultListener> listeners = new ArrayList<SearchResultListener>();
 	
 	@Override
-	public void find(final String query, final int treeID, SearchType type, final AsyncCallback<SearchResult[]> callback)
+	public void find(final String query, final int treeID, SearchType type, String layoutID, final AsyncCallback<SearchResult[]> callback)
 	{
 		if (query == null || query.length() < MIN_QUERY_LENGTH)
 		{
@@ -46,7 +47,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 			return;
 		}
 		
-		searchService.find(query, treeID, type, new AsyncCallback<SearchResult[]>(){
+		searchService.find(query, treeID, type, layoutID, new AsyncCallback<SearchResult[]>(){
 
 			@Override
 			public void onFailure(Throwable thrown)
@@ -70,7 +71,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	{
 		if (tree != null)
 		{
-			find(request.getQuery(), tree.getId(), SearchType.PREFIX, new AsyncCallback<SearchResult[]>()
+			find(request.getQuery(), tree.getId(), SearchType.PREFIX, layoutID, new AsyncCallback<SearchResult[]>()
 			{
 				@Override
 				public void onFailure(Throwable arg0)
@@ -156,6 +157,11 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 		return filteredList.toArray(new SearchResult[filteredList.size()]);
 	}
 	
+	public void setLayoutID(String layoutID)
+	{
+		this.layoutID = layoutID;
+	}
+
 	public class RemoteNodeSuggestion implements SuggestOracle.Suggestion
 	{
 		private SearchResult result;

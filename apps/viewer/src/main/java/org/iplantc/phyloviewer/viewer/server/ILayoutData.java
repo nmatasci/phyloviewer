@@ -5,5 +5,5 @@ import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResp
 
 public interface ILayoutData {
 	
-	public abstract LayoutResponse getLayout(INode node);
+	public abstract LayoutResponse getLayout(INode node, String layoutID);
 }

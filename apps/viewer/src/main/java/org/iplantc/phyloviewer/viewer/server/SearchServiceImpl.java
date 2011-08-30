@@ -19,7 +19,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	private static final long serialVersionUID = -7938571144166651105L;
 
 	@Override
-	public SearchResult[] find(String query, int tree, SearchType type)
+	public SearchResult[] find(String query, int tree, SearchType type, String layoutID)
 	{
 		//TODO sanitize the query string?  or does the PreparedStatement make that unnecessary?
 		//TODO escape any SQL wildcards
@@ -44,7 +44,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 				RemoteNode node = DatabaseTreeData.createNode(rs,null,false);
 				SearchResult result = new SearchResult();
 				result.node = node;
-				result.layout = layout.getLayout(node);
+				result.layout = layout.getLayout(node, layoutID);
 				results.add(result);
 			}
 		}

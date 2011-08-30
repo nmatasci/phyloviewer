@@ -27,33 +27,33 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 	}
 
 	@Override
-	public void getRootNode(int treeId, AsyncCallback<NodeResponse> callback)
+	public void getRootNode(int treeId, String layoutID, AsyncCallback<NodeResponse> callback)
 	{
-		service.getRootNode(treeId, callback);
+		service.getRootNode(treeId, layoutID, callback);
 	}
 
 	@Override
-	public void getChildrenAndLayout(int parentID, 
+	public void getChildrenAndLayout(int parentID, String layoutID,
 			AsyncCallback<CombinedResponse> callback)
 	{
 		if (defer)
 		{
-			addDeferredRequest(parentID, callback);
+			addDeferredRequest(parentID, layoutID, callback);
 		}
 		else
 		{
-			service.getChildrenAndLayout(parentID, callback);
+			service.getChildrenAndLayout(parentID, layoutID, callback);
 		}
 	}
 
 	@Override
-	public void getChildrenAndLayout(int[] parentIDs,
+	public void getChildrenAndLayout(int[] parentIDs, String[] layoutIDs,
 			AsyncCallback<CombinedResponse[]> callback)
 	{
-		service.getChildrenAndLayout(parentIDs, callback);
+		service.getChildrenAndLayout(parentIDs, layoutIDs, callback);
 	}
 	
-	private void addDeferredRequest(int parentID,
+	private void addDeferredRequest(int parentID, String layoutID,
 			AsyncCallback<CombinedResponse> callback)
 	{
 		if (nextRequestCommand == null) {
@@ -61,15 +61,17 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 			Scheduler.get().scheduleDeferred(nextRequestCommand);
 		}
 		
-		nextRequestCommand.addRequest(parentID, callback);
+		nextRequestCommand.addRequest(parentID, layoutID, callback);
 	}
 	
 	private class BatchRequestCommand implements ScheduledCommand {
 		ArrayList<Integer> parentList = new ArrayList<Integer>();
+		ArrayList<String> layoutIDList = new ArrayList<String>();
 		HashMap<Integer, AsyncCallback<CombinedResponse>> callbacks = new HashMap<Integer, AsyncCallback<CombinedResponse>>();
 		
-		public void addRequest(int parentID, AsyncCallback<CombinedResponse> callback) {
+		public void addRequest(int parentID, String layoutID, AsyncCallback<CombinedResponse> callback) {
 			parentList.add(parentID);
+			layoutIDList.add(layoutID);
 			callbacks.put(parentID, callback);
 		}
 
@@ -83,7 +85,9 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 				parentIDs[i] = parentList.get(i);
 			}
 			
-			service.getChildrenAndLayout(parentIDs, new AsyncCallback<CombinedResponse[]>()
+			String[] layoutIDs = layoutIDList.toArray(new String[layoutIDList.size()]);
+			
+			service.getChildrenAndLayout(parentIDs, layoutIDs, new AsyncCallback<CombinedResponse[]>()
 			{
 
 				@Override

@@ -8,6 +8,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface SearchServiceAsync
 {
 
-	void find(String query, int tree, SearchType type, AsyncCallback<SearchResult[]> callback);
+	void find(String query, int tree, SearchType type, String layoutID, AsyncCallback<SearchResult[]> callback);
 
 }
