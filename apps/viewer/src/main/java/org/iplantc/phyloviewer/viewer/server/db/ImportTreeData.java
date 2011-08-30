@@ -1,14 +1,10 @@
 package org.iplantc.phyloviewer.viewer.server.db;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -207,12 +203,22 @@ public class ImportTreeData implements IImportTreeData {
 			cladogramLayout.layout(tree);
 
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Writing layout to DB");
-			String uuid = "LAYOUT_TYPE_CLADOGRAM";
-			layoutImporter.addLayout(uuid, cladogramLayout, tree);
+			String layoutID = "LAYOUT_TYPE_CLADOGRAM"; //TODO should probably have these IDs in a Enum in the shared package.
+			layoutImporter.addLayout(layoutID, cladogramLayout, tree);
 			
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Rendering overview image");
 			BufferedImage image = renderTreeImage(tree,cladogramLayout,256,1024);
-			ImportTreeData.this.putOverviewImage(connection,tree.getId(), uuid, image);
+			ImportTreeData.this.putOverviewImage(connection,tree.getId(), layoutID, image);
+			
+			//TODO check if the tree actually has any branch lengths first
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Doing layout with branch lengths");
+			cladogramLayout.init(tree.getNumberOfNodes());
+			cladogramLayout.setUseBranchLengths(true);
+			cladogramLayout.layout(tree);
+
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Writing layout with branch lengths to DB");
+			layoutID = "LAYOUT_TYPE_PHYLOGRAM"; //TODO should probably have these IDs in a Enum in the shared package.
+			layoutImporter.addLayout(layoutID, cladogramLayout, tree);
 		}
 		catch(SQLException e)
 		{

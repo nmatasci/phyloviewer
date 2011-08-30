@@ -24,7 +24,7 @@ public class DatabaseLayoutData implements ILayoutData {
 		this.pool = pool;
 	}
 	
-	public LayoutResponse getLayout(INode node) {
+	public LayoutResponse getLayout(INode node, String layoutID) {
 		LayoutResponse response = new LayoutResponse();
 		
 		response.nodeID = node.getId();
@@ -36,8 +36,9 @@ public class DatabaseLayoutData implements ILayoutData {
 		try {
 			connection = pool.getConnection();
 			
-			statement = connection.prepareStatement("Select ST_AsText(point), ST_AsText(bounding_box) from node_layout where node_id=?");
+			statement = connection.prepareStatement("Select ST_AsText(point), ST_AsText(bounding_box) from node_layout where node_id=? and layout_id=?");
 			statement.setInt(1, node.getId());
+			statement.setString(2, layoutID);
 			
 			rs = statement.executeQuery();
 			
