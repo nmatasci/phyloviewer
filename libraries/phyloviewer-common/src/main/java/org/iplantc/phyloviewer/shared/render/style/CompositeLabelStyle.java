@@ -3,18 +3,20 @@ package org.iplantc.phyloviewer.shared.render.style;
 /**
  * An ILabelStyle that returns default values from a base ILabelStyle if they haven't been set.
  */
-public class CompositeLabelStyle extends LabelStyle
+public class CompositeLabelStyle implements ILabelStyle
 {
 	private ILabelStyle baseStyle;
-	
-	public CompositeLabelStyle(ILabelStyle baseStyle)
+	private ILabelStyle mainStyle;
+
+	public CompositeLabelStyle(ILabelStyle mainStyle, ILabelStyle baseStyle)
 	{
-		super(null);
+		this.mainStyle = mainStyle;
 		this.baseStyle = baseStyle;
 	}
 	
 	@Override
 	public String getColor() {
+		String color = mainStyle.getColor();
 		if (color != null)
 		{
 			return color;
@@ -33,5 +35,10 @@ public class CompositeLabelStyle extends LabelStyle
 	public ILabelStyle getBaseStyle()
 	{
 		return baseStyle;
+	}
+	
+	public void setColor(String color)
+	{
+		mainStyle.setColor(color);
 	}
 }

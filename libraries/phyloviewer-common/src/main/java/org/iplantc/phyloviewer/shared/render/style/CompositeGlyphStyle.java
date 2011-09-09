@@ -3,17 +3,19 @@ package org.iplantc.phyloviewer.shared.render.style;
 /**
  * An IGlyphStyle that returns default values from a base IGlyphStyle if they haven't been set.
  */
-public class CompositeGlyphStyle extends GlyphStyle
+public class CompositeGlyphStyle implements IGlyphStyle
 {
 	private IGlyphStyle baseStyle;
+	private IGlyphStyle mainStyle;
 	
-	public CompositeGlyphStyle(IGlyphStyle baseStyle)
+	public CompositeGlyphStyle(IGlyphStyle mainStyle, IGlyphStyle baseStyle)
 	{
-		super(null, null, Double.NaN);
+		this.mainStyle = mainStyle;
 		this.baseStyle = baseStyle;
 	}
 	
 	public String getFillColor() {
+		String fillColor = mainStyle.getFillColor();
 		if (fillColor != null)
 		{
 			return fillColor;
@@ -25,6 +27,7 @@ public class CompositeGlyphStyle extends GlyphStyle
 	}
 
 	public double getLineWidth() {
+		double strokeWidth = mainStyle.getLineWidth();
 		if (strokeWidth != Double.NaN)
 		{
 			return strokeWidth;
@@ -36,6 +39,7 @@ public class CompositeGlyphStyle extends GlyphStyle
 	}
 
 	public String getStrokeColor() {
+		String strokeColor = mainStyle.getStrokeColor();
 		if (strokeColor != null)
 		{
 			return strokeColor;
@@ -54,5 +58,20 @@ public class CompositeGlyphStyle extends GlyphStyle
 	public IGlyphStyle getBaseStyle()
 	{
 		return baseStyle;
+	}
+
+	public void setFillColor(String color)
+	{
+		mainStyle.setFillColor(color);
+	}
+
+	public void setLineWidth(double width)
+	{
+		mainStyle.setLineWidth(width);
+	}
+
+	public void setStrokeColor(String color)
+	{
+		mainStyle.setStrokeColor(color);
 	}
 }

@@ -85,7 +85,9 @@ public abstract class RenderTree
 		highlightSubTreeStack.clear();
 		highlightSubTreeStack.push(false);
 
-		this.renderNode(root, layout, graphics);
+		boolean isHighlighted = renderPreferences.isNodeHighlighted(root);
+		IStyle style = getStyle(root, isHighlighted);
+		this.renderNode(root, layout, graphics, style);
 	}
 
 	public RenderPreferences getRenderPreferences()
@@ -98,7 +100,7 @@ public abstract class RenderTree
 		renderPreferences = preferences;
 	}
 
-	protected void renderNode(INode node, ILayoutData layout, IGraphics graphics)
+	protected void renderNode(INode node, ILayoutData layout, IGraphics graphics, IStyle style)
 	{
 		if(graphics.isCulled(this.getBoundingBox(node, layout)))
 		{
@@ -134,8 +136,6 @@ public abstract class RenderTree
 
 		if(renderPreferences.isDrawPoints())
 		{
-			boolean isHighlighted = renderPreferences.isNodeHighlighted(node);
-			IStyle style = this.getStyle(node, isHighlighted);
 			Drawable[] drawables = drawableContainer.getNodeDrawables(node, document, layout);
 			for(Drawable drawable : drawables)
 			{
@@ -168,6 +168,7 @@ public abstract class RenderTree
 		{
 			INode child = children[i];
 
+			//FIXME: see below
 			boolean isHighlighted = renderPreferences.isBranchHighlighted(child);
 			IStyle style = this.getStyle(child, isHighlighted);
 
@@ -177,7 +178,10 @@ public abstract class RenderTree
 				drawable.draw(graphics, style);
 			}
 
-			renderNode(child, layout, graphics);
+			//FIXME: only get the style once and add highlight for branch and node as necessary
+			isHighlighted = renderPreferences.isNodeHighlighted(child);
+			style = this.getStyle(child, isHighlighted);
+			renderNode(child, layout, graphics, style);
 		}
 	}
 
@@ -204,14 +208,21 @@ public abstract class RenderTree
 
 		if(isHighlighted || highlightSubTreeStack.peek())
 		{
-			CompositeStyle highlightStyle = renderPreferences.getHighlightStyle();
-			if(highlightStyle != null)
-			{
-				highlightStyle.setBaseStyle(style);
-				style = highlightStyle;
-			}
+			style = addHighlight(style);
 		}
 
+		return style;
+	}
+
+	private IStyle addHighlight(IStyle style)
+	{
+		IStyle highlightStyle = renderPreferences.getHighlightStyle();
+
+		if(highlightStyle != null)
+		{
+			style = new CompositeStyle(style, highlightStyle);
+		}
+		
 		return style;
 	}
 }

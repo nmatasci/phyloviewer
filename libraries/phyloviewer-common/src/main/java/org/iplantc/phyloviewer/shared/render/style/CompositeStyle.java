@@ -6,14 +6,25 @@ package org.iplantc.phyloviewer.shared.render.style;
  * Wraps element styles (NodeStyle, BranchStyle, etc) in a corresponding composite element style, so modifying the
  * element styles returned by getters does not modify the base style.
  */
-public class CompositeStyle extends Style
-{
-	public CompositeStyle(String id, IStyle baseStyle)
+public class CompositeStyle implements IStyle
+{	
+	CompositeNodeStyle nodeStyle;
+	CompositeLabelStyle labelStyle;
+	CompositeGlyphStyle glyphStyle;
+	CompositeBranchStyle branchStyle;
+	
+	private String mainStyleId;
+	private String baseStyleId;
+	
+	public CompositeStyle(IStyle mainStyle, IStyle baseStyle)
 	{
-		super(id, new CompositeNodeStyle(baseStyle.getNodeStyle()), 
-				new CompositeLabelStyle(baseStyle.getLabelStyle()), 
-				new CompositeGlyphStyle(baseStyle.getGlyphStyle()), 
-				new CompositeBranchStyle(baseStyle.getBranchStyle()));
+		nodeStyle = new CompositeNodeStyle(mainStyle.getNodeStyle(), baseStyle.getNodeStyle());
+		labelStyle = new CompositeLabelStyle(mainStyle.getLabelStyle(), baseStyle.getLabelStyle());
+		glyphStyle = new CompositeGlyphStyle(mainStyle.getGlyphStyle(), baseStyle.getGlyphStyle());
+		branchStyle = new CompositeBranchStyle(mainStyle.getBranchStyle(), baseStyle.getBranchStyle());
+		
+		this.mainStyleId = mainStyle.getId();
+		this.baseStyleId = baseStyle.getId();
 	}
 	
 	public void setBaseStyle(IStyle baseStyle)
@@ -23,54 +34,37 @@ public class CompositeStyle extends Style
 		getLabelStyle().setBaseStyle(baseStyle.getLabelStyle());
 		getGlyphStyle().setBaseStyle(baseStyle.getGlyphStyle());
 		getBranchStyle().setBaseStyle(baseStyle.getBranchStyle());
+		this.baseStyleId = baseStyle.getId();
 	}
 	
-	@Override
-	public void setNodeStyle(INodeStyle baseStyle) {
-		getNodeStyle().setColor(baseStyle.getColor());
-		getNodeStyle().setPointSize(baseStyle.getPointSize());
-	}
-	
-	@Override
-	public void setLabelStyle(ILabelStyle baseStyle) {
-		getLabelStyle().setColor(baseStyle.getColor());
-	}
-	
-	@Override
-	public void setGlyphStyle(IGlyphStyle baseStyle) {
-		getGlyphStyle().setFillColor(baseStyle.getFillColor());
-		getGlyphStyle().setLineWidth(baseStyle.getLineWidth());
-		getGlyphStyle().setStrokeColor(baseStyle.getStrokeColor());
-	}
-	
-	@Override
-	public void setBranchStyle(IBranchStyle baseStyle) {
-		getBranchStyle().setLineWidth(baseStyle.getLineWidth());
-		getBranchStyle().setStrokeColor(baseStyle.getStrokeColor());
-	}
-
 	@Override
 	public CompositeBranchStyle getBranchStyle()
 	{
-		return (CompositeBranchStyle) super.getBranchStyle();
+		return branchStyle;
 	}
 
 	@Override
 	public CompositeGlyphStyle getGlyphStyle()
 	{
-		return (CompositeGlyphStyle) super.getGlyphStyle();
+		return glyphStyle;
 	}
 
 	@Override
 	public CompositeLabelStyle getLabelStyle()
 	{
-		return (CompositeLabelStyle) super.getLabelStyle();
+		return labelStyle;
 	}
 
 	@Override
 	public CompositeNodeStyle getNodeStyle()
 	{
-		return (CompositeNodeStyle) super.getNodeStyle();
+		return nodeStyle;
+	}
+
+	@Override
+	public String getId()
+	{
+		return mainStyleId + " | " + baseStyleId;
 	}
 	
 	

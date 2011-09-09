@@ -3,18 +3,20 @@ package org.iplantc.phyloviewer.shared.render.style;
 /**
  * An INodeStyle that returns default values from a base INodeStyle if they haven't been set.
  */
-public class CompositeNodeStyle extends NodeStyle
+public class CompositeNodeStyle implements INodeStyle
 {
 	private INodeStyle baseStyle;
-	
-	public CompositeNodeStyle(INodeStyle baseStyle)
+	private INodeStyle mainStyle;
+
+	public CompositeNodeStyle(INodeStyle mainStyle, INodeStyle baseStyle)
 	{
-		super(null, Double.NaN);
+		this.mainStyle = mainStyle;
 		this.baseStyle = baseStyle;
 	}
 	
 	@Override
 	public String getColor() {
+		String color = mainStyle.getColor();
 		if (color != null)
 		{
 			return color;
@@ -27,6 +29,7 @@ public class CompositeNodeStyle extends NodeStyle
 
 	@Override
 	public double getPointSize() {
+		double pointSize = mainStyle.getPointSize();
 		if (!Double.isNaN(pointSize))
 		{
 			return pointSize;
@@ -34,6 +37,19 @@ public class CompositeNodeStyle extends NodeStyle
 		else
 		{
 			return baseStyle.getPointSize();
+		}
+	}
+
+	public Shape getShape()
+	{
+		Shape s = mainStyle.getShape();
+		if (s != null) 
+		{
+			return s;
+		}
+		else
+		{
+			return baseStyle.getShape();
 		}
 	}
 
@@ -45,5 +61,15 @@ public class CompositeNodeStyle extends NodeStyle
 	public INodeStyle getBaseStyle()
 	{
 		return baseStyle;
+	}
+
+	public void setColor(String color)
+	{
+		mainStyle.setColor(color);
+	}
+
+	public void setPointSize(double size)
+	{
+		mainStyle.setPointSize(size);
 	}
 }

@@ -14,9 +14,11 @@ import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.style.BranchStyle;
 import org.iplantc.phyloviewer.shared.render.style.CompositeStyle;
 import org.iplantc.phyloviewer.shared.render.style.GlyphStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.LabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.NodeStyle;
+import org.iplantc.phyloviewer.shared.render.style.Style;
 import org.iplantc.phyloviewer.viewer.client.TreeWidget.ViewType;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsync;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsyncImpl;
@@ -92,14 +94,16 @@ public class Phyloviewer implements EntryPoint
 
 		widget = new TreeWidget(searchService, eventBus);
 
-		CompositeStyle highlightStyle = new CompositeStyle("highlight", Defaults.DEFAULT_STYLE);
-		highlightStyle.setNodeStyle(new NodeStyle("#C2C2F5", Double.NaN));
-		highlightStyle.setLabelStyle(new LabelStyle(null));
-		highlightStyle.setGlyphStyle(new GlyphStyle(null, "#C2C2F5", Double.NaN));
-		highlightStyle.setBranchStyle(new BranchStyle("#C2C2F5", Double.NaN));
+		Style highlight = new Style("highlight");
+		highlight.setNodeStyle(new NodeStyle("#C2C2F5", Double.NaN));
+		highlight.setLabelStyle(new LabelStyle(null));
+		highlight.setGlyphStyle(new GlyphStyle(null, "#C2C2F5", Double.NaN));
+		highlight.setBranchStyle(new BranchStyle("#C2C2F5", Double.NaN));
+		
+		IStyle highlightDefault = new CompositeStyle(highlight, Defaults.DEFAULT_STYLE);
 
 		RenderPreferences rp = new RenderPreferences();
-		rp.setHighlightStyle(highlightStyle);
+		rp.setHighlightStyle(highlightDefault);
 		widget.setRenderPreferences(rp);
 
 		MenuBar fileMenu = new MenuBar(true);

@@ -7,8 +7,10 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.render.style.BranchStyle;
 import org.iplantc.phyloviewer.shared.render.style.CompositeStyle;
 import org.iplantc.phyloviewer.shared.render.style.GlyphStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.LabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.NodeStyle;
+import org.iplantc.phyloviewer.shared.render.style.Style;
 
 public class RenderPreferences
 {
@@ -20,18 +22,20 @@ public class RenderPreferences
 	private HashMap<Integer,Boolean> highlightNodes = new HashMap<Integer,Boolean>();
 	private HashSet<Integer> highlightBranches = new HashSet<Integer>();
 
-	private CompositeStyle highlightStyle;
+	private IStyle highlightStyle;
 
 	private HashSet<Integer> forceCollapsed = new HashSet<Integer>();
 
 	public RenderPreferences()
 	{
 		String highlightColor = "#aaaa00";
-		highlightStyle = new CompositeStyle("highlight", Defaults.DEFAULT_STYLE);
-		highlightStyle.setNodeStyle(new NodeStyle(highlightColor, Double.NaN));
-		highlightStyle.setLabelStyle(new LabelStyle(highlightColor));
-		highlightStyle.setGlyphStyle(new GlyphStyle(null, highlightColor, Double.NaN));
-		highlightStyle.setBranchStyle(new BranchStyle(highlightColor, Double.NaN));
+		Style highlight = new Style("highlight");
+		highlight.setNodeStyle(new NodeStyle(highlightColor, Double.NaN));
+		highlight.setLabelStyle(new LabelStyle(highlightColor));
+		highlight.setGlyphStyle(new GlyphStyle(null, highlightColor, Double.NaN));
+		highlight.setBranchStyle(new BranchStyle(highlightColor, Double.NaN));
+		
+		this.highlightStyle = new CompositeStyle(highlight, Defaults.DEFAULT_STYLE);
 	}
 
 	public void clearAllHighlights()
@@ -58,7 +62,7 @@ public class RenderPreferences
 	 * Renderers should call highlightStyle.setBaseStyle(someOtherStyle) for whatever style they are
 	 * highlighting before using the returned style.
 	 */
-	public CompositeStyle getHighlightStyle()
+	public IStyle getHighlightStyle()
 	{
 		return highlightStyle;
 	}
@@ -145,9 +149,9 @@ public class RenderPreferences
 	 * When rendering, the baseStyle of highlightStyle will be replaced with the style of the node being
 	 * highlighted.
 	 */
-	public void setHighlightStyle(CompositeStyle style)
+	public void setHighlightStyle(IStyle highlightDefault)
 	{
-		highlightStyle = style;
+		highlightStyle = highlightDefault;
 	}
 
 	public void setCollapsed(INode node, boolean isCollapsed)

@@ -42,7 +42,7 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 		
 		if (style == null)
 		{	
-			style = new CompositeStyle(String.valueOf(node.getId()), Defaults.DEFAULT_STYLE);
+			//style = new CompositeStyle(String.valueOf(node.getId()), Defaults.DEFAULT_STYLE);
 			document.getStyleMap().put(node, style);
 		}
 		
