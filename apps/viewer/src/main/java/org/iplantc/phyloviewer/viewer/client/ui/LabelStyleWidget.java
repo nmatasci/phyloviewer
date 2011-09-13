@@ -2,7 +2,9 @@ package org.iplantc.phyloviewer.viewer.client.ui;
 
 import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.style.ILabelStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.user.client.ui.HasValue;
@@ -22,7 +24,7 @@ public class LabelStyleWidget extends AbstractElementStyleWidget
 		{
 			for(INode node : getNodes())
 			{
-				getStyle(node).getLabelStyle().setColor(event.getValue());
+				getStyle(node, true).getLabelStyle().setColor(event.getValue());
 			}
 		}
 	};
@@ -50,8 +52,14 @@ public class LabelStyleWidget extends AbstractElementStyleWidget
 	@Override
 	public void updateValues(INode node)
 	{
-		ILabelStyle style = getStyle(node).getLabelStyle();
-		String color = style.getColor();
+		IStyle style = getStyle(node, false);
+		if (style == null)
+		{
+			style = Defaults.NULL_STYLE;
+		}
+		
+		ILabelStyle labelStyle = style.getLabelStyle();
+		String color = labelStyle.getColor();
 		getColorWidget().setValue(color, true);
 	}
 }

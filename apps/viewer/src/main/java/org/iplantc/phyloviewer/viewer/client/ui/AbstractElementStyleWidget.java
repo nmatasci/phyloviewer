@@ -14,6 +14,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.style.CompositeStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
+import org.iplantc.phyloviewer.shared.render.style.Style;
 
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasEnabled;
@@ -36,13 +37,19 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 		this.document = document;
 	}
 	
-	public IStyle getStyle(INode node)
+	/**
+	 * @param node the node to get a style for
+	 * @param create create a style for the node if it doesn't exist.
+	 * @return the style (or null if !create and the style doesn't exist in the document).
+	 */
+	public IStyle getStyle(INode node, boolean create)
 	{
 		IStyle style = document.getStyleMap().get(node);
 		
-		if (style == null)
+		if (create && style == null)
 		{	
-			//style = new CompositeStyle(String.valueOf(node.getId()), Defaults.DEFAULT_STYLE);
+			style = new Style(String.valueOf(node.getId()));
+			style = new CompositeStyle(style, Defaults.DEFAULT_STYLE);
 			document.getStyleMap().put(node, style);
 		}
 		
@@ -66,8 +73,11 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 	@Override
 	public void onNodeSelection(NodeSelectionEvent event)
 	{
+		this.nodes = Collections.emptySet(); //empty first to prevent updateWidgets() from firing events that will alter styles for the previously selected nodes
+		clearWidgets(widgets);
+		updateWidgets(event.getSelectedNodes());
+		
 		AbstractElementStyleWidget.this.nodes = event.getSelectedNodes();
-		updateWidgets(nodes);
 	}
 
 	@Override
@@ -81,7 +91,6 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 	private void updateWidgets(Set<INode> selectedNodes)
 	{
 		setEnabled(widgets, true);
-		clearWidgets(widgets);
 		
 		if(selectedNodes.size() == 1)
 		{
@@ -98,7 +107,7 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 	{
 		for (HasValue<?> widget : widgets)
 		{
-			widget.setValue(null, false);
+			widget.setValue(null, true); //fireEvents = true to let listeners (e.g. the color picker's background color) update for empty value
 		}
 	}
 

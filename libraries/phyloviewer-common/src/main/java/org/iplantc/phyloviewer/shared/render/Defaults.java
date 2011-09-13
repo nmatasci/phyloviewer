@@ -32,4 +32,6 @@ public class Defaults {
 			new LabelStyle(Defaults.TEXT_COLOR), 
 			new GlyphStyle(Defaults.TRIANGLE_FILL_COLOR, Defaults.TRIANGLE_OUTLINE_COLOR, 1.0),
 			new BranchStyle(Defaults.LINE_COLOR, 1.0));
+	
+	public static final IStyle NULL_STYLE = new Style("null", new NodeStyle(), new LabelStyle(), new GlyphStyle(), new BranchStyle());
 }

@@ -2,7 +2,9 @@ package org.iplantc.phyloviewer.viewer.client.ui;
 
 import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.style.IBranchStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.user.client.ui.DoubleBox;
@@ -24,7 +26,7 @@ public class BranchStyleWidget extends AbstractElementStyleWidget
 		{
 			for(INode node : getNodes())
 			{
-				getStyle(node).getBranchStyle().setStrokeColor(event.getValue());
+				getStyle(node, true).getBranchStyle().setStrokeColor(event.getValue());
 			}
 		}
 	};
@@ -36,7 +38,7 @@ public class BranchStyleWidget extends AbstractElementStyleWidget
 		{
 			for(INode node : getNodes())
 			{
-				getStyle(node).getBranchStyle().setLineWidth(event.getValue());
+				getStyle(node, true).getBranchStyle().setLineWidth(event.getValue());
 			}
 		}
 	};
@@ -78,11 +80,17 @@ public class BranchStyleWidget extends AbstractElementStyleWidget
 	@Override
 	public void updateValues(INode node)
 	{
-		IBranchStyle style = getStyle(node).getBranchStyle();
-		String color = style.getStrokeColor();
+		IStyle style = getStyle(node, false);
+		if (style == null)
+		{
+			style = Defaults.NULL_STYLE;
+		}
+		
+		IBranchStyle branchStyle = style.getBranchStyle();
+		String color = branchStyle.getStrokeColor();
 		getStrokeColorWidget().setValue(color, true);
 		
-		double pointSize = style.getLineWidth();
+		double pointSize = branchStyle.getLineWidth();
 		getLineWidthWidget().setValue(pointSize, true);
 	}
 }

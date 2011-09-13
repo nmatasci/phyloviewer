@@ -2,7 +2,9 @@ package org.iplantc.phyloviewer.viewer.client.ui;
 
 import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.style.IGlyphStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.user.client.ui.DoubleBox;
@@ -25,7 +27,7 @@ public class GlyphStyleWidget extends AbstractElementStyleWidget
 		{
 			for(INode node : getNodes())
 			{
-				getStyle(node).getGlyphStyle().setFillColor(event.getValue());
+				getStyle(node, true).getGlyphStyle().setFillColor(event.getValue());
 			}
 		}
 	};
@@ -37,7 +39,7 @@ public class GlyphStyleWidget extends AbstractElementStyleWidget
 		{
 			for(INode node : getNodes())
 			{
-				getStyle(node).getGlyphStyle().setStrokeColor(event.getValue());
+				getStyle(node, true).getGlyphStyle().setStrokeColor(event.getValue());
 			}
 		}
 	};
@@ -49,7 +51,7 @@ public class GlyphStyleWidget extends AbstractElementStyleWidget
 		{
 			for(INode node : getNodes())
 			{
-				getStyle(node).getGlyphStyle().setLineWidth(event.getValue());
+				getStyle(node, true).getGlyphStyle().setLineWidth(event.getValue());
 			}
 		}
 	};
@@ -107,14 +109,20 @@ public class GlyphStyleWidget extends AbstractElementStyleWidget
 	@Override
 	public void updateValues(INode node)
 	{
-		IGlyphStyle style = getStyle(node).getGlyphStyle();
-		String fillColor = style.getFillColor();
+		IStyle style = getStyle(node, false);
+		if (style == null)
+		{
+			style = Defaults.NULL_STYLE;
+		}
+		
+		IGlyphStyle glyphStyle = style.getGlyphStyle();
+		String fillColor = glyphStyle.getFillColor();
 		getFillColorWidget().setValue(fillColor, true);
 		
-		String strokeColor = style.getStrokeColor();
+		String strokeColor = glyphStyle.getStrokeColor();
 		getStrokeColorWidget().setValue(strokeColor, true);
 		
-		double lineWidth = style.getLineWidth();
+		double lineWidth = glyphStyle.getLineWidth();
 		getLineWidthWidget().setValue(lineWidth, true);
 	}
 }
