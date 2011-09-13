@@ -43,4 +43,9 @@ public class JsStyle extends JavaScriptObject implements IStyle {
 	
 	private final native JsBranchStyle getBranchStyleNative() /*-{return this.branchStyle;}-*/;
 
+	@Override
+	public final native boolean isInheritable() /*-{
+		return this.isInheritable;
+	}-*/;
+
 }

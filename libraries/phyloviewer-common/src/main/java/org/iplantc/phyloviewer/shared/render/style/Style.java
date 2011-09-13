@@ -4,11 +4,12 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Style implements IStyle, IsSerializable {
 	
-	String id;
-	INodeStyle nodeStyle = new NodeStyle();
-	ILabelStyle labelStyle = new LabelStyle();
-	IGlyphStyle glyphStyle = new GlyphStyle();
-	IBranchStyle branchStyle = new BranchStyle();
+	private String id;
+	private INodeStyle nodeStyle = new NodeStyle();
+	private ILabelStyle labelStyle = new LabelStyle();
+	private IGlyphStyle glyphStyle = new GlyphStyle();
+	private IBranchStyle branchStyle = new BranchStyle();
+	private boolean isInheritable;
 	
 	public Style(String id) {
 		this.id = id;
@@ -61,6 +62,14 @@ public class Style implements IStyle, IsSerializable {
 	
 	public void setBranchStyle(IBranchStyle branchStyle) {
 		this.branchStyle = branchStyle;
+	}
+	
+	public boolean isInheritable() {
+		return isInheritable;
+	}
+
+	public void setInheritable(boolean isInheritable) {
+		this.isInheritable = isInheritable;
 	}
 
 }

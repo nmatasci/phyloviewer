@@ -31,4 +31,6 @@ public interface IStyle
 	 * @return
 	 */
 	public abstract IBranchStyle getBranchStyle();
+
+	public abstract boolean isInheritable();
 }

@@ -8,13 +8,14 @@ package org.iplantc.phyloviewer.shared.render.style;
  */
 public class CompositeStyle implements IStyle
 {	
-	CompositeNodeStyle nodeStyle;
-	CompositeLabelStyle labelStyle;
-	CompositeGlyphStyle glyphStyle;
-	CompositeBranchStyle branchStyle;
+	private CompositeNodeStyle nodeStyle;
+	private CompositeLabelStyle labelStyle;
+	private CompositeGlyphStyle glyphStyle;
+	private CompositeBranchStyle branchStyle;
 	
 	private String mainStyleId;
 	private String baseStyleId;
+	private boolean isInheritable;
 	
 	public CompositeStyle(IStyle mainStyle, IStyle baseStyle)
 	{
@@ -66,6 +67,12 @@ public class CompositeStyle implements IStyle
 	{
 		return mainStyleId + " | " + baseStyleId;
 	}
-	
-	
+
+	public boolean isInheritable() {
+		return isInheritable;
+	}
+
+	public void setInheritable(boolean isInheritable) {
+		this.isInheritable = isInheritable;
+	}
 }
