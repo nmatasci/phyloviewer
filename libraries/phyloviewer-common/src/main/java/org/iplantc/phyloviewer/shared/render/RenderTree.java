@@ -85,8 +85,7 @@ public abstract class RenderTree
 		highlightSubTreeStack.clear();
 		highlightSubTreeStack.push(false);
 
-		boolean isHighlighted = renderPreferences.isNodeHighlighted(root);
-		IStyle style = getStyle(root, isHighlighted);
+		IStyle style = document.getStyle(root);
 		this.renderNode(root, layout, graphics, style);
 	}
 
@@ -106,6 +105,12 @@ public abstract class RenderTree
 		{
 			return;
 		}
+		
+		IStyle highlightedStyle = style;
+		if (renderPreferences.isNodeHighlighted(node) || highlightSubTreeStack.peek()) 
+		{
+			highlightedStyle = addHighlight(highlightedStyle);
+		}
 
 		boolean stackNeedsPopped = false;
 		if(renderPreferences.isSubTreeHighlighted(node))
@@ -116,22 +121,22 @@ public abstract class RenderTree
 
 		if(renderPreferences.drawLabels() && node.isLeaf())
 		{
-			drawLabel(node, layout, graphics);
+			drawLabel(node, layout, graphics, highlightedStyle);
 		}
 		else if(renderPreferences.isCollapsed(node)
 				|| (renderPreferences.collapseOverlaps() && LODLevel.LOD_LOW == lodSelector.getLODLevel(
 						node, layout, graphics.getObjectToScreenMatrix())))
 		{
-			renderPlaceholder(node, layout, graphics);
+			renderPlaceholder(node, layout, graphics, highlightedStyle);
 		}
 		else if(!document.checkForData(node))
 		{
 			// while checkForData gets children and layouts (async), render a subtree placeholder
-			renderPlaceholder(node, layout, graphics);
+			renderPlaceholder(node, layout, graphics, highlightedStyle);
 		}
 		else
 		{
-			renderChildren(node, layout, graphics);
+			renderChildren(node, layout, graphics, style);
 		}
 
 		if(renderPreferences.isDrawPoints())
@@ -139,7 +144,7 @@ public abstract class RenderTree
 			Drawable[] drawables = drawableContainer.getNodeDrawables(node, document, layout);
 			for(Drawable drawable : drawables)
 			{
-				drawable.draw(graphics, style);
+				drawable.draw(graphics, highlightedStyle);
 			}
 		}
 
@@ -154,64 +159,45 @@ public abstract class RenderTree
 		return layout.getBoundingBox(node);
 	}
 
-	protected void drawLabel(INode node, ILayoutData layout, IGraphics graphics)
+	protected void drawLabel(INode node, ILayoutData layout, IGraphics graphics, IStyle style)
 	{
-		IStyle style = this.getStyle(node, false);
 		Drawable drawable = drawableContainer.getTextDrawable(node, document, layout);
 		drawable.draw(graphics, style);
 	}
 
-	protected void renderChildren(INode parent, ILayoutData layout, IGraphics graphics)
+	protected void renderChildren(INode parent, ILayoutData layout, IGraphics graphics, IStyle parentStyle)
 	{
 		INode[] children = parent.getChildren();
 		for(int i = 0;i < children.length;++i)
 		{
 			INode child = children[i];
-
-			//FIXME: see below
-			boolean isHighlighted = renderPreferences.isBranchHighlighted(child);
-			IStyle style = this.getStyle(child, isHighlighted);
+			IStyle style = getStyle(child);
+			 
+			style = createComposite(parentStyle, style, Defaults.DEFAULT_STYLE);
+			
+			IStyle branchStyle = style;
+			if (renderPreferences.isBranchHighlighted(child))
+			{
+				branchStyle = addHighlight(branchStyle);
+			}
 
 			Drawable[] drawables = drawableContainer.getBranchDrawables(parent, child, document, layout);
 			for(Drawable drawable : drawables)
 			{
-				drawable.draw(graphics, style);
+				drawable.draw(graphics, branchStyle);
 			}
 
-			//FIXME: only get the style once and add highlight for branch and node as necessary
-			isHighlighted = renderPreferences.isNodeHighlighted(child);
-			style = this.getStyle(child, isHighlighted);
 			renderNode(child, layout, graphics, style);
 		}
 	}
 
-	protected void renderPlaceholder(INode node, ILayoutData layout, IGraphics graphics)
+	protected void renderPlaceholder(INode node, ILayoutData layout, IGraphics graphics, IStyle style)
 	{
-		IStyle style = this.getStyle(node, false);
 		Drawable[] drawables = drawableContainer.getGlyphDrawables(node, document, layout);
 		for(Drawable drawable : drawables)
 		{
 			drawable.draw(graphics, style);
 		}
-	}
-
-	/**
-	 * If the node has been highlighted, the returned style will be renderPreferences.getHighlightStyle()
-	 * composited with the node style
-	 * 
-	 * @see CompositeStyle
-	 */
-	protected IStyle getStyle(INode node, boolean isHighlighted)
-	{
-		assert (document != null);
-		IStyle style = document.getStyle(node);
-
-		if(isHighlighted || highlightSubTreeStack.peek())
-		{
-			style = addHighlight(style);
-		}
-
-		return style;
 	}
 
 	private IStyle addHighlight(IStyle style)
@@ -223,6 +209,45 @@ public abstract class RenderTree
 			style = new CompositeStyle(highlightStyle, style);
 		}
 		
+		return style;
+	}
+	
+	/**
+	 * @return the style for a node.  May return null.
+	 */
+	private IStyle getStyle(INode node)
+	{
+		IStyle style = null;
+		if(node != null && document != null && document.getStyleMap() != null)
+		{
+			style = document.getStyleMap().get(node);
+		}
+		
+		return style;
+	}
+	
+	/**
+	 * @param parentStyle may be null
+	 * @param style may be null
+	 * @param defaultStyle may not be null
+	 * @return a composite of style and parentStyle if parentStyle.isInheritable().  defaultStyle if style is null and parentStyle is null or not inheritable
+	 */
+	private IStyle createComposite(IStyle parentStyle, IStyle style, IStyle defaultStyle) {
+		if (parentStyle != null && parentStyle.isInheritable()) 
+		{
+			if (style != null) 
+			{
+				style = new CompositeStyle(style, parentStyle);
+			}
+			else
+			{
+				style = parentStyle;
+			}
+		} 
+		else if (style == null)
+		{
+			style = defaultStyle;
+		}
 		return style;
 	}
 }
