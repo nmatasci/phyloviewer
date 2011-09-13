@@ -220,7 +220,7 @@ public abstract class RenderTree
 
 		if(highlightStyle != null)
 		{
-			style = new CompositeStyle(style, highlightStyle);
+			style = new CompositeStyle(highlightStyle, style);
 		}
 		
 		return style;

@@ -13,6 +13,13 @@ public class NodeStyle implements INodeStyle, IsSerializable
 		this.color = color;
 		this.pointSize = pointSize;
 	}
+	
+	public NodeStyle(String color, double pointSize, Shape shape)
+	{
+		this.color = color;
+		this.pointSize = pointSize;
+		this.shape = shape;
+	}
 
 	public NodeStyle()
 	{

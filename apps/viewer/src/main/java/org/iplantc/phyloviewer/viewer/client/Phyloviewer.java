@@ -9,25 +9,22 @@ import org.iplantc.phyloviewer.client.tree.viewer.render.svg.SVGGraphics;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.IDocument;
-import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.style.BranchStyle;
-import org.iplantc.phyloviewer.shared.render.style.CompositeStyle;
 import org.iplantc.phyloviewer.shared.render.style.GlyphStyle;
-import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.LabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.NodeStyle;
 import org.iplantc.phyloviewer.shared.render.style.Style;
 import org.iplantc.phyloviewer.viewer.client.TreeWidget.ViewType;
+import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsync;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsyncImpl;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl;
+import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.RemoteNodeSuggestion;
 import org.iplantc.phyloviewer.viewer.client.services.StyleServiceClient;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListServiceAsync;
-import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
-import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.RemoteNodeSuggestion;
 import org.iplantc.phyloviewer.viewer.client.style.StyleMapFactory;
 import org.iplantc.phyloviewer.viewer.client.style.StyleMapFactory.StyleParseException;
 import org.iplantc.phyloviewer.viewer.client.ui.BranchStyleWidget;
@@ -64,9 +61,9 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -95,15 +92,13 @@ public class Phyloviewer implements EntryPoint
 		widget = new TreeWidget(searchService, eventBus);
 
 		Style highlight = new Style("highlight");
-		highlight.setNodeStyle(new NodeStyle("#C2C2F5", Double.NaN));
+		highlight.setNodeStyle(new NodeStyle("#C2C2F5", Double.NaN, null));
 		highlight.setLabelStyle(new LabelStyle(null));
 		highlight.setGlyphStyle(new GlyphStyle(null, "#C2C2F5", Double.NaN));
 		highlight.setBranchStyle(new BranchStyle("#C2C2F5", Double.NaN));
-		
-		IStyle highlightDefault = new CompositeStyle(highlight, Defaults.DEFAULT_STYLE);
 
 		RenderPreferences rp = new RenderPreferences();
-		rp.setHighlightStyle(highlightDefault);
+		rp.setHighlightStyle(highlight);
 		widget.setRenderPreferences(rp);
 
 		MenuBar fileMenu = new MenuBar(true);
@@ -150,8 +145,6 @@ public class Phyloviewer implements EntryPoint
 				layoutType = "LAYOUT_TYPE_CLADOGRAM";
 				searchService.setLayoutID(layoutType);
 				loadTree(null, widget.getDocument().getTree().getId(), layoutType);
-				updateStyle();
-				
 			}
 		});
 		layoutMenu.addItem("Rectangular Phylogram", new Command()
@@ -163,7 +156,6 @@ public class Phyloviewer implements EntryPoint
 				layoutType = "LAYOUT_TYPE_PHYLOGRAM";
 				searchService.setLayoutID(layoutType);
 				loadTree(null, widget.getDocument().getTree().getId(), layoutType);
-				updateStyle();
 			}
 		});
 		layoutMenu.addItem("Circular", new Command()
@@ -175,7 +167,6 @@ public class Phyloviewer implements EntryPoint
 				layoutType = "LAYOUT_TYPE_CLADOGRAM";
 				searchService.setLayoutID(layoutType);
 				loadTree(null, widget.getDocument().getTree().getId(), layoutType);
-				updateStyle();
 			}
 		});
 
@@ -368,6 +359,7 @@ public class Phyloviewer implements EntryPoint
 				Document document = new PagedDocument(combinedService, eventBus, treeId, response, layoutID);
 				searchService.setTree(document.getTree());
 				widget.setDocument(document);
+				updateStyle();
 
 				if(displayTreePanel != null)
 				{
