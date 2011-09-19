@@ -6,7 +6,7 @@
 
     <link type="text/css" rel="stylesheet" href="/Phyloviewer.css">
     <title>Phyloviewer</title>
-    <script type="text/javascript" language="javascript" src="/phyloviewer/phyloviewer.nocache.js"></script>
+    <script type="text/javascript" src="/phyloviewer/phyloviewer.nocache.js"></script>
   </head>
   
   <body>

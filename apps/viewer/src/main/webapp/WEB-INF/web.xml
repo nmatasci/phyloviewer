@@ -44,87 +44,72 @@
     <servlet-name>parseTree</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.ParseTree</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>parseTree</servlet-name>
-    <url-pattern>/parseTree</url-pattern>
-  </servlet-mapping>
-  
   <servlet>
     <servlet-name>treeImage</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.TreeImageImpl</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>treeImage</servlet-name>
-    <url-pattern>/phyloviewer/treeImage</url-pattern>
-  </servlet-mapping>
-  
   <servlet>
     <servlet-name>treeList</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.TreeListServiceImpl</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>treeList</servlet-name>
-    <url-pattern>/phyloviewer/treeList</url-pattern>
-  </servlet-mapping>
-   
   <servlet>
     <servlet-name>renderTree</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.RenderTree</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>renderTree</servlet-name>
-    <url-pattern>/renderTree</url-pattern>
-  </servlet-mapping>
-    
   <servlet>
     <servlet-name>nodeLayout</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.CombinedServiceImpl</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>nodeLayout</servlet-name>
-    <url-pattern>/phyloviewer/nodeLayout</url-pattern>
-  </servlet-mapping>
-  
   <servlet>
     <servlet-name>search</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.SearchServiceImpl</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>search</servlet-name>
-    <url-pattern>/phyloviewer/search</url-pattern>
-  </servlet-mapping>
-
   <servlet>
     <servlet-name>treeIntersect</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.IntersectTreeServiceImpl</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>treeIntersect</servlet-name>
-    <url-pattern>/phyloviewer/treeIntersect</url-pattern>
-  </servlet-mapping>
-  
   <servlet>
     <servlet-name>view</servlet-name>
     <jsp-file>/phyloviewer/View.jsp</jsp-file>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>view</servlet-name>
-    <url-pattern>/view/*</url-pattern>
-  </servlet-mapping>
-  
   <servlet>
     <servlet-name>styledb</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.StyleProxy</servlet-class>
   </servlet>
   
+  <!-- Servlet Mappings -->
+  <servlet-mapping>
+    <servlet-name>parseTree</servlet-name>
+    <url-pattern>/parseTree</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>treeImage</servlet-name>
+    <url-pattern>/phyloviewer/treeImage</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>treeList</servlet-name>
+    <url-pattern>/phyloviewer/treeList</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>renderTree</servlet-name>
+    <url-pattern>/renderTree</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>nodeLayout</servlet-name>
+    <url-pattern>/phyloviewer/nodeLayout</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>search</servlet-name>
+    <url-pattern>/phyloviewer/search</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>treeIntersect</servlet-name>
+    <url-pattern>/phyloviewer/treeIntersect</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>view</servlet-name>
+    <url-pattern>/view/*</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>styledb</servlet-name>
     <url-pattern>/style/*</url-pattern>
