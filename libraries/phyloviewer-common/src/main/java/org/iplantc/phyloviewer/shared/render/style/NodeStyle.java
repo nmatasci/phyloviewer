@@ -1,9 +1,10 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class NodeStyle implements INodeStyle, IsSerializable
+public class NodeStyle implements INodeStyle, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	String color = null;
 	double pointSize = Double.NaN;
 	private Shape shape = Shape.SHAPE_CIRCLE;

@@ -5,10 +5,12 @@
 
 package org.iplantc.phyloviewer.shared.math;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class Vector2 implements IsSerializable
+public class Vector2 implements Serializable
 {
+	private static final long serialVersionUID = 4538356799839918857L;
+	
 	private double x = 0.0;
 	private double y = 0.0;
 

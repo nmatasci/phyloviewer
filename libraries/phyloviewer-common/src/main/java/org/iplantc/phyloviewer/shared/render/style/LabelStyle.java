@@ -1,9 +1,10 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class LabelStyle implements ILabelStyle, IsSerializable
+public class LabelStyle implements ILabelStyle, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	String color = null;
 
 	public LabelStyle(String color)

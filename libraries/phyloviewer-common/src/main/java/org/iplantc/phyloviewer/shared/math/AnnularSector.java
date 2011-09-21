@@ -1,8 +1,9 @@
 package org.iplantc.phyloviewer.shared.math;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class AnnularSector implements IsSerializable {
+public class AnnularSector implements Serializable {
+	private static final long serialVersionUID = 1L;
 	
 	private PolarVector2 min;
 	private PolarVector2 max;

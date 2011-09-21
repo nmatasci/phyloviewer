@@ -1,9 +1,10 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class BranchStyle implements IBranchStyle, IsSerializable
+public class BranchStyle implements IBranchStyle, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	String strokeColor = null;
 	double strokeWidth = Double.NaN;
 

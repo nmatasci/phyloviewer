@@ -91,6 +91,11 @@
     		<artifactId>commons-fileupload</artifactId>
     		<version>1.2.2</version>
 		</dependency>
+<dependency>
+  <groupId>org.nexml.model</groupId>
+  <artifactId>nexml</artifactId>
+  <version>1.5-SNAPSHOT</version>
+</dependency>
 	</dependencies>
 	<build>
 		<finalName>phyloviewer</finalName>
@@ -208,5 +213,10 @@
 			<url>http://projects.iplantcollaborative.org/archiva/repository/internal/
 			</url>
 		</repository>
+  <repository>
+    <id>m2.nexml.repos</id>
+    <name>NeXML Remote Repository</name>
+    <url>http://nexml-dev.nescent.org/.m2/repository</url>
+  </repository>	
 	</repositories>
 </project>

@@ -1,9 +1,9 @@
 package org.iplantc.phyloviewer.shared.math;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class PolarVector2 implements IsSerializable {
-
+public class PolarVector2 implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private double radius = 0.0;
 	private double angle = 0.0;
 	

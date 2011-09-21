@@ -1,9 +1,10 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class GlyphStyle implements IGlyphStyle, IsSerializable
+public class GlyphStyle implements IGlyphStyle, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	String fillColor = null;
 	String strokeColor = null;
 	double strokeWidth = Double.NaN;

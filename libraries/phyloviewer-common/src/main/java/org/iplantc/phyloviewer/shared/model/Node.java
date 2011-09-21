@@ -1,5 +1,6 @@
 package org.iplantc.phyloviewer.shared.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,10 +9,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-public class Node implements INode, IsSerializable
+public class Node implements INode, Serializable
 {
+	private static final long serialVersionUID = 3329649649400777449L;
+	
 	private int id;
 	private String label;
 	private Vector<Node> children = null;

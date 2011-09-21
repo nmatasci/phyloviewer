@@ -1,9 +1,9 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
-public class Style implements IStyle, IsSerializable {
-	
+public class Style implements IStyle, Serializable {
+	private static final long serialVersionUID = 1L;
 	private String id;
 	private INodeStyle nodeStyle = new NodeStyle();
 	private ILabelStyle labelStyle = new LabelStyle();
