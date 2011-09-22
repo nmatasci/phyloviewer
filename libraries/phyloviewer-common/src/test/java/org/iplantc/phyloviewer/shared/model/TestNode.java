@@ -24,11 +24,9 @@ public class TestNode extends TestCase {
 		Node d = new Node();
 		d.setBranchLength(3.0);
 		
-		root.addChild(a);
-		root.addChild(b);
+		root.setChildren(new Node[] {a,b});
 		
-		b.addChild(c);
-		b.addChild(d);
+		b.setChildren(new Node[] {c,d});
 		
 		double distance=root.findMaximumDistanceToLeaf();
 		assertTrue(5.0==distance);

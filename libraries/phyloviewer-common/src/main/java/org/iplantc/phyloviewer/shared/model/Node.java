@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.Vector;
 
 public class Node implements INode, Serializable
 {
@@ -12,7 +11,7 @@ public class Node implements INode, Serializable
 	
 	private int id;
 	private String label;
-	private Vector<Node> children = null;
+	private Node[] children;
 	private Double branchLength;
 	private transient ArrayList<NodeListener> listeners = new ArrayList<NodeListener>();
 	private INode parent;
@@ -60,34 +59,13 @@ public class Node implements INode, Serializable
 			return null;
 		}
 
-		return children.get(index);
-	}
-
-	public void addChild(Node node)
-	{
-		if(children == null)
-		{
-			children = new Vector<Node>();
-		}
-
-		children.add(node);
-		node.setParent(this);
+		return children[index];
 	}
 
 	@Override
 	public Node[] getChildren()
 	{
-		if(children == null)
-		{
-			return null;
-		}
-
-		Node[] array = new Node[children.size()];
-		for(int i = 0;i < children.size();++i)
-		{
-			array[i] = children.get(i);
-		}
-		return array;
+		return children;
 	}
 
 	@Override
@@ -188,20 +166,8 @@ public class Node implements INode, Serializable
 
 	public void setChildren(Node[] children)
 	{
-		if(children == null)
-		{
-			this.children = null;
-		}
-		else
-		{
-			this.children = new Vector<Node>();
-			for(Node node : children)
-			{
-				this.children.add(node);
-				node.setParent(this);
-			}
+			this.children = children;
 			notifyNodeListeners(children);
-		}
 	}
 
 	public void addNodeListener(NodeListener listener)

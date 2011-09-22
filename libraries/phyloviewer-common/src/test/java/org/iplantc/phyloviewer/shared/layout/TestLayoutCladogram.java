@@ -24,8 +24,7 @@ public class TestLayoutCladogram extends TestCase {
 		b.setBranchLength(2.0);
 		b.setId(2);
 		
-		root.addChild(a);
-		root.addChild(b);
+		root.setChildren(new Node[] {a,b});
 		
 		tree = new Tree();
 		tree.setRootNode(root);
