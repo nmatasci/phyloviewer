@@ -3,9 +3,9 @@ package org.iplantc.phyloviewer.viewer.client.render;
 import org.iplantc.phyloviewer.client.tree.viewer.View;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.model.Node;
-import org.iplantc.phyloviewer.shared.model.Node.NodeListener;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteNode.NodeListener;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService.SearchResult;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.SearchResultListener;
@@ -51,7 +51,7 @@ public class SearchHighlighter implements SearchResultListener, NodeListener
 		this.tree = tree;
 		if(tree != null)
 		{
-			((Node)tree.getRootNode()).addNodeListener(this);
+			((RemoteNode)tree.getRootNode()).addNodeListener(this);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class SearchHighlighter implements SearchResultListener, NodeListener
 	{
 		if(tree != null)
 		{
-			Node root = (Node)tree.getRootNode();
+			RemoteNode root = (RemoteNode)tree.getRootNode();
 
 			if(root != null)
 			{

@@ -1,5 +1,6 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.iplantc.phyloviewer.shared.model.INode;
@@ -8,7 +9,8 @@ import org.iplantc.phyloviewer.shared.model.Node;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class RemoteNode extends Node implements IsSerializable {
-
+	private static final long serialVersionUID = 1L;
+	
 	private int numChildren;
 	private int numNodes;
 	private int numLeaves;
@@ -18,6 +20,8 @@ public class RemoteNode extends Node implements IsSerializable {
 	/** any node (in the same tree) with a leftIndex >= this.leftIndex and rightIndex <= this.rightIndex is in this node's subtree */
 	private int leftIndex;
 	private int rightIndex;
+	
+	private transient ArrayList<NodeListener> listeners = new ArrayList<NodeListener>();
 
 	/**
 	 * Creates a node without children. Children can be added with setChildren(), or be fetched (on the
@@ -128,6 +132,8 @@ public class RemoteNode extends Node implements IsSerializable {
 		{
 			this.numChildren = children.length;
 		}
+		
+		notifyNodeListeners(children);
 	}
 	
 	public boolean subtreeContains(int traversalIndex)
@@ -224,4 +230,43 @@ public class RemoteNode extends Node implements IsSerializable {
 		
 		return mrca;
 	}
+	
+
+	public void addNodeListener(NodeListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	public void removeNodeListener(NodeListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	public void removeNodeListenerFromSubtree(NodeListener listener)
+	{
+		removeNodeListener(listener);
+
+		if(getChildren() != null)
+		{
+			for(RemoteNode child : getChildren())
+			{
+				child.removeNodeListenerFromSubtree(listener);
+			}
+		}
+	}
+
+	public interface NodeListener
+	{
+		/** Called when a Node has set new children */
+		void handleChildren(Node[] children);
+	}
+
+	private void notifyNodeListeners(Node[] children)
+	{
+		for(NodeListener listener : listeners)
+		{
+			listener.handleChildren(children);
+		}
+	}
+
 }

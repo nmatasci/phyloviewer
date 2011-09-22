@@ -1,7 +1,6 @@
 package org.iplantc.phyloviewer.shared.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -13,7 +12,6 @@ public class Node implements INode, Serializable
 	private String label;
 	private Node[] children;
 	private Double branchLength;
-	private transient ArrayList<NodeListener> listeners = new ArrayList<NodeListener>();
 	private INode parent;
 
 	public Node(int id, String label)
@@ -166,45 +164,7 @@ public class Node implements INode, Serializable
 
 	public void setChildren(Node[] children)
 	{
-			this.children = children;
-			notifyNodeListeners(children);
-	}
-
-	public void addNodeListener(NodeListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	public void removeNodeListener(NodeListener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	public void removeNodeListenerFromSubtree(NodeListener listener)
-	{
-		removeNodeListener(listener);
-
-		if(children != null)
-		{
-			for(Node child : children)
-			{
-				child.removeNodeListenerFromSubtree(listener);
-			}
-		}
-	}
-
-	public interface NodeListener
-	{
-		/** Called when a Node has set new children */
-		void handleChildren(Node[] children);
-	}
-
-	private void notifyNodeListeners(Node[] children)
-	{
-		for(NodeListener listener : listeners)
-		{
-			listener.handleChildren(children);
-		}
+		this.children = children;
 	}
 
 	@Override
