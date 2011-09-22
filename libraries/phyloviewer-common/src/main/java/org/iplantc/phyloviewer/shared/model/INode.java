@@ -5,7 +5,6 @@
 
 package org.iplantc.phyloviewer.shared.model;
 
-import java.util.Comparator;
 import java.util.Set;
 
 public interface INode
@@ -37,8 +36,6 @@ public interface INode
 	public abstract double findMaximumDistanceToLeaf();
 
 	public abstract String findLabelOfFirstLeafNode();
-
-	public abstract void sortChildrenBy(Comparator<INode> comparator);
 
 	public abstract Double getBranchLength();
 

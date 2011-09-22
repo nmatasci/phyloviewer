@@ -1,6 +1,5 @@
 package org.iplantc.phyloviewer.viewer.server;
 
-import java.util.Comparator;
 import java.util.Set;
 
 import org.iplantc.phyloparser.model.Node;
@@ -8,6 +7,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 
 public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model.Node
 {
+	private static final long serialVersionUID = 1L;
 	Node phyloparserNode;
 	PhyloparserNodeAdapter[] children; //children will get adapted lazily
 	int numNodes;
@@ -117,11 +117,4 @@ public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model
 	{
 		phyloparserNode.setName(label);
 	}
-
-	@Override
-	public void sortChildrenBy(Comparator<INode> comparator)
-	{
-		throw new UnsupportedOperationException("PhyloparserNodeAdapter does not support sortChildrenBy()");
-	}
-
 }

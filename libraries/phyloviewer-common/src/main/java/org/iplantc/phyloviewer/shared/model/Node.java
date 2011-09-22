@@ -3,9 +3,6 @@ package org.iplantc.phyloviewer.shared.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -169,17 +166,6 @@ public class Node implements INode, Serializable
 	public void setLabel(String label)
 	{
 		this.label = label;
-	}
-
-	@Override
-	public void sortChildrenBy(Comparator<INode> comparator)
-	{
-		if(getChildren() != null)
-		{
-			List<Node> childList = Arrays.asList(getChildren());
-			Collections.sort(childList, comparator);
-			setChildren(childList.toArray(new Node[childList.size()]));
-		}
 	}
 
 	@Override

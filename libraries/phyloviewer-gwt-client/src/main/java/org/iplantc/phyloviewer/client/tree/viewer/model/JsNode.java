@@ -5,8 +5,6 @@
 
 package org.iplantc.phyloviewer.client.tree.viewer.model;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Set;
 
 import org.iplantc.phyloviewer.shared.model.INode;
@@ -122,16 +120,6 @@ public class JsNode extends JavaScriptObject implements INode
 		}
 
 		return this.getChild(0).findLabelOfFirstLeafNode();
-	}
-
-	@Override
-	public final void sortChildrenBy(Comparator<INode> comparator)
-	{
-		if(this.getNumberOfChildren() > 0)
-		{
-			NodeList list = new NodeList(getNativeChildren());
-			Collections.sort(list, comparator);
-		}
 	}
 
 	@Override
