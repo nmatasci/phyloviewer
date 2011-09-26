@@ -91,11 +91,16 @@
     		<artifactId>commons-fileupload</artifactId>
     		<version>1.2.2</version>
 		</dependency>
-<dependency>
-  <groupId>org.nexml.model</groupId>
-  <artifactId>nexml</artifactId>
-  <version>1.5-SNAPSHOT</version>
-</dependency>
+        <dependency>
+          <groupId>org.nexml.model</groupId>
+          <artifactId>nexml</artifactId>
+          <version>1.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+          <version>3.6.7.Final</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<finalName>phyloviewer</finalName>
