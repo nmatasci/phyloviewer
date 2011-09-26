@@ -88,7 +88,7 @@ public class SelectionMouseHandler extends BaseMouseHandler implements HasNodeSe
 						if (downEvent.isAltKeyDown)
 						{
 							addToSelection(node, false);
-							addSubtreeToSelection(view.getTree().getRootNode().mrca(currentSelection));
+//							addSubtreeToSelection(view.getTree().getRootNode().mrca(currentSelection));
 						}
 						else
 						{

@@ -101,12 +101,6 @@ public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model
 	}
 
 	@Override
-	public INode mrca(Set<INode> nodes)
-	{
-		throw new UnsupportedOperationException("PhyloparserNodeAdapter does not support mrca()");
-	}
-
-	@Override
 	public void setBranchLength(Double branchLength)
 	{
 		phyloparserNode.setBranchLength(branchLength);

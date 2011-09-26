@@ -5,7 +5,6 @@
 
 package org.iplantc.phyloviewer.client.tree.viewer.model;
 
-import java.util.Set;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 
@@ -179,15 +178,4 @@ public class JsNode extends JavaScriptObject implements INode
 	}
 	
 	private final native JavaScriptObject getMetaDataStringNative() /*-{	return this.metadata; }-*/;
-
-	@Override
-	public final INode mrca(Set<INode> nodes)
-	{
-		/*
-		 * FIXME return the most recent common ancestor of the given set of nodes within this INode's
-		 * subtree. Return null if this subtree does not contain all of the nodes. Probably need a parent
-		 * reference to do this with any kind of efficiency
-		 */
-		return null;
-	}
 }

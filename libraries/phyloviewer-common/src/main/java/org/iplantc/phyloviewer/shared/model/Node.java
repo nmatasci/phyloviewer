@@ -221,17 +221,6 @@ public class Node implements INode, Serializable
 	}
 
 	@Override
-	public INode mrca(Set<INode> nodes)
-	{
-		/*
-		 * FIXME return the most recent common ancestor of the given set of nodes within this INode's
-		 * subtree. Return null if this subtree does not contain all of the nodes. Probably need a parent
-		 * reference to do this with any kind of efficiency
-		 */
-		return null;
-	}
-
-	@Override
 	public INode getParent()
 	{
 		return this.parent;
