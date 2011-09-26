@@ -131,7 +131,6 @@ public class Node implements INode, Serializable
 		return getNumberOfChildren() == 0;
 	}
 
-	@Override
 	public void setId(int id)
 	{
 		this.id = id;

@@ -12,8 +12,6 @@ public interface INode
 {
 	public abstract int getId();
 
-	public abstract void setId(int id);
-
 	public abstract String getLabel();
 
 	public abstract void setLabel(String label);

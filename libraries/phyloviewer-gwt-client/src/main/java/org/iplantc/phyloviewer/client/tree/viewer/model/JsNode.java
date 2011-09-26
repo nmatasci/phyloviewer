@@ -23,7 +23,6 @@ public class JsNode extends JavaScriptObject implements INode
 	@Override
 	public final native int getId() /*-{ return this.id; }-*/;
 
-	@Override
 	public final native void setId(int id) /*-{ this.id = id; }-*/;
 
 	public final native String getLabel() /*-{ return this.name; }-*/;
