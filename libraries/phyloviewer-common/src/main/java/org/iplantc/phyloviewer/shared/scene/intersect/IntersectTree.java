@@ -153,13 +153,10 @@ public class IntersectTree
 
 	private void traverse(INode node)
 	{
-		INode[] children = node.getChildren();
-		if(children != null)
+		if(node.getChildren() != null)
 		{
-			for(int i = 0;i < children.length;++i)
+			for(INode child : node.getChildren())
 			{
-				INode child = children[i];
-
 				Drawable[] drawables = drawableContainer.getBranchDrawables(child);
 				this.testIntersection(child, drawables);
 

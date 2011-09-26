@@ -202,10 +202,9 @@ public class SelectionMouseHandler extends BaseMouseHandler implements HasNodeSe
 	{
 		addToSelection(node, false);
 		
-		INode[] children = node.getChildren();
-		if (children != null)
+		if (node.getChildren() != null)
 		{
-			for (INode child : children)
+			for (INode child : node.getChildren())
 			{
 				if (child != null)
 				{

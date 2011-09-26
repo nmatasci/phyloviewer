@@ -5,6 +5,8 @@
 
 package org.iplantc.phyloviewer.client.tree.viewer.model;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 
@@ -53,12 +55,13 @@ public class JsNode extends JavaScriptObject implements INode
 		return child;
 	}
 
-	public final INode[] getChildren()
+	@Override
+	public final List<JsNode> getChildren()
 	{
-		JsNode[] children = new JsNode[getNumberOfChildren()];
+		ArrayList<JsNode> children = new ArrayList<JsNode>(getNumberOfChildren());
 		for(int i = 0;i < getNumberOfChildren();i++)
 		{
-			children[i] = getChild(i);
+			children.set(i, getChild(i));
 		}
 
 		return children;

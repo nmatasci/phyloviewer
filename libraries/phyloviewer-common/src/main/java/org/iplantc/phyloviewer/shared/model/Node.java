@@ -1,8 +1,7 @@
 package org.iplantc.phyloviewer.shared.model;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
 public class Node implements INode, Serializable
 {
@@ -10,7 +9,7 @@ public class Node implements INode, Serializable
 	
 	private int id;
 	private String label;
-	private Node[] children;
+	private List<? extends Node> children;
 	private Double branchLength;
 	private INode parent;
 
@@ -57,11 +56,11 @@ public class Node implements INode, Serializable
 			return null;
 		}
 
-		return children[index];
+		return children.get(index);
 	}
 
 	@Override
-	public Node[] getChildren()
+	public List<? extends Node> getChildren()
 	{
 		return children;
 	}
@@ -87,7 +86,7 @@ public class Node implements INode, Serializable
 		}
 		else
 		{
-			return getChildren().length;
+			return getChildren().size();
 		}
 	}
 
@@ -147,6 +146,11 @@ public class Node implements INode, Serializable
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (this == obj) 
+		{
+			return true;
+		}
+		
 		if(obj == null || !(obj instanceof Node))
 		{
 			return false;
@@ -154,15 +158,10 @@ public class Node implements INode, Serializable
 
 		Node that = (Node)obj;
 
-		return this.shallowEquals(that) && Arrays.equals(this.getChildren(), that.getChildren());
+		return this.getId() == that.getId();
 	}
 
-	public boolean shallowEquals(Node obj)
-	{
-		return this.getId() == obj.getId() && this.getLabel().equals(obj.getLabel());
-	}
-
-	public void setChildren(Node[] children)
+	public void setChildren(List<? extends Node> children)
 	{
 		this.children = children;
 	}

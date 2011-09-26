@@ -1,5 +1,7 @@
 package org.iplantc.phyloviewer.model;
 
+import java.util.ArrayList;
+
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Node;
 import org.iplantc.phyloviewer.shared.model.Tree;
@@ -31,9 +33,9 @@ public class BuildTreeFromJSON {
 		JSONArray children = object.optJSONArray("children");
 		if(null!=children) {
 			int numChildren = children.length();
-			Node[] myChildren = new Node[numChildren];
+			ArrayList<Node> myChildren = new ArrayList<Node>(numChildren);
 			for(int i = 0;i<numChildren;++i) {
-				myChildren[i]=buildNode(children.getJSONObject(i));
+				myChildren.set(i, buildNode(children.getJSONObject(i)));
 			}
 			
 			node.setChildren(myChildren);

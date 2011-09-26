@@ -43,11 +43,10 @@ public class IntersectTreeBox
 	}
 
 	static void traverse(INode node, ILayoutData layout, Box2D range, Set<INode> result) {
-		INode[] children = node.getChildren();
-		if (children != null)
+		if (node.getChildren() != null)
 		{
-			for(int i = 0; i < children.length; ++i) {
-				visit(children[i], layout, range, result);
+			for(INode child : node.getChildren()) {
+				visit(child, layout, range, result);
 			}
 		}
 	}

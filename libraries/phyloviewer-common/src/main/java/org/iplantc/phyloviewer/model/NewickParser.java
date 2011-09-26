@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.iplantc.phyloparser.exception.ParserException;
@@ -84,19 +85,13 @@ public class NewickParser
 		public org.iplantc.phyloviewer.shared.model.Node convertDataModels(
 				org.iplantc.phyloparser.model.Node node)
 		{
-			List<Node> myChildren = node.getChildren();
-
-			int len = myChildren.size();
-			org.iplantc.phyloviewer.shared.model.Node[] children = new org.iplantc.phyloviewer.shared.model.Node[len];
+			ArrayList<org.iplantc.phyloviewer.shared.model.Node> children = new ArrayList<org.iplantc.phyloviewer.shared.model.Node>();
 
 			int id = nextId++;
 
-			for(int i = 0;i < len;i++)
+			for(Node myChild : node.getChildren())
 			{
-				Node myChild = myChildren.get(i);
-
-				org.iplantc.phyloviewer.shared.model.Node child = convertDataModels(myChild);
-				children[i] = child;
+				children.add(convertDataModels(myChild));
 			}
 
 			String label = node.getName();

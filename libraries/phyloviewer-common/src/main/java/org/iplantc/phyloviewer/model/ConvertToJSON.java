@@ -23,11 +23,10 @@ public class ConvertToJSON
 		object.put("name", node.getLabel());
 		object.put("branchLength", node.getBranchLength());
 
-		INode[] myChildren = node.getChildren();
-		if(myChildren != null)
+		if(node.getChildren() != null)
 		{
 			JSONArray children = new JSONArray();
-			for(INode child : myChildren)
+			for(INode child : node.getChildren())
 			{
 				children.put(buildJSON(child));
 			}

@@ -5,6 +5,8 @@
 
 package org.iplantc.phyloviewer.shared.model;
 
+import java.util.List;
+
 
 public interface INode
 {
@@ -18,7 +20,7 @@ public interface INode
 
 	public abstract int getNumberOfChildren();
 
-	public abstract INode[] getChildren();
+	public abstract List<? extends INode> getChildren();
 
 	public abstract INode getChild(int index);
 	

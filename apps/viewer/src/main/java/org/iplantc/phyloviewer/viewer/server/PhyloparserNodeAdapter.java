@@ -1,15 +1,15 @@
 package org.iplantc.phyloviewer.viewer.server;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.iplantc.phyloparser.model.Node;
-import org.iplantc.phyloviewer.shared.model.INode;
 
 public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model.Node
 {
 	private static final long serialVersionUID = 1L;
 	Node phyloparserNode;
-	PhyloparserNodeAdapter[] children; //children will get adapted lazily
+	List<PhyloparserNodeAdapter> children; //children will get adapted lazily
 	int numNodes;
 	int numLeaves;
 	
@@ -17,7 +17,7 @@ public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model
 	{
 		this.phyloparserNode = node;
 		int numChildren = node.getChildren().size();
-		children = new PhyloparserNodeAdapter[numChildren];
+		children = new ArrayList<PhyloparserNodeAdapter>(numChildren);
 	}
 	
 	@Override
@@ -35,18 +35,18 @@ public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model
 	@Override
 	public PhyloparserNodeAdapter getChild(int index)
 	{
-		if (children[index] == null) {
-			children[index] = new PhyloparserNodeAdapter(phyloparserNode.getChildren().get(index));
+		if (children.get(index) == null) {
+			children.set(index, new PhyloparserNodeAdapter(phyloparserNode.getChildren().get(index)));
 		}
 		
-		return children[index];
+		return children.get(index);
 	}
 
 	@Override
-	public PhyloparserNodeAdapter[] getChildren()
+	public List<PhyloparserNodeAdapter> getChildren()
 	{
 		//make sure the children have all been adapted
-		for (int index = 0; index < children.length; index++)
+		for (int index = 0; index < children.size(); index++)
 		{
 			getChild(index);
 		}
@@ -69,7 +69,7 @@ public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model
 	@Override
 	public int getNumberOfChildren()
 	{
-		return children.length;
+		return children.size();
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class PhyloparserNodeAdapter extends org.iplantc.phyloviewer.shared.model
 	@Override
 	public Boolean isLeaf()
 	{
-		return children.length == 0;
+		return children.size() == 0;
 	}
 
 	@Override

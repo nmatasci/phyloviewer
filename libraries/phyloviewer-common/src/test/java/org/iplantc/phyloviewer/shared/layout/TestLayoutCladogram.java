@@ -1,5 +1,7 @@
 package org.iplantc.phyloviewer.shared.layout;
 
+import java.util.ArrayList;
+
 import org.iplantc.phyloviewer.shared.model.Node;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.junit.Test;
@@ -24,7 +26,10 @@ public class TestLayoutCladogram extends TestCase {
 		b.setBranchLength(2.0);
 		b.setId(2);
 		
-		root.setChildren(new Node[] {a,b});
+		ArrayList<Node> children = new ArrayList<Node>();
+		children.add(a);
+		children.add(b);
+		root.setChildren(children);
 		
 		tree = new Tree();
 		tree.setRootNode(root);

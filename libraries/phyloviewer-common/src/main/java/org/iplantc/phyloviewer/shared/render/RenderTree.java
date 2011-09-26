@@ -167,10 +167,8 @@ public abstract class RenderTree
 
 	protected void renderChildren(INode parent, ILayoutData layout, IGraphics graphics, IStyle parentStyle)
 	{
-		INode[] children = parent.getChildren();
-		for(int i = 0;i < children.length;++i)
+		for(INode child : parent.getChildren())
 		{
-			INode child = children[i];
 			IStyle style = getStyle(child);
 			 
 			style = createComposite(parentStyle, style, Defaults.DEFAULT_STYLE);

@@ -1,6 +1,8 @@
 
 package org.iplantc.phyloviewer.shared.model;
 
+import java.util.ArrayList;
+
 import org.iplantc.phyloviewer.shared.model.Node;
 import org.junit.Test;
 
@@ -24,9 +26,15 @@ public class TestNode extends TestCase {
 		Node d = new Node();
 		d.setBranchLength(3.0);
 		
-		root.setChildren(new Node[] {a,b});
+		ArrayList<Node> children = new ArrayList<Node>();
+		children.add(a);
+		children.add(b);
+		root.setChildren(children);
 		
-		b.setChildren(new Node[] {c,d});
+		children = new ArrayList<Node>();
+		children.add(c);
+		children.add(d);
+		b.setChildren(children);
 		
 		double distance=root.findMaximumDistanceToLeaf();
 		assertTrue(5.0==distance);
