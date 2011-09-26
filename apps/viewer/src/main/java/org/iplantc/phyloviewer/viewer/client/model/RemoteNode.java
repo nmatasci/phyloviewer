@@ -1,7 +1,6 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -24,7 +23,7 @@ public class RemoteNode extends PersistentNode implements Serializable {
 		super(label);
 	}
 
-	public RemoteNode() 
+	protected RemoteNode() 
 	{ 
 	}
 
@@ -69,20 +68,13 @@ public class RemoteNode extends PersistentNode implements Serializable {
 	{
 		this.topology = topology;
 	}
-
+	
 	@Override
-	public void setChildren(List<? extends PersistentNode> children)
+	public void addChild(PersistentNode child)
 	{
-		super.setChildren(children);
+		super.addChild(child);
 		
-		if (children != null)
-		{
-			this.topology.setNumChildren(children.size());
-		}
-		else
-		{
-			this.topology.setNumChildren(0);
-		}
+		this.topology.setNumChildren(getNumberOfChildren());
 	}
 
 	/**

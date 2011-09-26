@@ -278,15 +278,13 @@ public class ImportTreeData implements IImportTreeData {
 	public static RemoteNode convertDataModels(org.iplantc.phyloparser.model.Node parserNode) 
 	{
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>(parserNode.getChildren().size());
-		
-		for (Node parserChild : parserNode.getChildren()) {			
-			children.add(convertDataModels(parserChild));
-		}
-		
 		//create a RemoteNode for the current node
 		String label = parserNode.getName();
 		RemoteNode rNode = new RemoteNode(label);
-		rNode.setChildren(children);
+		
+		for (Node parserChild : parserNode.getChildren()) {			
+			rNode.addChild(convertDataModels(parserChild));
+		}
 		
 		return rNode;
 	}

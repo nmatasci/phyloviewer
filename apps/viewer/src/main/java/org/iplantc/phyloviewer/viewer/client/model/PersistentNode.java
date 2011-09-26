@@ -1,6 +1,7 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -30,7 +31,7 @@ public class PersistentNode implements INode, Serializable
 	private PersistentNode parent;
 	
 	@OneToMany(mappedBy="parent", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<? extends PersistentNode> children;
+	protected List<PersistentNode> children;
 
 	public PersistentNode(String label)
 	{
@@ -40,7 +41,7 @@ public class PersistentNode implements INode, Serializable
 	/**
 	 * No-arg constructor, required by Serializable and @Entity
 	 */
-	public PersistentNode()
+	protected PersistentNode()
 	{
 	}
 
@@ -178,10 +179,30 @@ public class PersistentNode implements INode, Serializable
 
 	public void setChildren(List<? extends PersistentNode> children)
 	{
-		this.children = children;
+		if (this.children == null) 
+		{
+			this.children = new ArrayList<PersistentNode>();
+		}
+		else 
+		{
+			this.children.clear();
+		}
+		
 		for (PersistentNode child : children) {
+			this.children.add(child);
 			child.setParent(this);
 		}
+	}
+	
+	public void addChild(PersistentNode child)
+	{
+		if (this.children == null) 
+		{
+			this.children = new ArrayList<PersistentNode>();
+		}
+		
+		this.children.add(child);
+		child.setParent(this);
 	}
 
 	public String toString()
