@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -62,10 +63,18 @@ public class ImportTreeData implements IImportTreeData {
 	
 	public static RemoteNode rootNodeFromNewick(String newick, String name) throws ParserException {
 		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name);
+		if (tree == null)
+		{
+			return null;
+		}
+		
+		RemoteNode root = convertDataModels(tree.getRoot());
 		
 		int depth = 0;
-		int nextTraversalIndex = 1; //starts with 1 to avoid ambiguity, because JDBC ResultSet.getInt() returns 0 for null values 
-		return convertDataModels(tree.getRoot(), depth, nextTraversalIndex);
+		int nextTraversalIndex = 1;
+		root.reindex(depth, nextTraversalIndex);
+		
+		return root;
 	}
 	
 	public static org.iplantc.phyloparser.model.Tree treeFromNewick(String newick, String name) throws ParserException
@@ -266,38 +275,17 @@ public class ImportTreeData implements IImportTreeData {
 		}
 	}
 	
-	private static RemoteNode convertDataModels(org.iplantc.phyloparser.model.Node node, int depth, int nextTraversalIndex) {
+	public static RemoteNode convertDataModels(org.iplantc.phyloparser.model.Node parserNode) 
+	{
+		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>(parserNode.getChildren().size());
 		
-		List<Node> myChildren = node.getChildren();
-		
-		int len = myChildren.size();
-		RemoteNode[] children = new RemoteNode[len];
-		int numNodes = 1;
-		int maxChildHeight = -1;
-		int numLeaves = len == 0 ? 1 : 0;
-		int leftIndex = nextTraversalIndex;
-		nextTraversalIndex++;
-		
-		for (int i = 0; i < len; i++) {
-			Node myChild = myChildren.get(i);
-			
-			RemoteNode child = convertDataModels(myChild, depth + 1, nextTraversalIndex);
-			children[i] = child;
-			
-			//note: numNodes, height and numLeaves are fields in RemoteNode, so the tree is not actually traversed again for each of these.
-			maxChildHeight = Math.max(maxChildHeight, child.findMaximumDepthToLeaf()); 
-			numLeaves += child.getNumberOfLeafNodes();
-			numNodes += child.getNumberOfNodes();
-			nextTraversalIndex = child.getRightIndex() + 1;
+		for (Node parserChild : parserNode.getChildren()) {			
+			children.add(convertDataModels(parserChild));
 		}
 		
 		//create a RemoteNode for the current node
-		String label = node.getName();
-		
-		int height = maxChildHeight + 1;
-		int id = -1;  //id will be assigned when this node is inserted in the DB
-		int numChildren = children.length;
-		RemoteNode rNode = new RemoteNode(id, label, numChildren, numNodes, numLeaves, depth, height, leftIndex, nextTraversalIndex);
+		String label = parserNode.getName();
+		RemoteNode rNode = new RemoteNode(label);
 		rNode.setChildren(children);
 		
 		return rNode;
