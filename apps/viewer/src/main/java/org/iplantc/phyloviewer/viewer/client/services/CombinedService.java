@@ -1,5 +1,7 @@
 package org.iplantc.phyloviewer.viewer.client.services;
 
+import java.util.List;
+
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
@@ -18,7 +20,7 @@ public interface CombinedService extends RemoteService
 	{
 		public int parentID;
 		public LayoutResponse[] layouts;
-		public RemoteNode[] nodes;
+		public List<RemoteNode> nodes;
 	}
 	
 	/**

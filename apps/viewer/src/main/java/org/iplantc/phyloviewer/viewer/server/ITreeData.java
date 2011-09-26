@@ -1,8 +1,9 @@
 package org.iplantc.phyloviewer.viewer.server;
 
+import java.util.List;
+
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
-import org.iplantc.phyloviewer.viewer.client.services.TreeNotAvailableException;
 
 public interface ITreeData
 {
@@ -33,6 +34,6 @@ public interface ITreeData
 	 * @param parentID
 	 * @return the children of parentID.  Null if the node had no children
 	 */
-	public abstract RemoteNode[] getChildren(int parentID) throws TreeDataException;
+	public abstract List<RemoteNode> getChildren(int parentID) throws TreeDataException;
 	
 }
