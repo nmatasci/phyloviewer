@@ -1,179 +1,130 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
-import org.iplantc.phyloviewer.shared.model.INode;
-import org.iplantc.phyloviewer.shared.model.Node;
+import java.io.Serializable;
+import java.util.List;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 
-public class RemoteNode extends Node implements IsSerializable {
+@Entity
+public class RemoteNode extends PersistentNode implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private int numChildren;
-	private int numNodes;
-	private int numLeaves;
-	private int height;
-	private int depth;
-	
-	/** any node (in the same tree) with a leftIndex >= this.leftIndex and rightIndex <= this.rightIndex is in this node's subtree */
-	private int leftIndex;
-	private int rightIndex;
+	@Embedded
+	private NodeTopology topology = new NodeTopology();
 
-	/**
-	 * Creates a node without children. Children can be added with setChildren(), or be fetched (on the
-	 * client), using getChildrenAsync()
-	 */
-	public RemoteNode(int id, String label, int numChildren, int numNodes, int numLeaves, int depth, int height, int leftIndex, int rightIndex) {
-		super(id, label);
-		//TODO do some validation on these
-		this.numChildren = numChildren;
-		this.numNodes = numNodes;
-		this.numLeaves = numLeaves;
-		this.depth = depth;
-		this.height = height;
-		this.leftIndex = leftIndex;
-		this.rightIndex = rightIndex;
+	public RemoteNode(String label, NodeTopology topology) {
+		this(label);
+		this.topology = topology;
 	}
 	
-	/** no-arg constructor required for serialization */
-	public RemoteNode() { 
+	public RemoteNode(String label)
+	{
+		super(label);
 	}
-	
-	@Override
+
+	public RemoteNode() 
+	{ 
+	}
+
+	@Override @Transient
 	public int getNumberOfLeafNodes() {
-		return numLeaves;
+		return topology.getNumLeaves();
 	}
 	
-	@Override
-	public String findLabelOfFirstLeafNode() {
-		if(numChildren==0) {
-			return getLabel();
-		}
-		return this.getChild(0).findLabelOfFirstLeafNode();
-	}
 
 	@Override
 	public int findMaximumDepthToLeaf() {
-		return height;
+		return topology.getHeight();
 	}
 
 	/**
 	 * @return the number of children this node has. These children may not have been fetched yet.
 	 */
-	@Override
-	public int getNumberOfChildren() {
-		return numChildren;
+	@Override @Transient
+	public int getNumberOfChildren() 
+	{
+		return topology.getNumChildren();
 	}
 		
-	@Override
+	@Override @Transient
 	public int getNumberOfNodes()
 	{
-		return numNodes;
+		return topology.getNumNodes();
 	}
 	
-	public int getNumberOfLocalNodes() 
+	@Override
+	public double findMaximumDistanceToLeaf()
 	{
-		int count = 1;
+		return topology.getBranchLengthHeight();
+	}
+
+	public NodeTopology getTopology()
+	{
+		return topology;
+	}
+
+	protected void setTopology(NodeTopology topology)
+	{
+		this.topology = topology;
+	}
+
+	@Override
+	public void setChildren(List<? extends PersistentNode> children)
+	{
+		super.setChildren(children);
 		
-		if (getChildren() != null) 
+		if (children != null)
 		{
-			for (INode child : getChildren()) 
+			this.topology.setNumChildren(children.size());
+		}
+		else
+		{
+			this.topology.setNumChildren(0);
+		}
+	}
+
+	/**
+	 * @param depth this nodes depth
+	 * @param leftIndex this node's leftIndex
+	 * @return
+	 */
+	public NodeTopology reindex(int depth, int leftIndex)
+	{
+		int numNodes = 1;
+		int maxChildHeight = -1;
+		double maxBranchLengthHeight = 0.0;
+		int numLeaves = this.isLeaf() ? 1 : 0;
+		int nextTraversalIndex = leftIndex + 1;
+		
+		if (this.getChildren() != null)
+		{
+			for (PersistentNode child : this.getChildren())
 			{
-				if (child instanceof RemoteNode)
-				{
-					count += ((RemoteNode)child).getNumberOfLocalNodes();
-				}
-				else
-				{
-					count += child.getNumberOfNodes();
-				}
+				NodeTopology childTopology = ((RemoteNode)child).reindex(depth + 1, nextTraversalIndex);
+				
+				maxChildHeight = Math.max(maxChildHeight, childTopology.getHeight());
+				maxBranchLengthHeight = Math.max(maxBranchLengthHeight, childTopology.getBranchLengthHeight() + child.getBranchLength());
+				numLeaves += childTopology.getNumLeaves();
+				numNodes += childTopology.getNumNodes();
+				nextTraversalIndex = childTopology.getRightIndex() + 1;
 			}
 		}
 		
-		return count;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if(obj == null || !(obj instanceof RemoteNode))
+		if (this.topology == null)
 		{
-			return false;
+			this.topology = new NodeTopology();
 		}
-
-		RemoteNode that = (RemoteNode)obj;
-
-		return super.shallowEquals(that)
-			&& this.numChildren == that.getNumberOfChildren()
-			&& this.numLeaves == that.getNumberOfLeafNodes()
-			&& this.height == that.findMaximumDepthToLeaf()
-			&& this.numNodes == that.getNumberOfNodes();
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return getId();
-	}
-
-	@Override
-	public void setChildren(Node[] children) 
-	{
-		/*
-		 * TODO Adding non-RemoteNode children invalidates the topology fields (right/left indices, height, etc). Make sure children
-		 * are RemoteNodes with the correct topology fields
-		 */
-		super.setChildren(children);
-		if (children != null)
-		{
-			this.numChildren = children.length;
-		}
-	}
-	
-	public boolean subtreeContains(int traversalIndex)
-	{
-		return traversalIndex >= leftIndex && traversalIndex <= rightIndex;
-	}
-	
-	public boolean subtreeContains(RemoteNode node)
-	{
-		return subtreeContains(node.getLeftIndex());
-	}
-	
-	/** any node (in the same tree) with a leftIndex >= this.leftIndex and rightIndex <= this.rightIndex is in this node's subtree */
-	public int getLeftIndex() 
-	{
-		return leftIndex;
-	}
-	
-	/** any node (in the same tree) with a leftIndex >= this.leftIndex and rightIndex <= this.rightIndex is in this node's subtree */
-	public int getRightIndex()
-	{
-		return rightIndex;
-	}
-	
-	public int getDepth()
-	{
-		return depth;
-	}
-
-	@Override
-	public RemoteNode getChild(int index)
-	{
-		return (RemoteNode) super.getChild(index);
-	}
-
-	@Override
-	public RemoteNode[] getChildren()
-	{
-		if(super.getChildren() == null) {
-			return null;
-		}
+		this.topology.setDepth(depth);
+		this.topology.setLeftIndex(leftIndex);
+		this.topology.setBranchLengthHeight(maxBranchLengthHeight);
+		this.topology.setHeight(maxChildHeight + 1);
+		this.topology.setNumChildren(super.getNumberOfChildren());
+		this.topology.setNumLeaves(numLeaves);
+		this.topology.setNumNodes(numNodes);
+		this.topology.setRightIndex(nextTraversalIndex);
 		
-		int numChildren = this.getNumberOfChildren();
-		RemoteNode[] array = new RemoteNode[numChildren];
-		for(int i = 0; i < numChildren; ++i) {
-			array[i] = this.getChild(i);
-		}
-		return array;
-	}	
+		return this.topology;
+	}
 }
