@@ -3,7 +3,7 @@ package org.iplantc.phyloviewer.shared.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class Node implements INode, Serializable
+public class Node extends AbstractNode implements Serializable
 {
 	private static final long serialVersionUID = 3329649649400777449L;
 	
@@ -24,42 +24,6 @@ public class Node implements INode, Serializable
 	}
 
 	@Override
-	public String findLabelOfFirstLeafNode()
-	{
-		if(this.isLeaf())
-		{
-			return this.getLabel();
-		}
-
-		return this.getChild(0).findLabelOfFirstLeafNode();
-	}
-
-	@Override
-	public int findMaximumDepthToLeaf()
-	{
-		int maxChildHeight = -1; // -1 so leaf will return 0
-
-		for(int index = 0;index < getNumberOfChildren();index++)
-		{
-			INode child = getChild(index);
-			maxChildHeight = Math.max(maxChildHeight, child.findMaximumDepthToLeaf());
-		}
-
-		return maxChildHeight + 1;
-	}
-
-	@Override
-	public Node getChild(int index)
-	{
-		if(children == null)
-		{
-			return null;
-		}
-
-		return children.get(index);
-	}
-
-	@Override
 	public List<? extends Node> getChildren()
 	{
 		return children;
@@ -77,60 +41,6 @@ public class Node implements INode, Serializable
 		return label;
 	}
 
-	@Override
-	public int getNumberOfChildren()
-	{
-		if(getChildren() == null)
-		{
-			return 0;
-		}
-		else
-		{
-			return getChildren().size();
-		}
-	}
-
-	@Override
-	public int getNumberOfLeafNodes()
-	{
-		int count = 0;
-		if(this.isLeaf())
-		{
-			count = 1;
-		}
-		else
-		{
-			for(int i = 0;i < this.getNumberOfChildren();++i)
-			{
-				count += this.getChild(i).getNumberOfLeafNodes();
-			}
-		}
-
-		return count;
-	}
-
-	@Override
-	public int getNumberOfNodes()
-	{
-		int count = 1;
-
-		if(getChildren() != null)
-		{
-			for(INode child : getChildren())
-			{
-				count += child.getNumberOfNodes();
-			}
-		}
-
-		return count;
-	}
-
-	@Override
-	public Boolean isLeaf()
-	{
-		return getNumberOfChildren() == 0;
-	}
-
 	public void setId(int id)
 	{
 		this.id = id;
@@ -142,33 +52,9 @@ public class Node implements INode, Serializable
 		this.label = label;
 	}
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj) 
-		{
-			return true;
-		}
-		
-		if(obj == null || !(obj instanceof Node))
-		{
-			return false;
-		}
-
-		Node that = (Node)obj;
-
-		return this.getId() == that.getId();
-	}
-
 	public void setChildren(List<? extends Node> children)
 	{
 		this.children = children;
-	}
-
-	@Override
-	public String toString()
-	{
-		return label;
 	}
 
 	@Override
@@ -198,7 +84,7 @@ public class Node implements INode, Serializable
 		{
 			for(int i = 0;i < numChildren;++i)
 			{
-				Node child = this.getChild(i);
+				Node child = (Node) this.getChild(i);
 				double distance = child.findMaximumDistanceToLeaf(currentDistance);
 
 				if(distance > localMaximum)

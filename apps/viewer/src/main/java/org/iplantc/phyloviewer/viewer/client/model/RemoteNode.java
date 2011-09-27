@@ -1,14 +1,39 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.iplantc.phyloviewer.shared.model.AbstractNode;
+import org.iplantc.phyloviewer.shared.model.INode;
 
 @Entity
-public class RemoteNode extends PersistentNode implements Serializable {
+public class RemoteNode extends AbstractNode implements INode, Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private int id;
+
+	private String label;
+
+	private Double branchLength = 1.0;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private RemoteNode parent;
+
+	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	protected List<RemoteNode> children;
 	
 	@Embedded
 	private NodeTopology topology = new NodeTopology();
@@ -20,14 +45,14 @@ public class RemoteNode extends PersistentNode implements Serializable {
 	
 	public RemoteNode(String label)
 	{
-		super(label);
+		this.label = label;
 	}
 
 	protected RemoteNode() 
 	{ 
 	}
 
-	@Override @Transient
+	@Override
 	public int getNumberOfLeafNodes() {
 		return topology.getNumLeaves();
 	}
@@ -41,13 +66,13 @@ public class RemoteNode extends PersistentNode implements Serializable {
 	/**
 	 * @return the number of children this node has. These children may not have been fetched yet.
 	 */
-	@Override @Transient
+	@Override
 	public int getNumberOfChildren() 
 	{
 		return topology.getNumChildren();
 	}
 		
-	@Override @Transient
+	@Override
 	public int getNumberOfNodes()
 	{
 		return topology.getNumNodes();
@@ -69,12 +94,80 @@ public class RemoteNode extends PersistentNode implements Serializable {
 		this.topology = topology;
 	}
 	
-	@Override
-	public void addChild(PersistentNode child)
+	public void addChild(RemoteNode child)
 	{
-		super.addChild(child);
+		if (this.children == null) 
+		{
+			this.children = new ArrayList<RemoteNode>();
+		}
 		
-		this.topology.setNumChildren(getNumberOfChildren());
+		this.children.add(child);
+		child.setParent(this);
+		
+		this.topology.setNumChildren(this.children.size());
+	}
+	
+	@Override
+	public List<RemoteNode> getChildren()
+	{
+		return children;
+	}
+	
+	public void setChildren(List<RemoteNode> children)
+	{
+		this.children = children;
+		
+		for (RemoteNode child : children)
+		{
+			child.setParent(this);
+		}
+		
+		this.topology.setNumChildren(children.size());
+	}
+	
+	public int getId()
+	{
+		return id;
+	}
+
+	public void setId(int id)
+	{
+		this.id = id;
+	}
+
+	public String getLabel()
+	{
+		return label;
+	}
+
+	public void setLabel(String label)
+	{
+		this.label = label;
+	}
+
+	public Double getBranchLength()
+	{
+		return branchLength;
+	}
+
+	public void setBranchLength(Double branchLength)
+	{
+		this.branchLength = branchLength;
+	}
+
+	public RemoteNode getParent()
+	{
+		return parent;
+	}
+
+	public void setParent(RemoteNode parent)
+	{
+		this.parent = parent;
+	}
+	
+	public String getMetaDataString()
+	{
+		return null;
 	}
 
 	/**
@@ -92,7 +185,7 @@ public class RemoteNode extends PersistentNode implements Serializable {
 		
 		if (this.getChildren() != null)
 		{
-			for (PersistentNode child : this.getChildren())
+			for (RemoteNode child : this.getChildren())
 			{
 				NodeTopology childTopology = ((RemoteNode)child).reindex(depth + 1, nextTraversalIndex);
 				
