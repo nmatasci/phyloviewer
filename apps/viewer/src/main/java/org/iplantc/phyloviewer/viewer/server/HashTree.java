@@ -43,6 +43,14 @@ public class HashTree
 		}
 	}
 	
+	public static byte[] hash(String tree, String encoding, String algorithm) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	{
+		byte[] bytes;
+		bytes = tree.getBytes(encoding);
+		MessageDigest md = MessageDigest.getInstance(algorithm);
+		return md.digest(bytes);
+	}
+	
 	public byte[] hash(ITree tree) throws UnsupportedOperationException
 	{
 		//TODO

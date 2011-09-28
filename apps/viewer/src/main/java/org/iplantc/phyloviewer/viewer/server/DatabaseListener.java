@@ -3,11 +3,13 @@ package org.iplantc.phyloviewer.viewer.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.iplantc.phyloviewer.viewer.server.db.ImportTreeData;
+import org.iplantc.phyloviewer.viewer.server.db.PersistTreeData;
 import org.postgresql.ds.PGPoolingDataSource;
 
 public class DatabaseListener implements ServletContextListener
@@ -34,7 +36,9 @@ public class DatabaseListener implements ServletContextListener
 		
 		servletContext.setAttribute("db.connectionPool", pool);
 		
-		DatabaseTreeData treeData = new DatabaseTreeData(pool);
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.iplantc.phyloviewer");
+		
+		ITreeData treeData = new UnpersistTreeData(emf);
 		servletContext.setAttribute(Constants.TREE_DATA_KEY, treeData);
 		
 		DatabaseLayoutData layoutData = new DatabaseLayoutData(pool);
@@ -47,7 +51,7 @@ public class DatabaseListener implements ServletContextListener
 		imagePath = servletContext.getRealPath(imagePath);
 		String treeBackupPath = servletContext.getInitParameter("treefile.path");
 		treeBackupPath = servletContext.getRealPath(treeBackupPath);
-		ImportTreeData importer = new ImportTreeData(pool, imagePath, treeBackupPath);
+		IImportTreeData importer = new PersistTreeData(emf);
 		servletContext.setAttribute(Constants.IMPORT_TREE_DATA_KEY, importer);
 	}
 
