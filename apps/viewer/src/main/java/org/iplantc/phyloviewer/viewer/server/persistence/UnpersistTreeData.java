@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.server;
+package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
+import org.iplantc.phyloviewer.viewer.server.ITreeData;
 
 public class UnpersistTreeData implements ITreeData
 {

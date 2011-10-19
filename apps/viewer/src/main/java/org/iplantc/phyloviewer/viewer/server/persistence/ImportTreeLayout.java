@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.server.db;
+package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

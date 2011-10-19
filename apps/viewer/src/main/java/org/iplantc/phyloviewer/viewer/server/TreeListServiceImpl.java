@@ -5,6 +5,7 @@ import java.util.List;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
+import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 

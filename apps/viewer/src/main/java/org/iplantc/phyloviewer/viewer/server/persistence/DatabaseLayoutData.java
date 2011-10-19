@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.server;
+package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,7 +11,7 @@ import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
-import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
+import org.iplantc.phyloviewer.viewer.server.ILayoutData;
 import org.postgis.PGgeometry;
 import org.postgis.Point;
 import org.postgis.Polygon;

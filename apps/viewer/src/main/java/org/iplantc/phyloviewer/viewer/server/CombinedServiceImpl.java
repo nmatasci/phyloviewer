@@ -6,6 +6,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
+import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 

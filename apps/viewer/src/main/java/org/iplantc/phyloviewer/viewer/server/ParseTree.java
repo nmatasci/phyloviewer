@@ -23,6 +23,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.iplantc.phyloparser.exception.ParserException;
+import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 public class ParseTree extends HttpServlet {
 	private static final long serialVersionUID = -2532260393364629170L;

@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.server;
+package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

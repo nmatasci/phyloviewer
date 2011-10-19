@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
+
 public class RenderTree extends HttpServlet {
 
 	/**

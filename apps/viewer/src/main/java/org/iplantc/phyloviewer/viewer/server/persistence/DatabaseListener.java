@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.server;
+package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,7 +9,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.iplantc.phyloviewer.viewer.server.db.PersistTreeData;
+import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
+import org.iplantc.phyloviewer.viewer.server.ITreeData;
 import org.postgresql.ds.PGPoolingDataSource;
 
 public class DatabaseListener implements ServletContextListener

@@ -10,7 +10,8 @@ import javax.sql.DataSource;
 
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService;
-import org.iplantc.phyloviewer.viewer.server.db.ConnectionUtil;
+import org.iplantc.phyloviewer.viewer.server.persistence.ConnectionUtil;
+import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
