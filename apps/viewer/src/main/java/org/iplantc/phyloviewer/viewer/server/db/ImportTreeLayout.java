@@ -17,10 +17,10 @@ import org.iplantc.phyloviewer.shared.layout.LayoutCladogram;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.server.ImportTreeUtil;
 
-public class ImportTreeData {
+public class ImportTreeLayout {
 	private String imageDirectory;
 
-	public ImportTreeData(DataSource pool, String imageDirectory, String treeBackupDirectory) {
+	public ImportTreeLayout(DataSource pool, String imageDirectory, String treeBackupDirectory) {
 		this.imageDirectory = imageDirectory;
 		
 		new File(imageDirectory).mkdir();
@@ -43,7 +43,7 @@ public class ImportTreeData {
 			
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Rendering overview image");
 			BufferedImage image = ImportTreeUtil.renderTreeImage(tree,cladogramLayout,256,1024);
-			ImportTreeData.this.putOverviewImage(connection,tree.getId(), layoutID, image);
+			putOverviewImage(connection,tree.getId(), layoutID, image);
 			
 			//TODO check if the tree actually has any branch lengths first
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Doing layout with branch lengths");
