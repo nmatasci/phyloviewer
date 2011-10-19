@@ -12,6 +12,7 @@ import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.HashTree;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
+import org.iplantc.phyloviewer.viewer.server.ImportTreeUtil;
 
 public class PersistTreeData implements IImportTreeData
 {	
@@ -32,7 +33,7 @@ public class PersistTreeData implements IImportTreeData
 			return id;
 		}
 		
-		RemoteNode root = ImportTreeData.rootNodeFromNewick(newick, name);
+		RemoteNode root = ImportTreeUtil.rootNodeFromNewick(newick, name);
 		persist(root);
 		id = root.getId();
 		
