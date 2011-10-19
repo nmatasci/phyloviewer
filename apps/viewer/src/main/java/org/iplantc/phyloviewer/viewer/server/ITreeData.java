@@ -2,6 +2,7 @@ package org.iplantc.phyloviewer.viewer.server;
 
 import java.util.List;
 
+import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 
@@ -17,9 +18,9 @@ public interface ITreeData
 	
 	/** 
 	 * Get a list of loaded trees.
-	 * @return Gets a json string of all loaded trees.
+	 * @return Gets a list of all loaded trees.
 	 */
-	public abstract String getTrees() throws TreeDataException;
+	public abstract List<ITree> getTrees() throws TreeDataException;
 	
 	/**
 	 * @param depth the number of levels below the root to include.  Use Integer.MAX_VALUE to guarantee getting the whole tree.

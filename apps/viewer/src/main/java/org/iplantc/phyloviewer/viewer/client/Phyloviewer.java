@@ -5,10 +5,13 @@
 
 package org.iplantc.phyloviewer.viewer.client;
 
+import java.util.List;
+
 import org.iplantc.phyloviewer.client.tree.viewer.render.svg.SVGGraphics;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.IDocument;
+import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 import org.iplantc.phyloviewer.shared.render.style.BranchStyle;
 import org.iplantc.phyloviewer.shared.render.style.GlyphStyle;
@@ -70,7 +73,7 @@ public class Phyloviewer implements EntryPoint
 
 	TreeWidget widget;
 
-	JSTreeList trees;
+	List<ITree> trees;
 
 	CombinedServiceAsync combinedService = new CombinedServiceAsyncImpl();
 	SearchServiceAsyncImpl searchService = new SearchServiceAsyncImpl();
@@ -411,7 +414,7 @@ public class Phyloviewer implements EntryPoint
 				int index = lb.getSelectedIndex();
 				if(index >= 0 && trees != null)
 				{
-					final JSTreeData data = trees.getTree(index);
+					final ITree data = trees.get(index);
 					if(data != null)
 					{
 						loadTree(displayTreePanel, data.getId(), layoutType);
@@ -435,7 +438,7 @@ public class Phyloviewer implements EntryPoint
 
 		displayTreePanel.show();
 
-		treeList.getTreeList(new AsyncCallback<String>()
+		treeList.getTreeList(new AsyncCallback<List<ITree>>()
 		{
 
 			@Override
@@ -445,13 +448,11 @@ public class Phyloviewer implements EntryPoint
 			}
 
 			@Override
-			public void onSuccess(String json)
-			{
-				trees = JSTreeList.parseJSON(json);
-
-				for(int i = 0;i < trees.getNumberOfTrees();++i)
-				{
-					lb.addItem(trees.getTree(i).getName());
+			public void onSuccess(List<ITree> trees)
+			{	
+				Phyloviewer.this.trees = trees;
+				for (ITree tree : trees) {
+					lb.addItem(tree.getName());
 				}
 
 				label.setVisible(false);

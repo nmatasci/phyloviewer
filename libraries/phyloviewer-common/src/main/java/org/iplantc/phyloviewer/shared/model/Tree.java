@@ -47,4 +47,11 @@ public class Tree implements ITree {
 		Tree that = (Tree)obj;
 		return this.id == that.getId() && this.root.equals(that.getRootNode());
 	}
+
+	@Override
+	public String getName()
+	{
+		// TODO 
+		return String.valueOf(this.id);
+	}
 }

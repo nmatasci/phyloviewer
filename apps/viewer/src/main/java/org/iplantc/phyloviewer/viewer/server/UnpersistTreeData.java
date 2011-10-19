@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
+import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 
@@ -26,7 +27,7 @@ public class UnpersistTreeData implements ITreeData
 	}
 
 	@Override
-	public String getTrees() throws TreeDataException
+	public List<ITree> getTrees() throws TreeDataException
 	{
 		// TODO Auto-generated method stub
 		return null;

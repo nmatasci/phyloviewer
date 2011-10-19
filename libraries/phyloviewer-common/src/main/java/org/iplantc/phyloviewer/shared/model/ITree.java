@@ -15,4 +15,6 @@ public interface ITree {
 	public abstract int getNumberOfNodes();
 
 	public int getId();
+	
+	public String getName();
 }
