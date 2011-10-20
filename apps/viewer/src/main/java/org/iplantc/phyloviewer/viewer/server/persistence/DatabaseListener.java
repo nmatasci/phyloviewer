@@ -16,6 +16,7 @@ import org.postgresql.ds.PGPoolingDataSource;
 public class DatabaseListener implements ServletContextListener
 {
 	PGPoolingDataSource pool;
+	EntityManagerFactory emf;
 
 	@Override
 	public void contextInitialized(ServletContextEvent contextEvent)
@@ -37,7 +38,7 @@ public class DatabaseListener implements ServletContextListener
 		
 		servletContext.setAttribute("db.connectionPool", pool);
 		
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.iplantc.phyloviewer");
+		emf = Persistence.createEntityManagerFactory("org.iplantc.phyloviewer");
 		
 		ITreeData treeData = new UnpersistTreeData(emf);
 		servletContext.setAttribute(Constants.TREE_DATA_KEY, treeData);
@@ -48,12 +49,20 @@ public class DatabaseListener implements ServletContextListener
 		DatabaseOverviewImage overviewData = new DatabaseOverviewImage(pool);
 		servletContext.setAttribute(Constants.OVERVIEW_DATA_KEY, overviewData);
 		
-		String imagePath = servletContext.getInitParameter("image.path");
-		imagePath = servletContext.getRealPath(imagePath);
-		String treeBackupPath = servletContext.getInitParameter("treefile.path");
-		treeBackupPath = servletContext.getRealPath(treeBackupPath);
 		IImportTreeData importer = new PersistTreeData(emf);
+		//TODO do tree file backup in PersistTreeData
+		//String treeBackupPath = servletContext.getInitParameter("treefile.path");
+		//treeBackupPath = servletContext.getRealPath(treeBackupPath);
 		servletContext.setAttribute(Constants.IMPORT_TREE_DATA_KEY, importer);
+		
+		{
+			//temporary.  TODO: Hope to be moving layouts to hibernate too.
+			String imagePath = servletContext.getInitParameter("image.path");
+			imagePath = servletContext.getRealPath(imagePath);
+			ImportTreeLayout layoutImporter = new ImportTreeLayout(pool);
+			layoutImporter.setImageDirectory(imagePath);
+			((PersistTreeData)importer).setLayoutImporter(layoutImporter);
+		}
 	}
 
 	@Override
@@ -61,5 +70,6 @@ public class DatabaseListener implements ServletContextListener
 	{
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "contextDestroyed: Closing database connection pool");
 		pool.close();
+		emf.close();
 	}
 }

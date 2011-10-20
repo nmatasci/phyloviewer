@@ -1,5 +1,7 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,8 +14,9 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Tree;
 
 @Entity
-public class RemoteTree extends Tree
+public class RemoteTree extends Tree implements Serializable
 {	
+	private static final long serialVersionUID = -2029381657931174208L;
 	private String name;
 	private byte[] hash;
 	

@@ -22,6 +22,7 @@ public class PersistTreeData implements IImportTreeData
 	static final String algorithm = "MD5";
 	
 	private final EntityManagerFactory emf;
+	private ImportTreeLayout layoutImporter;
 	
 	public PersistTreeData(EntityManagerFactory emf)
 	{
@@ -63,6 +64,13 @@ public class PersistTreeData implements IImportTreeData
 		
 		//TODO save newick to disk as backup
 		
+		{
+			//TODO doing this inside PersistTreeData seems unnecessary and is probably temporary.  call this from outside.
+			if(layoutImporter != null) 
+			{
+				layoutImporter.importLayouts(tree);
+			}
+		}
 		
 		em.close();
 		
@@ -101,6 +109,16 @@ public class PersistTreeData implements IImportTreeData
 		}
 		
 		return matchingTree;
+	}
+
+	public ImportTreeLayout getLayoutImporter()
+	{
+		return layoutImporter;
+	}
+
+	public void setLayoutImporter(ImportTreeLayout layoutImporter)
+	{
+		this.layoutImporter = layoutImporter;
 	}
 
 }

@@ -18,19 +18,19 @@ import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.server.ImportTreeUtil;
 
 public class ImportTreeLayout {
-	private String imageDirectory;
+	private String imageDirectory = ".";
+	private DataSource pool;
 
-	public ImportTreeLayout(DataSource pool, String imageDirectory, String treeBackupDirectory) {
-		this.imageDirectory = imageDirectory;
-		
-		new File(imageDirectory).mkdir();
+	public ImportTreeLayout(DataSource pool) {
+		this.pool = pool;
 	}
 
-	private void importLayout(Connection connection, Tree tree) throws SQLException {
+	public void importLayouts(Tree tree) throws SQLException {
 		ImportLayout layoutImporter = null;
 		
 		try
 		{
+			Connection connection = pool.getConnection();
 			layoutImporter = new ImportLayout(connection);
 
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Doing layout");
@@ -99,5 +99,16 @@ public class ImportTreeLayout {
 		{
 			ConnectionUtil.close(statement);
 		}
+	}
+
+	public String getImageDirectory()
+	{
+		return imageDirectory;
+	}
+
+	public void setImageDirectory(String imageDirectory)
+	{
+		this.imageDirectory = imageDirectory;
+		new File(imageDirectory).mkdir();
 	}
 }
