@@ -4,43 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class RemoteTreePersistTest
+public class RemoteTreePersistTest extends PersistenceTest
 {
-	private static EntityManagerFactory entityManagerFactory;
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception
-	{
-		entityManagerFactory = Persistence.createEntityManagerFactory( "org.iplantc.phyloviewer" );
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception
-	{
-	}
-
-	@Before
-	public void setUp() throws Exception
-	{
-	}
-
-	@After
-	public void tearDown() throws Exception
-	{
-	}
-
 	@Test
 	public void test()
 	{

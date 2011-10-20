@@ -8,46 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class RemoteNodePersistTest
+public class RemoteNodePersistTest extends PersistenceTest
 {
-	private static EntityManagerFactory entityManagerFactory;
 	private int nodeCount = 0;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception
-	{
-		entityManagerFactory = Persistence.createEntityManagerFactory( "org.iplantc.phyloviewer" );
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception
-	{
-		entityManagerFactory.close();
-	}
-
-	@Before
-	public void setUp() throws Exception
-	{
-		
-	}
-
-	@After
-	public void tearDown() throws Exception
-	{
-		
-	}
 
 	@Test
 	public void test()
@@ -90,7 +59,7 @@ public class RemoteNodePersistTest
 		newTree.getChildren().get(0);
 	}
 	
-	@Test
+	//@Test
 	public void testBigTree()
 	{
 		int depth = 10;

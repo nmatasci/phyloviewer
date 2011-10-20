@@ -29,7 +29,7 @@ public class PersistTreeData implements IImportTreeData
 	}
 	
 	@Override
-	public int importFromNewick(String newick, String name) throws ParserException, SQLException, TreeDataException
+	public RemoteTree importFromNewick(String newick, String name) throws ParserException, SQLException, TreeDataException
 	{	
 		EntityManager em = emf.createEntityManager();
 		byte[] hash = getHash(newick);
@@ -39,7 +39,7 @@ public class PersistTreeData implements IImportTreeData
 		if (existingTree != null)
 		{
 			if (existingTree.getName().equals(name)) {
-				return existingTree.getId();
+				return existingTree;
 			}
 			
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "A tree matching the given newick string was found, but with a different name. Creating a new tree with the existing nodes.");
@@ -63,7 +63,10 @@ public class PersistTreeData implements IImportTreeData
 		
 		//TODO save newick to disk as backup
 		
-		return tree.getId();
+		
+		em.close();
+		
+		return tree;
 	}
 	
 	private byte[] getHash(String newick)

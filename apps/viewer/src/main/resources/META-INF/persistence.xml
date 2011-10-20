@@ -10,7 +10,18 @@
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/phyloviewer" />
             <property name="javax.persistence.jdbc.user" value="phyloviewer" />
             <property name="javax.persistence.jdbc.password" value="phyloviewer" />
-<!--             <property name="hibernate.hbm2ddl.auto" value="create" /> -->
+        </properties>
+
+    </persistence-unit>
+    
+    <persistence-unit name="org.iplantc.phyloviewer-test">
+
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/phyloviewertest" />
+            <property name="javax.persistence.jdbc.user" value="phyloviewer" />
+            <property name="javax.persistence.jdbc.password" value="phyloviewer" />
+            <property name="hibernate.hbm2ddl.auto" value="create" />
         </properties>
 
     </persistence-unit>

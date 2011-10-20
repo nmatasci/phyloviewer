@@ -36,7 +36,7 @@
   </context-param>
   
   <listener>
-    <listener-class>org.iplantc.phyloviewer.viewer.server.DatabaseListener</listener-class>
+    <listener-class>org.iplantc.phyloviewer.viewer.server.persistence.DatabaseListener</listener-class>
   </listener>
   
   <!-- Servlets -->
