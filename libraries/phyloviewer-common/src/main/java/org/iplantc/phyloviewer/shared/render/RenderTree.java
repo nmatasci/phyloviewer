@@ -5,6 +5,7 @@
 
 package org.iplantc.phyloviewer.shared.render;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.iplantc.phyloviewer.shared.layout.ILayoutData;
@@ -167,25 +168,28 @@ public abstract class RenderTree
 
 	protected void renderChildren(INode parent, ILayoutData layout, IGraphics graphics, IStyle parentStyle)
 	{
-		for(INode child : parent.getChildren())
-		{
-			IStyle style = getStyle(child);
-			 
-			style = createComposite(parentStyle, style, Defaults.DEFAULT_STYLE);
-			
-			IStyle branchStyle = style;
-			if (renderPreferences.isBranchHighlighted(child))
+		List<? extends INode> children = parent.getChildren();
+		if (children != null) { //this null check also happens in PagedDocument.checkForData, but I wanted to make it more explicit here
+			for(INode child : children)
 			{
-				branchStyle = addHighlight(branchStyle);
+				IStyle style = getStyle(child);
+				 
+				style = createComposite(parentStyle, style, Defaults.DEFAULT_STYLE);
+				
+				IStyle branchStyle = style;
+				if (renderPreferences.isBranchHighlighted(child))
+				{
+					branchStyle = addHighlight(branchStyle);
+				}
+	
+				Drawable[] drawables = drawableContainer.getBranchDrawables(parent, child, document, layout);
+				for(Drawable drawable : drawables)
+				{
+					drawable.draw(graphics, branchStyle);
+				}
+	
+				renderNode(child, layout, graphics, style);
 			}
-
-			Drawable[] drawables = drawableContainer.getBranchDrawables(parent, child, document, layout);
-			for(Drawable drawable : drawables)
-			{
-				drawable.draw(graphics, branchStyle);
-			}
-
-			renderNode(child, layout, graphics, style);
 		}
 	}
 

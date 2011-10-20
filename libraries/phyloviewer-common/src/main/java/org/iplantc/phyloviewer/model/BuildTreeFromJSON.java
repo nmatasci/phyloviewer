@@ -35,7 +35,7 @@ public class BuildTreeFromJSON {
 			int numChildren = children.length();
 			ArrayList<Node> myChildren = new ArrayList<Node>(numChildren);
 			for(int i = 0;i<numChildren;++i) {
-				myChildren.set(i, buildNode(children.getJSONObject(i)));
+				myChildren.add(buildNode(children.getJSONObject(i)));
 			}
 			
 			node.setChildren(myChildren);

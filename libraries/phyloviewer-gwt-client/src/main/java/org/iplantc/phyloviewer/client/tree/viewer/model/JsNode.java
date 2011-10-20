@@ -60,7 +60,7 @@ public class JsNode extends JavaScriptObject implements INode
 		ArrayList<JsNode> children = new ArrayList<JsNode>(getNumberOfChildren());
 		for(int i = 0;i < getNumberOfChildren();i++)
 		{
-			children.set(i, getChild(i));
+			children.add(getChild(i));
 		}
 
 		return children;

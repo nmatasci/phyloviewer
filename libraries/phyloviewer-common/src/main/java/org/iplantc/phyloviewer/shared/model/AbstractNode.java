@@ -1,5 +1,7 @@
 package org.iplantc.phyloviewer.shared.model;
 
+import java.util.List;
+
 /**
  * Some default implementations of INode methods that don't directly access state.
  */
@@ -73,9 +75,13 @@ public abstract class AbstractNode implements INode
 	{
 		int maxChildHeight = -1; // -1 so leaf will return 0
 
-		for(INode child : getChildren())
+		List<? extends INode> children = getChildren();
+		if (children != null) 
 		{
-			maxChildHeight = Math.max(maxChildHeight, child.findMaximumDepthToLeaf());
+			for(INode child : getChildren())
+			{
+				maxChildHeight = Math.max(maxChildHeight, child.findMaximumDepthToLeaf());
+			}
 		}
 
 		return maxChildHeight + 1;
@@ -86,9 +92,13 @@ public abstract class AbstractNode implements INode
 	{
 		double maxHeight = 0.0;
 		
-		for(INode child : getChildren())
+		List<? extends INode> children = getChildren();
+		if (children != null) 
 		{
-			maxHeight = Math.max(maxHeight, child.findMaximumDepthToLeaf() + child.getBranchLength());
+			for(INode child : getChildren())
+			{
+				maxHeight = Math.max(maxHeight, child.findMaximumDepthToLeaf() + child.getBranchLength());
+			}
 		}
 
 		return maxHeight;
