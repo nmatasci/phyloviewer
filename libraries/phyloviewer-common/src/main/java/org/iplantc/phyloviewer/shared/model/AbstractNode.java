@@ -126,6 +126,14 @@ public abstract class AbstractNode implements INode
 	@Override
 	public String toString()
 	{
-		return getLabel();
+		String s = getLabel();
+		
+		if (s == null)
+		{
+			s = "";
+		}
+		
+		return s;
+		
 	}
 }

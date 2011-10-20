@@ -1,20 +1,26 @@
 package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 import org.iplantc.phyloviewer.viewer.server.ImportTreeUtil;
 
 public class PersistTreeData implements IImportTreeData
 {	
+	static final String encoding = "UTF-8";
+	static final String algorithm = "MD5";
+	
 	private final EntityManagerFactory emf;
 	
 	public PersistTreeData(EntityManagerFactory emf)
@@ -25,50 +31,73 @@ public class PersistTreeData implements IImportTreeData
 	@Override
 	public int importFromNewick(String newick, String name) throws ParserException, SQLException, TreeDataException
 	{	
-		int id = getExistingTreeID(newick);
-		if (id != -1)
+		EntityManager em = emf.createEntityManager();
+		byte[] hash = getHash(newick);
+		RemoteNode root = null;
+		RemoteTree existingTree = getExistingTree(hash, em);
+		
+		if (existingTree != null)
 		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "A tree matching the given newick string was found.  Returning ID of existing tree.");
-			return id;
+			if (existingTree.getName().equals(name)) {
+				return existingTree.getId();
+			}
+			
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "A tree matching the given newick string was found, but with a different name. Creating a new tree with the existing nodes.");
+			root = existingTree.getRootNode();
+		}
+		else
+		{
+			root = ImportTreeUtil.rootNodeFromNewick(newick, name);
 		}
 		
-		RemoteNode root = ImportTreeUtil.rootNodeFromNewick(newick, name);
-		persist(root);
-		id = root.getId();
+		RemoteTree tree = new RemoteTree(name);
+		tree.setRootNode(root);
 		
-		//TODO add the hash of the tree to the database
+		if (hash != null) {
+			tree.setHash(hash);
+		}
+		
+		em.getTransaction().begin();
+		em.persist(tree);
+		em.getTransaction().commit();
+		
 		//TODO save newick to disk as backup
 		
-		return id;
-	}
-
-	private void persist(RemoteNode root)
-	{
-		EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-		em.persist(root);
-		em.getTransaction().commit();
-		em.close();
+		return tree.getId();
 	}
 	
-	private int getExistingTreeID(String newick)
+	private byte[] getHash(String newick)
 	{
-		String encoding = "UTF-8";
-		String algorithm = "MD5";
-		int id = -1;
-
+		byte[] hash = null;
+		
 		try
 		{
-			byte[] hash = HashTree.hash(newick, encoding, algorithm);
+			hash = HashTree.hash(newick, encoding, algorithm);
 		}
 		catch(Exception e)
 		{
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to create hash value for tree using " + algorithm + " & " + encoding, e);
 		}
+
+		return hash;
+	}
+	
+	private RemoteTree getExistingTree(byte[] hash, EntityManager em) {
+		RemoteTree matchingTree = null;
+		if (hash != null)
+		{
+			em.getTransaction().begin();
+			TypedQuery<RemoteTree> query = em.createQuery("SELECT t FROM RemoteTree t WHERE t.hash = :hash", RemoteTree.class);
+			query.setParameter("hash", hash);
+			List<RemoteTree> results = query.getResultList();
+			if (!results.isEmpty()) {
+				matchingTree = results.get(0);
+			}
+			
+			em.getTransaction().commit();
+		}
 		
-		//TODO id = find tree by hash
-		
-		return id;
+		return matchingTree;
 	}
 
 }

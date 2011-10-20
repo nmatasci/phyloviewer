@@ -21,12 +21,6 @@ public interface ITreeData
 	 * @return Gets a list of all loaded trees.
 	 */
 	public abstract List<ITree> getTrees() throws TreeDataException;
-	
-	/**
-	 * @param depth the number of levels below the root to include.  Use Integer.MAX_VALUE to guarantee getting the whole tree.
-	 * @return the subtree rooted at rootID, to <strong>at least</strong> the given depth.
-	 */
-	public abstract RemoteNode getSubtree(int rootID, int depth) throws TreeDataException;
 
 	/**
 	 * Gets the children of the parent node with id parentID. (The order of the children is not defined

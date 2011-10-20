@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
@@ -23,22 +23,45 @@ public class UnpersistTreeData implements ITreeData
 	@Override
 	public RemoteNode getRootNode(int treeID) throws TreeDataException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = emf.createEntityManager();
+		
+		RemoteNode root = getRootNode(treeID, em);
+		em.detach(root);
+		em.close();
+		
+		return root;
+	}
+	
+	/**
+	 * @return the tree's root node.  Still attached to the persistence context so, for example, children can be lazily fetched by calling node.getChild().
+	 */
+	public RemoteNode getRootNode(int treeID, EntityManager em) throws TreeDataException
+	{
+		em.getTransaction().begin();
+		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteTree t JOIN t.rootNode n WHERE t.id = :id", RemoteNode.class)
+				.setParameter("id", treeID);
+
+		RemoteNode root = query.getSingleResult();
+
+		em.getTransaction().commit();
+		
+		return root;
 	}
 
 	@Override
 	public List<ITree> getTrees() throws TreeDataException
 	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+		EntityManager em = emf.createEntityManager();
+		
+		em.getTransaction().begin();
+		TypedQuery<ITree> query = em.createQuery("SELECT t FROM RemoteTree t", ITree.class);
 
-	@Override
-	public RemoteNode getSubtree(int rootID, int depth) throws TreeDataException
-	{
-		// TODO Auto-generated method stub
-		return null;
+		List<ITree> trees = query.getResultList();
+
+		em.getTransaction().commit();
+		em.close();
+		
+		return trees;
 	}
 
 	@Override
@@ -48,11 +71,13 @@ public class UnpersistTreeData implements ITreeData
 		
 		//pull the root back out of persistence
 		em.getTransaction().begin();
-		Query query = em.createQuery("SELECT n FROM RemoteNode n WHERE n.id = :id")
+		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteNode n WHERE n.id = :id", RemoteNode.class)
 				.setParameter("id", parentID);
 
-		RemoteNode parent = (RemoteNode) query.getSingleResult();
-		List<RemoteNode> children = parent.getChildren();
+		List<RemoteNode> children = query.getSingleResult().getChildren();
+		children.isEmpty(); //force lazy fetch of children
+		
+		em.getTransaction().commit();
 		em.close();
 		
 		return children;
