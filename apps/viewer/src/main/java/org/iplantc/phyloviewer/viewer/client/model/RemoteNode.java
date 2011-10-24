@@ -19,7 +19,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 
 @Entity
 public class RemoteNode extends AbstractNode implements INode, Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -32,6 +32,10 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private RemoteNode parent;
 
+	/*
+	 * need to avoid trying to serialize lazy-loading children on detached nodes. The node will have to
+	 * be cloned to a DTO, or use Gilead, or use custom serialization (needs GWT 2.4).
+	 */
 	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	protected List<RemoteNode> children;
 	
@@ -89,7 +93,7 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		return topology;
 	}
 
-	protected void setTopology(NodeTopology topology)
+	public void setTopology(NodeTopology topology)
 	{
 		this.topology = topology;
 	}

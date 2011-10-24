@@ -1,10 +1,13 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class NodeTopology
+public class NodeTopology implements Serializable
 {
+	private static final long serialVersionUID = 552531523709182005L;
 	private int numChildren = 0;
 	private int numNodes = 1;
 	private int numLeaves = 1;

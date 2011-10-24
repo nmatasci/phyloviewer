@@ -1,9 +1,12 @@
 package org.iplantc.phyloviewer.shared.model;
 
+import java.io.Serializable;
 
-public class Tree implements ITree {
-	private INode root;
-	int id;
+
+public class Tree implements ITree, Serializable {
+	private static final long serialVersionUID = 5545157148705536777L;
+	private INode rootNode;
+	private int id;
 	
 	public Tree() {
 	}
@@ -15,17 +18,17 @@ public class Tree implements ITree {
 
 	@Override
 	public int getNumberOfNodes() {
-		return root.getNumberOfNodes();
+		return rootNode.getNumberOfNodes();
 	}
 
 	@Override
 	public INode getRootNode() {
-		return root;
+		return rootNode;
 	}
 
 	@Override
 	public void setRootNode(INode node) {
-		this.root = node;
+		this.rootNode = node;
 	}
 
 	public int getId() {
@@ -45,7 +48,7 @@ public class Tree implements ITree {
 		}
 
 		Tree that = (Tree)obj;
-		return this.id == that.getId() && this.root.equals(that.getRootNode());
+		return this.id == that.getId() && this.rootNode.equals(that.getRootNode());
 	}
 
 	@Override

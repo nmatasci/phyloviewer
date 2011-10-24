@@ -1,13 +1,16 @@
 package org.iplantc.phyloviewer.viewer.server.persistence;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.ITreeData;
 
@@ -29,7 +32,7 @@ public class UnpersistTreeData implements ITreeData
 		em.detach(root);
 		em.close();
 		
-		return root;
+		return clone(root); //cloning here to get an unproxied (non-hibernate) copy of the node, so it doesn't try to serialize unloaded lazy fields.  
 	}
 	
 	/**
@@ -54,13 +57,18 @@ public class UnpersistTreeData implements ITreeData
 		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
-		TypedQuery<ITree> query = em.createQuery("SELECT t FROM RemoteTree t", ITree.class);
+		TypedQuery<RemoteTree> query = em.createQuery("SELECT t FROM RemoteTree t", RemoteTree.class);
 
-		List<ITree> trees = query.getResultList();
-
+		List<RemoteTree> results = query.getResultList();
+		List<ITree> trees = new ArrayList<ITree>(results.size());
+		for(RemoteTree tree : results) {
+			em.detach(tree);
+			trees.add(clone(tree));
+		}
+		
 		em.getTransaction().commit();
 		em.close();
-		
+
 		return trees;
 	}
 
@@ -69,18 +77,47 @@ public class UnpersistTreeData implements ITreeData
 	{
 		EntityManager em = emf.createEntityManager();
 		
-		//pull the root back out of persistence
 		em.getTransaction().begin();
 		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteNode n WHERE n.id = :id", RemoteNode.class)
 				.setParameter("id", parentID);
 
-		List<RemoteNode> children = query.getSingleResult().getChildren();
-		children.isEmpty(); //force lazy fetch of children
+		RemoteNode parent = query.getSingleResult();
+		parent.getChildren().isEmpty(); //force lazy fetch of children
+		
+		List<RemoteNode> children = clone(parent).getChildren();
 		
 		em.getTransaction().commit();
 		em.close();
 		
 		return children;
 	}
-
+	
+	public static RemoteNode clone(RemoteNode node) {
+		RemoteNode clone = new RemoteNode(node.getLabel());
+		clone.setId(node.getId());
+		clone.setBranchLength(node.getBranchLength());
+		
+		List<RemoteNode> children = node.getChildren();
+		if (children != null && Persistence.getPersistenceUtil().isLoaded(node, "children")) {
+			for (RemoteNode child : children) {
+				clone.addChild(clone(child));
+			}
+		}
+		
+		clone.setTopology(node.getTopology());
+		
+		return clone;
+	}
+	
+	public static RemoteTree clone(RemoteTree tree) {
+		RemoteTree clone = new RemoteTree();
+		clone.setId(tree.getId());
+		clone.setHash(tree.getHash());
+		clone.setName(tree.getName());
+		clone.setRootNode(clone(tree.getRootNode()));
+		
+		return clone;
+	}
+	
+	
 }

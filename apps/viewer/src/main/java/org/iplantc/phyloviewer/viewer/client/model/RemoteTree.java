@@ -16,7 +16,7 @@ import org.iplantc.phyloviewer.shared.model.Tree;
 @Entity
 public class RemoteTree extends Tree implements Serializable
 {	
-	private static final long serialVersionUID = -2029381657931174208L;
+	private static final long serialVersionUID = -2029381657931174210L;
 	private String name;
 	private byte[] hash;
 	
@@ -42,7 +42,7 @@ public class RemoteTree extends Tree implements Serializable
 		super.setId(id);
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST) //many trees (having different user-assigned names, for example) could point at the same root node
+	@ManyToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.DETACH}) //many trees (having different user-assigned names, for example) could point at the same root node
 	@Override
 	public RemoteNode getRootNode()
 	{
