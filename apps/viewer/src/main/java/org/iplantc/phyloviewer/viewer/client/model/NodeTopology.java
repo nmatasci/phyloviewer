@@ -17,6 +17,7 @@ public class NodeTopology implements Serializable
 	/** any node (in the same tree) with a leftIndex >= this.leftIndex and rightIndex <= this.rightIndex is in this node's subtree */
 	private int leftIndex = 1;
 	private int rightIndex = 2;
+	private String altLabel = null;
 
 	public NodeTopology()
 	{
@@ -110,5 +111,15 @@ public class NodeTopology implements Serializable
 	public void setBranchLengthHeight(double branchLengthHeight)
 	{
 		this.branchLengthHeight = branchLengthHeight;
+	}
+
+	public String getAltLabel()
+	{
+		return altLabel;
+	}
+
+	public void setAltLabel(String altLabel)
+	{
+		this.altLabel = altLabel;
 	}
 }

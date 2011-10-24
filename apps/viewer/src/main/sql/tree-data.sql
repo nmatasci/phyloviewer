@@ -14,6 +14,7 @@ CREATE TABLE node
   node_id integer NOT NULL,
   branchlength double precision,
   label character varying(255),
+  altlabel character varying(255),
   branchlengthheight double precision NOT NULL,
   depth integer NOT NULL,
   height integer NOT NULL,
@@ -48,11 +49,6 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE tree OWNER TO phyloviewer;
-
-create table node_label_lookup (
-	node_id integer primary key, 
-	alt_label varchar
-);
 
 create table overview_images (
 	tree_id integer not null,
