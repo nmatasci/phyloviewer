@@ -34,9 +34,7 @@ public class ImportTreeUtil
 		
 		RemoteNode root = convertDataModels(tree.getRoot());
 		
-		int depth = 0;
-		int nextTraversalIndex = 1;
-		root.reindex(depth, nextTraversalIndex);
+		root.reindex();
 		
 		return root;
 	}

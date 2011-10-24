@@ -179,11 +179,11 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	}
 
 	/**
+	 * Recalculates the NodeTopology for this node's subtree.
 	 * @param depth this nodes depth
 	 * @param leftIndex this node's leftIndex
-	 * @return
 	 */
-	public NodeTopology reindex(int depth, int leftIndex)
+	public NodeTopology reindex(int depth, int leftIndex, RemoteNode rootNode)
 	{
 		int numNodes = 1;
 		int maxChildHeight = -1;
@@ -196,7 +196,7 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		{
 			for (RemoteNode child : this.getChildren())
 			{
-				NodeTopology childTopology = ((RemoteNode)child).reindex(depth + 1, nextTraversalIndex);
+				NodeTopology childTopology = ((RemoteNode)child).reindex(depth + 1, nextTraversalIndex, rootNode);
 				
 				maxChildHeight = Math.max(maxChildHeight, childTopology.getHeight());
 				maxBranchLengthHeight = Math.max(maxBranchLengthHeight, childTopology.getBranchLengthHeight() + child.getBranchLength());
@@ -223,7 +223,15 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		this.topology.setNumNodes(numNodes);
 		this.topology.setRightIndex(nextTraversalIndex);
 		this.topology.setAltLabel(altLabel);
+		this.topology.setRootNode(rootNode);
 		
 		return this.topology;
+	}
+	
+	/**
+	 * Recalculates the NodeTopology for this tree.  (Assumes this node is the root of the entire tree.)
+	 */
+	public NodeTopology reindex() {
+		return reindex(0, 1, this);
 	}
 }

@@ -24,7 +24,11 @@ CREATE TABLE node
   numnodes integer NOT NULL,
   rightindex integer NOT NULL,
   parent_node_id integer,
+  rootnode_node_id integer,
   CONSTRAINT node_pkey PRIMARY KEY (node_id),
+  CONSTRAINT fk33ae0243d48de0 FOREIGN KEY (rootnode_node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk33ae02919982a6 FOREIGN KEY (parent_node_id)
       REFERENCES node (node_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION

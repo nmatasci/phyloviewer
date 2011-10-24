@@ -23,6 +23,7 @@ public class RemoteNodePersistTest extends PersistenceTest
 	{
 		//make a little tree
 		RemoteNode cavemanLawyer = createTree(1, 2);
+		cavemanLawyer.reindex();
 		
 		persist(cavemanLawyer);
 		
@@ -46,6 +47,7 @@ public class RemoteNodePersistTest extends PersistenceTest
 	public void testLazy()
 	{
 		RemoteNode tree = createTree(2, 2);
+		tree.reindex();
 		persist(tree);
 		
 		//pull it back out
@@ -70,7 +72,7 @@ public class RemoteNodePersistTest extends PersistenceTest
 		System.out.print("building tree...");
 		startTime = System.currentTimeMillis();
 		RemoteNode root = createTree(depth, numChildren);
-		root.reindex(0, 1);
+		root.reindex();
 		System.out.println(System.currentTimeMillis() - startTime + " ms");
 		System.out.println(nodeCount + " nodes");
 		

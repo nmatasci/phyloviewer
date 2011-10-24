@@ -9,6 +9,7 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.shared.model.ITree;
+import org.iplantc.phyloviewer.viewer.client.model.NodeTopology;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
@@ -85,6 +86,7 @@ public class UnpersistTreeData implements ITreeData
 		parent.getChildren().isEmpty(); //force lazy fetch of children
 		
 		List<RemoteNode> children = clone(parent).getChildren();
+		em.detach(parent);
 		
 		em.getTransaction().commit();
 		em.close();
@@ -104,7 +106,9 @@ public class UnpersistTreeData implements ITreeData
 			}
 		}
 		
-		clone.setTopology(node.getTopology());
+		NodeTopology topology = node.getTopology();
+		topology.setRootNode(null);
+		clone.setTopology(topology);
 		
 		return clone;
 	}
@@ -118,6 +122,4 @@ public class UnpersistTreeData implements ITreeData
 		
 		return clone;
 	}
-	
-	
 }

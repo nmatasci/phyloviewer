@@ -3,6 +3,8 @@ package org.iplantc.phyloviewer.viewer.client.model;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 @Embeddable
 public class NodeTopology implements Serializable
@@ -18,6 +20,9 @@ public class NodeTopology implements Serializable
 	private int leftIndex = 1;
 	private int rightIndex = 2;
 	private String altLabel = null;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private RemoteNode rootNode;
 
 	public NodeTopology()
 	{
@@ -121,5 +126,15 @@ public class NodeTopology implements Serializable
 	public void setAltLabel(String altLabel)
 	{
 		this.altLabel = altLabel;
+	}
+
+	public RemoteNode getRootNode()
+	{
+		return rootNode;
+	}
+
+	public void setRootNode(RemoteNode rootNode)
+	{
+		this.rootNode = rootNode;
 	}
 }
