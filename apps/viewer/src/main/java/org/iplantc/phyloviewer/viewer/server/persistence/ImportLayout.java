@@ -23,7 +23,7 @@ public class ImportLayout {
 		
 		// Create our prepared statement.
 		// How to handle prepared statements with postgis (http://postgis.refractions.net/pipermail/postgis-users/2006-October/013484.html).
-		addNodeLayoutStmt = conn.prepareStatement("insert into node_layout(node_id,tree_id,layout_id,point,bounding_box) values (?,?,?,?::geometry,?::geometry)");
+		addNodeLayoutStmt = conn.prepareStatement("insert into node_layout(node_id,root_node_id,layout_id,point,bounding_box) values (?,?,?,?::geometry,?::geometry)");
 	}
 	
 	public void close() {
@@ -31,16 +31,17 @@ public class ImportLayout {
 	}
 	
 	public void addLayout(String layoutID, ILayoutData layout, ITree tree) throws SQLException {
+		addNodeLayoutStmt.setInt(2, tree.getRootNode().getId());
 		addNodeLayoutStmt.setString(3, layoutID);
-		this.addNode(layout,tree.getId(),tree.getRootNode());
+		this.addNode(layout,tree.getRootNode());
 		addNodeLayoutStmt.executeBatch();
 	}
 	
-	private void addNode(ILayoutData layout, int treeId, INode node) throws SQLException {
+	private void addNode(ILayoutData layout, INode node) throws SQLException {
 		
 		addNodeLayoutStmt.setInt(1, node.getId());
-		addNodeLayoutStmt.setInt(2, treeId);
-
+		//params 2 and 3 are set in addLayout(), are the same for the whole layout
+		
 		Vector2 position = layout.getPosition(node);
 		Box2D box = layout.getBoundingBox(node);
 		
@@ -66,7 +67,7 @@ public class ImportLayout {
 		addNodeLayoutStmt.addBatch();
 		
 		for(int i=0; i<node.getNumberOfChildren(); ++i) {
-			addNode(layout,treeId,node.getChild(i));
+			addNode(layout,node.getChild(i));
 		}
 	}
 }

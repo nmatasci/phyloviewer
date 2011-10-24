@@ -36,6 +36,7 @@ public class PersistTreeData implements IImportTreeData
 		byte[] hash = getHash(newick);
 		RemoteNode root = null;
 		RemoteTree existingTree = getExistingTree(hash, em);
+		boolean doLayout;
 		
 		if (existingTree != null)
 		{
@@ -45,10 +46,12 @@ public class PersistTreeData implements IImportTreeData
 			
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "A tree matching the given newick string was found, but with a different name. Creating a new tree with the existing nodes.");
 			root = existingTree.getRootNode();
+			doLayout = false;
 		}
 		else
 		{
 			root = ImportTreeUtil.rootNodeFromNewick(newick, name);
+			doLayout = true;
 		}
 		
 		RemoteTree tree = new RemoteTree(name);
@@ -64,6 +67,7 @@ public class PersistTreeData implements IImportTreeData
 		
 		//TODO save newick to disk as backup
 		
+		if(doLayout)
 		{
 			//TODO doing this inside PersistTreeData seems unnecessary and is probably temporary.  call this from outside.
 			if(layoutImporter != null) 

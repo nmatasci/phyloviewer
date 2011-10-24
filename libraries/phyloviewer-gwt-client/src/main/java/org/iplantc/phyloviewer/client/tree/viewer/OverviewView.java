@@ -97,7 +97,7 @@ public class OverviewView extends AnimatedView
 				ITree tree = getTree();
 				if(tree != null)
 				{
-					treeIntersectService.intersectTree(tree.getId(), position.getX(), position.getY(),
+					treeIntersectService.intersectTree(tree.getRootNode().getId(), position.getX(), position.getY(),
 							new AsyncCallback<String>()
 							{
 
