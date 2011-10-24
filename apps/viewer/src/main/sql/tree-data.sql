@@ -1,55 +1,58 @@
 
 BEGIN;
 
-CREATE SEQUENCE nodes_node_id
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
+CREATE SEQUENCE hibernate_sequence
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 5
+  CACHE 1;
+ALTER TABLE hibernate_sequence OWNER TO phyloviewer;
 
-CREATE SEQUENCE trees_tree_id
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-create table node (
-	node_id integer DEFAULT nextval('nodes_node_id'::regclass) primary key, 
-	Label varchar
+CREATE TABLE node
+(
+  node_id integer NOT NULL,
+  branchlength double precision,
+  label character varying(255),
+  branchlengthheight double precision NOT NULL,
+  depth integer NOT NULL,
+  height integer NOT NULL,
+  leftindex integer NOT NULL,
+  numchildren integer NOT NULL,
+  numleaves integer NOT NULL,
+  numnodes integer NOT NULL,
+  rightindex integer NOT NULL,
+  parent_node_id integer,
+  CONSTRAINT node_pkey PRIMARY KEY (node_id),
+  CONSTRAINT fk33ae02919982a6 FOREIGN KEY (parent_node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
 );
+ALTER TABLE node OWNER TO phyloviewer;
+
+CREATE TABLE tree
+(
+  tree_id integer NOT NULL,
+  hash bytea,
+  "name" character varying(255),
+  rootnode_node_id integer,
+  CONSTRAINT tree_pkey PRIMARY KEY (tree_id),
+  CONSTRAINT fk36739e43d48de0 FOREIGN KEY (rootnode_node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE tree OWNER TO phyloviewer;
 
 create table node_label_lookup (
 	node_id integer primary key, 
 	alt_label varchar
 );
-
-create table tree (
-	tree_id integer DEFAULT nextval('trees_tree_id'::regclass) primary key, 
-	root_id integer not null, 
-	Name varchar, 
-	import_complete boolean default FALSE not null,
-	hash bytea not null,
-	foreign key(root_id) references node(node_id) on delete cascade
-);
-
-create table topology (
-	node_id integer primary key, 
-	parent_id integer, 
-	tree_id integer, 
-	LeftNode int, 
-	RightNode int, 
-	Depth int, 
-	Height int, 
-	NumChildren int, 
-	NumLeaves int, 
-	NumNodes int, 
-	foreign key(node_id) references node(node_id) on delete cascade, 
-	foreign key(parent_id) references node(node_id) on delete cascade, 
-	foreign key(tree_id) references tree(tree_id) on delete cascade
-);
-
 
 create table overview_images (
 	tree_id integer not null,
@@ -59,8 +62,7 @@ create table overview_images (
 	image_path varchar not null
 );
 
-create index IndexParent on topology(parent_id);
-create index IndexTreeID on topology(tree_id);
+create index IndexParent on node(parent_node_id);
 create index IndexLabel on node(lower(label::text));
 
 COMMIT;

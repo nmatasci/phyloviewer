@@ -3,17 +3,20 @@ package org.iplantc.phyloviewer.viewer.client.model;
 import java.io.Serializable;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Tree;
 
 @Entity
+@Table(name="tree")
 public class RemoteTree extends Tree implements Serializable
 {	
 	private static final long serialVersionUID = -2029381657931174210L;
@@ -30,6 +33,7 @@ public class RemoteTree extends Tree implements Serializable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@Column(name="tree_id")
 	@Override
 	public int getId()
 	{

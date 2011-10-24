@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,16 +14,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.iplantc.phyloviewer.shared.model.AbstractNode;
 import org.iplantc.phyloviewer.shared.model.INode;
 
 @Entity
+@Table(name="node")
 public class RemoteNode extends AbstractNode implements INode, Serializable {
 	private static final long serialVersionUID = 3L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@Column(name="node_id")
 	private int id;
 
 	private String label;
