@@ -1,17 +1,17 @@
 package org.iplantc.phyloviewer.viewer.server;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService;
-import org.iplantc.phyloviewer.viewer.server.persistence.ConnectionUtil;
+import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
+import org.iplantc.phyloviewer.viewer.server.persistence.UnpersistTreeData;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -20,68 +20,40 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	private static final long serialVersionUID = -7938571144166651105L;
 
 	@Override
-	public SearchResult[] find(String query, int tree, SearchType type, String layoutID)
+	public SearchResult[] find(String query, int treeId, SearchType type, String layoutID)
 	{
-		//TODO sanitize the query string?  or does the PreparedStatement make that unnecessary?
-		//TODO escape any SQL wildcards
+		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+		
 		String queryString = type.queryString(query);
+		
+		ITreeData treeData = (ITreeData) getServletContext().getAttribute(Constants.TREE_DATA_KEY);
+		RemoteNode root;
+		try
+		{
+			root = treeData.getRootNode(treeId);
+		}
+		catch(TreeDataException e)
+		{
+			return results.toArray(new SearchResult[results.size()]);
+		}
+		
+		
+		EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("EntityManagerFactory");
+		EntityManager em = emf.createEntityManager();
+		TypedQuery<RemoteNode> q = em.createQuery("SELECT n FROM RemoteNode n WHERE n.topology.rootNode.id = :rootId AND n.label LIKE :pattern", RemoteNode.class);
+		q.setParameter("rootId", root.getId());
+		q.setParameter("pattern", queryString);
+		List<RemoteNode> nodes = q.getResultList();
 		
 		ILayoutData layout = (ILayoutData) this.getServletContext().getAttribute(Constants.LAYOUT_DATA_KEY);
 		
-		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try
-		{
-			conn = getConnection();
-			stmt = conn.prepareStatement("select * from node natural join topology where tree_id = ? and lower(label) like lower(?)"); //TODO if this is slow, make an index on lower(label) or use ILIKE (which is not standard SQL)
-			stmt.setInt(1, tree);
-			stmt.setString(2, queryString);
-			rs = stmt.executeQuery();
-			
-			while (rs.next())
-			{
-				RemoteNode node = DatabaseTreeData.createNode(rs,null,false);
-				SearchResult result = new SearchResult();
-				result.node = node;
-				result.layout = layout.getLayout(node, layoutID);
-				results.add(result);
-			}
+		for (RemoteNode node : nodes) {
+			SearchResult result = new SearchResult();
+			result.node = UnpersistTreeData.clone(node);
+			result.layout = layout.getLayout(node, layoutID);
+			results.add(result);
 		}
-		catch(SQLException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally
-		{
-			ConnectionUtil.close(conn);
-			ConnectionUtil.close(stmt);
-			ConnectionUtil.close(rs);
-		}
-		
 		
 		return results.toArray(new SearchResult[results.size()]);
-	}
-
-	private Connection getConnection() {
-		Connection conn = null;
-		
-		try
-		{
-			DataSource pool = (DataSource) getServletContext().getAttribute("db.connectionPool");
-			conn = pool.getConnection();
-		}
-		catch(SQLException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return conn;
 	}
 }

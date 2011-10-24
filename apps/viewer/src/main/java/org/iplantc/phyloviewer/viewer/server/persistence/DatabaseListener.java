@@ -39,6 +39,7 @@ public class DatabaseListener implements ServletContextListener
 		servletContext.setAttribute("db.connectionPool", pool);
 		
 		emf = Persistence.createEntityManagerFactory("org.iplantc.phyloviewer");
+		servletContext.setAttribute("EntityManagerFactory", emf);
 		
 		ITreeData treeData = new UnpersistTreeData(emf);
 		servletContext.setAttribute(Constants.TREE_DATA_KEY, treeData);
