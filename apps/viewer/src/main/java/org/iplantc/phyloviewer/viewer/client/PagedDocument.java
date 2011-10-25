@@ -105,4 +105,17 @@ public class PagedDocument extends Document
 
 		return true;
 	}
+
+	@Override
+	public String getLabel(INode node)
+	{
+		String label = node.getLabel();
+		if (node instanceof RemoteNode && (label == null || label.length() == 0)) {
+			label = ((RemoteNode)node).getTopology().getAltLabel();
+		}
+		
+		return label;
+	}
+	
+	
 }

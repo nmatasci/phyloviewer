@@ -190,7 +190,7 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		double maxBranchLengthHeight = 0.0;
 		int numLeaves = this.isLeaf() ? 1 : 0;
 		int nextTraversalIndex = leftIndex + 1;
-		String altLabel = null;
+		String altLabel = this.isLeaf() ? this.label : null;
 		
 		if (this.getChildren() != null)
 		{
@@ -234,4 +234,12 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	public NodeTopology reindex() {
 		return reindex(0, 1, this);
 	}
+
+	@Override
+	public String findLabelOfFirstLeafNode()
+	{
+		return topology.getAltLabel();
+	}
+	
+	
 }
