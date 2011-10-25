@@ -26,13 +26,11 @@ public class ImportTreeLayout {
 	}
 
 	public void importLayouts(Tree tree) throws SQLException {
-		ImportLayout layoutImporter = null;
+		Connection connection = pool.getConnection();
+		ImportLayout layoutImporter = new ImportLayout(connection);
 		
 		try
 		{
-			Connection connection = pool.getConnection();
-			layoutImporter = new ImportLayout(connection);
-
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Doing layout");
 			LayoutCladogram cladogramLayout = new LayoutCladogram(0.8,1.0);
 			cladogramLayout.layout(tree);
@@ -65,6 +63,8 @@ public class ImportTreeLayout {
 			if(layoutImporter != null) {
 				layoutImporter.close();
 			}
+			
+			connection.close();
 		}
 	}
 	

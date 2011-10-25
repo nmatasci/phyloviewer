@@ -23,6 +23,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.iplantc.phyloparser.exception.ParserException;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 public class ParseTree extends HttpServlet {
@@ -34,6 +35,7 @@ public class ParseTree extends HttpServlet {
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Received tree post request");
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		String newick = request.getParameter("newickData");
+		String nexml = request.getParameter("nexml");
 		String name = request.getParameter("name");
 		
 		PrintWriter writer = null;
@@ -61,6 +63,11 @@ public class ParseTree extends HttpServlet {
 				{
 					newick = parameters.get("newickData").getString();
 				}
+				
+				if (parameters.containsKey("nexml"))
+				{
+					nexml = parameters.get("nexml").getString();
+				}
 			}
 			catch(FileUploadException e)
 			{
@@ -80,31 +87,49 @@ public class ParseTree extends HttpServlet {
 				response.setHeader("Location", viewURL);
 				
 				writer.print(viewURL);
-				writer.flush();
 			}
 			catch (ParserException e) 
 			{
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				writer.println(e.getMessage());
 				e.printStackTrace(writer);
-				writer.flush();
 			}
 			catch(Exception e)
 			{
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				writer.println(e.getMessage());
 				e.printStackTrace(writer);
-				writer.flush();
+			}
+		}
+		else if (nexml != null) 
+		{
+			try
+			{
+				int[] ids = loadNexml(nexml);
+				response.setStatus(HttpServletResponse.SC_ACCEPTED);
+				for (int id : ids)
+				{
+					String viewURL = getViewURL(id, request);
+					response.setHeader("Location", viewURL);	
+					writer.println(viewURL);
+				}
+			}
+			catch(Exception e)
+			{
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				writer.println(e.getMessage());
+				e.printStackTrace(writer);
 			}
 		}
 		else
 		{
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			writer.println("Bad request: No newick data found.");
-			writer.flush();
+			writer.println("Bad request: No tree data found.");
 		}
+		
+		writer.flush();
 	}
-	
+
 	private int loadNewickString(String newick, String name ) throws Exception {
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
 		IImportTreeData importer = (IImportTreeData) this.getServletContext().getAttribute(Constants.IMPORT_TREE_DATA_KEY);
@@ -121,7 +146,7 @@ public class ParseTree extends HttpServlet {
 	{
 		HashMap<String, FileItem> parameters = new HashMap<String, FileItem>();
 
-		List items = null;
+		List<?> items = null;
 		try
 		{
 			items = upload.parseRequest(request);
@@ -160,6 +185,23 @@ public class ParseTree extends HttpServlet {
 		viewURL += "/view/treeId/" + id;
 		
 		return viewURL;
+	}
+	
+	private int[] loadNexml(String nexml) throws Exception
+	{
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing nexml");
+		IImportTreeData importer = (IImportTreeData) this.getServletContext().getAttribute(Constants.IMPORT_TREE_DATA_KEY);
+		
+		int[] ids = null;
+		if(importer != null) {
+			List<RemoteTree> trees = importer.importFromNexml(nexml);
+			ids = new int[trees.size()]; 
+			for (int i = 0; i < trees.size(); i++) {
+				ids[i] = trees.get(i).getId();
+			}
+		}
+		
+		return ids;
 	}
 
 }

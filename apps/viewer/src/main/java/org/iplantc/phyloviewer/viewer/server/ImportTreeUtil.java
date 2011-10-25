@@ -19,6 +19,8 @@ import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
+import org.nexml.model.Edge;
 
 /**
  * Static methods removed from org.iplantc.phyloviewer.viewer.server.db.ImportTreeData
@@ -98,6 +100,60 @@ public class ImportTreeUtil
 		
 		rNode.setChildren(children);
 		
+		Double branchLength = parserNode.getBranchLength();
+		if (branchLength != null && branchLength > 0) {
+			rNode.setBranchLength(branchLength);
+		}
+		
 		return rNode;
+	}
+	
+	public static RemoteTree convertDataModels(org.nexml.model.Tree<Edge> in) {
+		RemoteTree out = new RemoteTree();
+		out.setName(in.getId());
+		
+		org.nexml.model.Node inRoot = findRoot(in);
+		RemoteNode outRoot = convertDataModels(inRoot, in, null);
+		out.setRootNode(outRoot);
+		
+		out.getRootNode().reindex();
+		
+		return out;
+	}
+
+	private static org.nexml.model.Node findRoot(org.nexml.model.Tree<Edge> tree)
+	{
+		org.nexml.model.Node root = tree.getRoot();
+		
+		if(root == null) {
+			//no node has the actual attribute root="true", so check if there's a node without a parent.  Just return the first one found.
+			for (org.nexml.model.Node node : tree.getNodes()) {
+				if (tree.getInNodes(node).size() == 0) {
+					return node;
+				}
+			}
+		}
+		
+		return root;
+	}
+
+	private static RemoteNode convertDataModels(org.nexml.model.Node in, org.nexml.model.Tree<Edge> tree, Edge parentEdge)
+	{
+		String label = in.getLabel();
+		RemoteNode out = new RemoteNode(label);
+		
+		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>();
+		for(org.nexml.model.Node child : tree.getOutNodes(in)) {
+			Edge e = tree.getEdge(in, child);
+			children.add(convertDataModels(child, tree, e));
+		}
+		
+		out.setChildren(children);
+		
+		if (parentEdge != null && parentEdge.getLength() != null && parentEdge.getLength().doubleValue() > 0) {
+			out.setBranchLength(parentEdge.getLength().doubleValue());
+		}
+		
+		return out;
 	}
 }
