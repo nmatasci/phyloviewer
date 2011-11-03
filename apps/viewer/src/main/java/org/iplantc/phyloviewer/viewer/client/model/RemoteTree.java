@@ -22,6 +22,8 @@ public class RemoteTree extends Tree implements Serializable
 	private static final long serialVersionUID = -2029381657931174210L;
 	private String name;
 	private byte[] hash;
+	private boolean isPublic = false;
+	private boolean importComplete = false;
 	
 	public RemoteTree() {
 		
@@ -78,5 +80,25 @@ public class RemoteTree extends Tree implements Serializable
 	public void setHash(byte[] hash)
 	{
 		this.hash = hash;
+	}
+
+	public boolean isPublic()
+	{
+		return isPublic;
+	}
+
+	public void setPublic(boolean isPublic)
+	{
+		this.isPublic = isPublic;
+	}
+
+	public boolean isImportComplete()
+	{
+		return importComplete;
+	}
+
+	public void setImportComplete(boolean importComplete)
+	{
+		this.importComplete = importComplete;
 	}
 }

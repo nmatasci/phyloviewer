@@ -42,7 +42,9 @@ CREATE TABLE tree
 (
   tree_id integer NOT NULL,
   hash bytea,
+  importcomplete boolean NOT NULL,
   "name" character varying(255),
+  public boolean NOT NULL,
   rootnode_node_id integer,
   CONSTRAINT tree_pkey PRIMARY KEY (tree_id),
   CONSTRAINT fk36739e43d48de0 FOREIGN KEY (rootnode_node_id)

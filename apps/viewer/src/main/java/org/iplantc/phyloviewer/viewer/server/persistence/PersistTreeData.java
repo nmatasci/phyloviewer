@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -82,9 +83,10 @@ public class PersistTreeData implements IImportTreeData
 			tree.setHash(hash);
 		}
 		
-		em.getTransaction().begin();
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();
 		em.persist(tree);
-		em.getTransaction().commit();
+		tx.commit();
 		
 		if(doLayout)
 		{
@@ -94,6 +96,13 @@ public class PersistTreeData implements IImportTreeData
 				layoutImporter.importLayouts(tree);
 			}
 		}
+		
+		tree.setImportComplete(true);
+		tx.begin();
+		em.merge(tree);
+		tx.commit();
+		
+		em.detach(tree);
 		
 		em.close();
 		
