@@ -17,13 +17,14 @@
     <persistence-unit name="org.iplantc.phyloviewer-test">
 
         <properties>
-            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/phyloviewertest" />
+            <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:phyloviewer" />
             <property name="javax.persistence.jdbc.user" value="phyloviewer" />
             <property name="javax.persistence.jdbc.password" value="phyloviewer" />
             <property name="hibernate.hbm2ddl.auto" value="create" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
         </properties>
-
+        
     </persistence-unit>
 
 </persistence>
