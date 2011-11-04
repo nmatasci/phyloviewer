@@ -9,5 +9,5 @@ import javax.persistence.Persistence;
  */
 public abstract class PersistenceTest
 {
-	protected static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "org.iplantc.phyloviewer-test" );
+	protected static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "org.iplantc.phyloviewer.test.postgres" );
 }
