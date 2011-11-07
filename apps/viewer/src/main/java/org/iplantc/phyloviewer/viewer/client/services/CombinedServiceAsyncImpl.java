@@ -3,8 +3,10 @@ package org.iplantc.phyloviewer.viewer.client.services;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.CombinedResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
+import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -51,6 +53,12 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 			AsyncCallback<CombinedResponse[]> callback)
 	{
 		service.getChildrenAndLayout(parentIDs, layoutIDs, callback);
+	}
+	
+	@Override
+	public void getLayout(INode node, String layoutID, AsyncCallback<LayoutResponse> callback)
+	{
+		service.getLayout(node, layoutID, callback);
 	}
 	
 	private void addDeferredRequest(int parentID, String layoutID,
