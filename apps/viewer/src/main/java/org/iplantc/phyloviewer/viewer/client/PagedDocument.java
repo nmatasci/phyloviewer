@@ -1,5 +1,6 @@
 package org.iplantc.phyloviewer.viewer.client;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,46 +8,42 @@ import org.iplantc.phyloviewer.client.events.RenderEvent;
 import org.iplantc.phyloviewer.shared.layout.LayoutStorage;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.INode;
-import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
-import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsync;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.CombinedResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
-import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
+import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsync;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class PagedDocument extends Document
+public class PagedDocument extends Document implements Serializable
 {
+	private static final long serialVersionUID = -1787841507150753540L;
+	
 	LayoutStorage remoteLayout = new LayoutStorage();
-	CombinedServiceAsync combinedService;
-	EventBus eventBus;
-	Set<Integer> pendingRequests = new HashSet<Integer>();
-	String layoutID;
+	
+	private String layoutID;
+	
+	private transient CombinedServiceAsync combinedService;
+	private transient EventBus eventBus;
+	private transient Set<Integer> pendingRequests = new HashSet<Integer>();
 
-	public PagedDocument(CombinedServiceAsync combinedService, EventBus eventBus, int treeId,
-			NodeResponse nodeData, String layoutID)
+	public PagedDocument(RemoteTree tree, LayoutResponse rootLayout)
 	{
 		super();
 
-		this.combinedService = combinedService;
-		this.eventBus = eventBus;
-
-		Tree tree = new Tree();
-		tree.setId(treeId);
-		tree.setRootNode(nodeData.node);
-
 		this.setTree(tree);
 
-		int numberOfNodes = nodeData.node.getNumberOfNodes();
+		int numberOfNodes = tree.getNumberOfNodes();
 
+		remoteLayout = new LayoutStorage();
 		remoteLayout.init(numberOfNodes);
-		remoteLayout.setPositionAndBounds(nodeData.layout.nodeID, nodeData.layout.position,
-				nodeData.layout.boundingBox);
+		remoteLayout.setPositionAndBounds(rootLayout.nodeID, rootLayout.position,
+				rootLayout.boundingBox);
 		this.setLayout(remoteLayout);
 		
-		this.layoutID = layoutID;
+		this.layoutID = rootLayout.layoutID;
 	}
 
 	@Override
@@ -67,7 +64,7 @@ public class PagedDocument extends Document
 			{
 				pendingRequests.add(rNode.getId());
 
-				combinedService.getChildrenAndLayout(rNode.getId(), layoutID,
+				getCombinedService().getChildrenAndLayout(rNode.getId(), layoutID,
 						new AsyncCallback<CombinedResponse>()
 						{
 
@@ -90,9 +87,9 @@ public class PagedDocument extends Document
 											layoutResponse.position, layoutResponse.boundingBox);
 								}
 
-								if(eventBus != null)
+								if(getEventBus() != null)
 								{
-									eventBus.fireEvent(new RenderEvent());
+									getEventBus().fireEvent(new RenderEvent());
 								}
 							}
 
@@ -115,6 +112,32 @@ public class PagedDocument extends Document
 		}
 		
 		return label;
+	}
+
+	public EventBus getEventBus()
+	{
+		return eventBus;
+	}
+
+	public void setEventBus(EventBus eventBus)
+	{
+		this.eventBus = eventBus;
+	}
+
+	public CombinedServiceAsync getCombinedService()
+	{
+		return combinedService;
+	}
+
+	public void setCombinedService(CombinedServiceAsync combinedService)
+	{
+		this.combinedService = combinedService;
+	}
+
+	@Override
+	public RemoteTree getTree()
+	{
+		return (RemoteTree)super.getTree();
 	}
 	
 	
