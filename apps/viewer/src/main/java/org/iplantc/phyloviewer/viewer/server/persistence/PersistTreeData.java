@@ -1,12 +1,11 @@
 package org.iplantc.phyloviewer.viewer.server.persistence;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +18,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
@@ -37,64 +34,56 @@ import org.xml.sax.SAXException;
 
 public class PersistTreeData implements IImportTreeData
 {	
+	private static final String hashAlgorithm = "MD5";
 	private final EntityManagerFactory emf;
 	private ImportTreeLayout layoutImporter;
-	private String treeBackupPath;
 	
 	public PersistTreeData(EntityManagerFactory emf)
 	{
 		this.emf = emf;
 	}
 	
-	public void setTreeBackupPath(String treeBackupPath) {
-		this.treeBackupPath = treeBackupPath;
-	}
-	
 	@Override
 	public RemoteTree importFromNewick(String newick, String name) throws ParserException, SQLException, TreeDataException
 	{	
-		EntityManager em = emf.createEntityManager();
-		byte[] hash = DigestUtils.md5(newick);
-		RemoteNode root = null;
-		RemoteTree existingTree = getExistingTree(hash, em);
-		boolean doLayout;
-		
-		if (existingTree != null)
-		{
-			if (existingTree.getName().equals(name)) {
-				return existingTree;
-			}
-			
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "A tree matching the given newick string was found, but with a different name. Creating a new tree with the existing nodes.");
-			root = existingTree.getRootNode();
-			doLayout = false;
-		}
-		else
-		{
-			root = ImportTreeUtil.rootNodeFromNewick(newick, name);
-			saveBackupFile(hash, newick);
-			doLayout = true;
-		}
+		RemoteNode root = ImportTreeUtil.rootNodeFromNewick(newick, name);
+		byte[] hash = hashTree(root);
+		newick = null;
 		
 		RemoteTree tree = new RemoteTree(name);
 		tree.setRootNode(root);
+		tree.setHash(hash);
+		tree.setName(name);
 		
-		if (hash != null) {
-			tree.setHash(hash);
-		}
-		
+		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
+		
+		RemoteTree existingTree = getExistingTree(hash, em);
+		
+		boolean doLayout;
+		
+		if (existingTree != null) {
+			if (existingTree.getName().equals(name)) {
+				return existingTree; //same tree, same name, nothing to do
+			} 
+			
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "A tree matching the given newick string was found, but with a different name. Creating a new tree with the existing nodes.");
+			root = null;
+			tree.setRootNode(existingTree.getRootNode());
+			doLayout = false;
+		} else {
+			tree.setRootNode(root);
+			doLayout = true;
+		}
+
 		tx.begin();
 		em.persist(tree);
 		tx.commit();
-		
-		if(doLayout)
+
+		//TODO doing this inside PersistTreeData seems unnecessary and is probably temporary.  call this from outside.
+		if(doLayout && layoutImporter != null) 
 		{
-			//TODO doing this inside PersistTreeData seems unnecessary and is probably temporary.  call this from outside.
-			if(layoutImporter != null) 
-			{
-				layoutImporter.importLayouts(tree);
-			}
+			layoutImporter.importLayouts(tree);
 		}
 		
 		tree.setImportComplete(true);
@@ -112,8 +101,6 @@ public class PersistTreeData implements IImportTreeData
 	@Override
 	public List<RemoteTree> importFromNexml(String nexml) throws ParserConfigurationException, SAXException, IOException, SQLException
 	{
-		byte[] hash = DigestUtils.md5(nexml);
-		
 		EntityManager em = emf.createEntityManager();
 		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
 		Document document = DocumentFactory.parse(stream);
@@ -126,6 +113,15 @@ public class PersistTreeData implements IImportTreeData
 					@SuppressWarnings("unchecked")
 					Tree<Edge> nexmlTree = (Tree<Edge>) network;
 					RemoteTree tree = ImportTreeUtil.convertDataModels(nexmlTree);
+					byte[] hash = hashTree(tree.getRootNode());
+					
+					RemoteTree existingTree = getExistingTree(hash, em);
+					
+					if (existingTree != null) {
+						trees.add(existingTree);
+						continue;
+					}
+					
 					tree.setHash(hash);
 					trees.add(tree);
 					
@@ -140,9 +136,7 @@ public class PersistTreeData implements IImportTreeData
 				}
 			}
 		}
-		
-		saveBackupFile(hash, nexml);
-		
+
 		em.close();
 		
 		return trees;
@@ -176,24 +170,44 @@ public class PersistTreeData implements IImportTreeData
 		this.layoutImporter = layoutImporter;
 	}
 	
-	private void saveBackupFile(byte[] hash, String data)
-	{
-		if(this.treeBackupPath != null)
+	public static byte[] hashTree(RemoteNode root) {
+		byte[] hash = null;
+		
+		try
 		{
-			try
-			{
-				String name = Hex.encodeHexString(hash);
-				new File(treeBackupPath).mkdir();
-				File file = new File(treeBackupPath + name);
-				
-				Writer writer = new BufferedWriter(new FileWriter(file));
-				writer.write(data);
-				writer.close();
-			}
-			catch(IOException e)
-			{
-				Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to save backup of newick string to file system", e);
+			MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
+			hashNode(root, digest);
+			hash = digest.digest();
+		}
+		catch(NoSuchAlgorithmException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage());
+		}
+		
+		return hash;
+	}
+
+	public static void hashNode(RemoteNode node, MessageDigest digest) {
+		if (node.getNumberOfChildren() > 0) {
+			for (RemoteNode child : node.getChildren()) {
+				hashNode(child, digest);
 			}
 		}
+		
+		String label = node.getLabel();
+		if (label != null) {
+			digest.update(label.getBytes());
+		}
+		
+		Double branchLength = node.getBranchLength();
+		byte[] bytes = new byte[8];
+		ByteBuffer buf = ByteBuffer.wrap(bytes);
+		buf.putDouble(branchLength);
+		digest.update(bytes);
+		
+		bytes = new byte[4];
+		buf = ByteBuffer.wrap(bytes);
+		buf.putInt(node.getTopology().getRightIndex());
+		digest.update(bytes);
 	}
 }

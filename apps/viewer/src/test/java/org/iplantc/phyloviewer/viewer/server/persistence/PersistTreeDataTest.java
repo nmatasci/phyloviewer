@@ -22,7 +22,7 @@ public class PersistTreeDataTest extends PersistenceTest
 		
 		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
 		EntityManager em = entityManagerFactory.createEntityManager();
-		RemoteNode root = in.getRootNode(tree.getId(), em);
+		RemoteNode root = in.getRootNode(tree.getHash(), em);
 		
 		RemoteNode node = (RemoteNode) root.getChild(0);
 		assertEquals("Protomyces_inouyei", node.getLabel());
@@ -40,8 +40,8 @@ public class PersistTreeDataTest extends PersistenceTest
 	public void testDuplicateTree() throws Exception
 	{
 		PersistTreeData out = new PersistTreeData(entityManagerFactory);
-		int treeID = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "test").getId();
-		int treeID2 = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "duplicate").getId();
+		byte[] treeID = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "test").getHash();
+		byte[] treeID2 = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "duplicate").getHash();
 		
 		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
 		RemoteNode root = in.getRootNode(treeID);
@@ -101,7 +101,7 @@ public class PersistTreeDataTest extends PersistenceTest
 		trees[4].setRootNode(node);
 		
 		for (int t = 0; t < trees.length; t++) {
-			hashes[t] = PersistTreeData.hashTree(trees[t]);
+			hashes[t] = PersistTreeData.hashTree(trees[t].getRootNode());
 		}
 		
 		//loop over hashes

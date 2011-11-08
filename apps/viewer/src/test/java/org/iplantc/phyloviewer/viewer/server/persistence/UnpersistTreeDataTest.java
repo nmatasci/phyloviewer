@@ -30,7 +30,7 @@ public class UnpersistTreeDataTest extends PersistenceTest
 	public void testGetRootNode() throws TreeDataException
 	{
 		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
-		RemoteNode root = in.getRootNode(trees[0].getId());
+		RemoteNode root = in.getRootNode(trees[0].getHash());
 		assertEquals("root1", root.getLabel());
 	}
 

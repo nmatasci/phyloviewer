@@ -11,10 +11,10 @@ public interface ITreeData
 
 	/**
 	 * Get the root node for the given tree id
-	 * @param the id of the tree to get the root node.
+	 * @param rootID the hash value of the tree
 	 * @return the node.
 	 */
-	public abstract RemoteNode getRootNode(int treeID) throws TreeDataException;
+	public abstract RemoteNode getRootNode(byte[] rootID) throws TreeDataException;
 	
 	/** 
 	 * Get a list of loaded trees.

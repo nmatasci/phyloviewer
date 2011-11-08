@@ -51,9 +51,6 @@ public class DatabaseListener implements ServletContextListener
 		servletContext.setAttribute(Constants.OVERVIEW_DATA_KEY, overviewData);
 		
 		IImportTreeData importer = new PersistTreeData(emf);
-		String treeBackupPath = servletContext.getInitParameter("treefile.path");
-		treeBackupPath = servletContext.getRealPath(treeBackupPath);
-		((PersistTreeData)importer).setTreeBackupPath(treeBackupPath);
 		servletContext.setAttribute(Constants.IMPORT_TREE_DATA_KEY, importer);
 		
 		{

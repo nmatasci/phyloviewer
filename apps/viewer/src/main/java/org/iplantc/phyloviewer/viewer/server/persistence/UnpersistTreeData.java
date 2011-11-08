@@ -1,10 +1,12 @@
 package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
@@ -25,31 +27,38 @@ public class UnpersistTreeData implements ITreeData
 	}
 
 	@Override
-	public RemoteNode getRootNode(int treeID) throws TreeDataException
+	public RemoteNode getRootNode(byte[] rootID) throws TreeDataException
 	{
 		EntityManager em = emf.createEntityManager();
 		
-		RemoteNode root = getRootNode(treeID, em);
+		RemoteNode root = getRootNode(rootID, em);
 		em.detach(root);
 		em.close();
 		
-		return clone(root); //cloning here to get an unproxied (non-hibernate) copy of the node, so it doesn't try to serialize unloaded lazy fields.  
+		return clone(root);
 	}
 	
 	/**
-	 * @return the tree's root node.  Still attached to the persistence context so, for example, children can be lazily fetched by calling node.getChild().
-	 */
-	public RemoteNode getRootNode(int treeID, EntityManager em) throws TreeDataException
+	* @return the tree's root node.  Still attached to the persistence context so, for example, children can be lazily fetched by calling node.getChild().
+	*/
+	public RemoteNode getRootNode(byte[] rootID, EntityManager em) throws TreeDataException
 	{
 		em.getTransaction().begin();
-		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteTree t JOIN t.rootNode n WHERE t.id = :id", RemoteNode.class)
-				.setParameter("id", treeID);
+		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteTree t JOIN t.rootNode n WHERE t.hash = :id", RemoteNode.class)
+				.setParameter("id", rootID);
 
-		RemoteNode root = query.getSingleResult();
-
-		em.getTransaction().commit();
+		RemoteNode node;
+		try
+		{
+			node = query.getSingleResult();
+			em.getTransaction().commit();
+		}
+		catch(NoResultException e)
+		{
+			throw new TreeDataException("Tree not found for ID " + Arrays.toString(rootID));
+		}
 		
-		return root;
+		return node;
 	}
 
 	@Override
