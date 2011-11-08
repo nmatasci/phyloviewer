@@ -20,7 +20,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	private static final long serialVersionUID = -7938571144166651105L;
 
 	@Override
-	public SearchResult[] find(String query, int treeId, SearchType type, String layoutID)
+	public SearchResult[] find(String query, byte[] rootID, SearchType type, String layoutID)
 	{
 		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
 		
@@ -30,7 +30,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		RemoteNode root;
 		try
 		{
-			root = treeData.getRootNode(treeId);
+			root = treeData.getRootNode(rootID);
 		}
 		catch(TreeDataException e)
 		{

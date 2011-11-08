@@ -3,7 +3,7 @@ package org.iplantc.phyloviewer.viewer.client.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.iplantc.phyloviewer.shared.model.ITree;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService.SearchResult;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService.SearchType;
 
@@ -20,20 +20,20 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	private SearchServiceAsync searchService = GWT.create(SearchService.class);
 	private String lastQuery;
 	private SearchResult[] lastResult = new SearchResult[0];
-	private ITree tree;
+	private RemoteTree tree;
 	private String layoutID; //TODO I don't think this search service should have to fetch the layout too.  The client knows what layoutID to use and can fetch it when they get the search result.
 	
 	private ArrayList<SearchResultListener> listeners = new ArrayList<SearchResultListener>();
 	
 	@Override
-	public void find(final String query, final int treeID, SearchType type, String layoutID, final AsyncCallback<SearchResult[]> callback)
+	public void find(final String query, final byte[] rootID, SearchType type, String layoutID, final AsyncCallback<SearchResult[]> callback)
 	{
 		if (query == null || query.length() < MIN_QUERY_LENGTH)
 		{
 			lastQuery = query;
 			lastResult = new SearchResult[0];
 			callback.onSuccess(lastResult);
-			notifyListeners(lastResult, query, treeID);
+			notifyListeners(lastResult, query, rootID);
 			return;
 		} 
 		else if (lastQuery != null && !lastQuery.isEmpty() && query.startsWith(lastQuery) && lastResult.length > 0)
@@ -43,11 +43,11 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 			lastQuery = query;
 			lastResult = filter(query, type, lastResult);
 			callback.onSuccess(lastResult);
-			notifyListeners(lastResult, query, treeID);
+			notifyListeners(lastResult, query, rootID);
 			return;
 		}
 		
-		searchService.find(query, treeID, type, layoutID, new AsyncCallback<SearchResult[]>(){
+		searchService.find(query, rootID, type, layoutID, new AsyncCallback<SearchResult[]>(){
 
 			@Override
 			public void onFailure(Throwable thrown)
@@ -61,7 +61,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 				lastQuery = query;
 				lastResult = result;
 				callback.onSuccess(result);
-				notifyListeners(lastResult, query, treeID);
+				notifyListeners(lastResult, query, rootID);
 			}
 		});
 	}
@@ -71,7 +71,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	{
 		if (tree != null)
 		{
-			find(request.getQuery(), tree.getId(), SearchType.PREFIX, layoutID, new AsyncCallback<SearchResult[]>()
+			find(request.getQuery(), tree.getHash(), SearchType.PREFIX, layoutID, new AsyncCallback<SearchResult[]>()
 			{
 				@Override
 				public void onFailure(Throwable arg0)
@@ -99,7 +99,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 		return lastResult;
 	}
 	
-	public void setTree(ITree tree)
+	public void setTree(RemoteTree tree)
 	{
 		this.tree = tree;
 		lastQuery = null;
@@ -134,11 +134,11 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 		return new Response(suggestions);
 	}
 	
-	private void notifyListeners(SearchResult[] result, String query, int treeID)
+	private void notifyListeners(SearchResult[] result, String query, byte[] rootID)
 	{
 		for (SearchResultListener listener : listeners)
 		{
-			listener.handleSearchResult(result, query, treeID);
+			listener.handleSearchResult(result, query, rootID);
 		}
 	}
 	
@@ -192,6 +192,6 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	public interface SearchResultListener
 	{
 		/** Called when there is a new search result */
-		void handleSearchResult(SearchResult[] result, String query, int treeID);
+		void handleSearchResult(SearchResult[] result, String query, byte[] rootID);
 	}
 }

@@ -19,7 +19,7 @@ public interface SearchService extends RemoteService
 	/**
 	 * Finds nodes matching the given query (case-insensitive) in the given tree
 	 */
-	SearchResult[] find(String query, int tree, SearchType type, String layoutID);
+	SearchResult[] find(String query, byte[] rootID, SearchType type, String layoutID);
 	
 	public enum SearchType implements IsSerializable { 
 		EXACT 

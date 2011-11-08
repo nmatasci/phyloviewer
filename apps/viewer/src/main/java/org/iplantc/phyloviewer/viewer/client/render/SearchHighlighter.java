@@ -47,7 +47,7 @@ public class SearchHighlighter implements SearchResultListener
 	}
 
 	@Override
-	public void handleSearchResult(SearchResult[] result, String query, int treeID)
+	public void handleSearchResult(SearchResult[] result, String query, byte[] rootID)
 	{
 		if(renderPreferences != null)
 		{
