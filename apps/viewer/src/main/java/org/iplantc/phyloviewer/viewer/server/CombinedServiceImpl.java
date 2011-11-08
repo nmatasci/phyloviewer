@@ -27,10 +27,10 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 	}
 
 	@Override
-	public NodeResponse getRootNode(int treeId, String layoutID) throws TreeDataException 
+	public NodeResponse getRootNode(byte[] rootID, String layoutID) throws TreeDataException 
 	{
 		ITreeData treeData = this.getTreeData();
-		RemoteNode node = treeData.getRootNode(treeId);
+		RemoteNode node = treeData.getRootNode(rootID);
 		
 		NodeResponse response = new NodeResponse();
 		response.node = node;
@@ -73,5 +73,4 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 		}
 		return responses;
 	}
-
 }

@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.CombinedResponse;
-import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
+import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -29,9 +29,9 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 	}
 
 	@Override
-	public void getRootNode(int treeId, String layoutID, AsyncCallback<NodeResponse> callback)
+	public void getRootNode(byte[] rootID, String layoutID, AsyncCallback<NodeResponse> callback)
 	{
-		service.getRootNode(treeId, layoutID, callback);
+		service.getRootNode(rootID, layoutID, callback);
 	}
 
 	@Override

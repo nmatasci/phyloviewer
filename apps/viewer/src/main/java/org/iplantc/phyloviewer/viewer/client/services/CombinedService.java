@@ -31,7 +31,7 @@ public interface CombinedService extends RemoteService
 	 *         rest must be fetched using RemoteNode.getChildrenAsync()
 	 * @throws TreeNotAvailableException 
 	 */
-	NodeResponse getRootNode(int treeId, String layoutID) throws TreeDataException;
+	NodeResponse getRootNode(byte[] rootID, String layoutID) throws TreeDataException;
 	
 	public class LayoutResponse implements IsSerializable {
 		public int nodeID;

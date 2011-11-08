@@ -2,14 +2,14 @@ package org.iplantc.phyloviewer.viewer.client.services;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.CombinedResponse;
-import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
+import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface CombinedServiceAsync
 {
-	void getRootNode(int treeId, String layoutID, AsyncCallback<NodeResponse> callback);
+	void getRootNode(byte[] rootID, String layoutID, AsyncCallback<NodeResponse> callback);
 	
 	void getChildrenAndLayout(int parentID, String layoutID,
 			AsyncCallback<CombinedResponse> callback);
