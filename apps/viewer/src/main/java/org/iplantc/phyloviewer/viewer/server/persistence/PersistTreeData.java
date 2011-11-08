@@ -102,6 +102,7 @@ public class PersistTreeData implements IImportTreeData
 	public List<RemoteTree> importFromNexml(String nexml) throws ParserConfigurationException, SAXException, IOException, SQLException
 	{
 		EntityManager em = emf.createEntityManager();
+		EntityTransaction tx = em.getTransaction();
 		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
 		Document document = DocumentFactory.parse(stream);
 		TreeBlock treeBlock = document.getTreeBlockList().get(0);
@@ -133,6 +134,13 @@ public class PersistTreeData implements IImportTreeData
 					{
 						layoutImporter.importLayouts(tree);
 					}
+					
+					tree.setImportComplete(true);
+					tx.begin();
+					em.merge(tree);
+					tx.commit();
+					
+					em.detach(tree);
 				}
 			}
 		}

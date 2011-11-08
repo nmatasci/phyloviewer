@@ -127,6 +127,8 @@ public class UnpersistTreeData implements ITreeData
 		clone.setId(tree.getId());
 		clone.setHash(tree.getHash());
 		clone.setName(tree.getName());
+		clone.setImportComplete(tree.isImportComplete());
+		clone.setPublic(tree.isPublic());
 		clone.setRootNode(clone(tree.getRootNode()));
 		
 		return clone;
