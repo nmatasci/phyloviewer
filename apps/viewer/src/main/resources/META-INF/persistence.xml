@@ -14,7 +14,7 @@
 
     </persistence-unit>
     
-    <persistence-unit name="org.iplantc.phyloviewer-test">
+    <persistence-unit name="org.iplantc.phyloviewer.test">
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
