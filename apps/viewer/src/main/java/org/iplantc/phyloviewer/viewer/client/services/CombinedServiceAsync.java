@@ -1,6 +1,6 @@
 package org.iplantc.phyloviewer.viewer.client.services;
 
-import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.CombinedResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
@@ -17,5 +17,5 @@ public interface CombinedServiceAsync
 	void getChildrenAndLayout(int[] parentIDs, String[] layoutIDs,
 			AsyncCallback<CombinedResponse[]> callback);
 
-	void getLayout(INode node, String layoutID, AsyncCallback<LayoutResponse> callback);
+	void getLayout(RemoteNode node, String layoutID, AsyncCallback<LayoutResponse> callback);
 }

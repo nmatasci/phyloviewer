@@ -22,7 +22,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 @Entity
 @Table(name="node")
 public class RemoteNode extends AbstractNode implements INode, Serializable {
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -125,12 +125,14 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	{
 		this.children = children;
 		
-		for (RemoteNode child : children)
-		{
-			child.setParent(this);
+		if (children != null) {
+			for (RemoteNode child : children)
+			{
+				child.setParent(this);
+			}
+			
+			this.topology.setNumChildren(children.size());
 		}
-		
-		this.topology.setNumChildren(children.size());
 	}
 	
 	public int getId()

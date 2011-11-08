@@ -2,7 +2,6 @@ package org.iplantc.phyloviewer.viewer.server;
 
 import java.util.List;
 
-import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
@@ -38,7 +37,7 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 		return response;
 	}
 
-	public LayoutResponse getLayout(INode node, String layoutID) {		
+	public LayoutResponse getLayout(RemoteNode node, String layoutID) {		
 		return this.getLayoutData().getLayout(node, layoutID);
 	}
 	

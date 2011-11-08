@@ -28,6 +28,7 @@ public class DatabaseLayoutData implements ILayoutData {
 		LayoutResponse response = new LayoutResponse();
 		
 		response.nodeID = node.getId();
+		response.layoutID = layoutID;
 		
 		Connection connection = null;
 		PreparedStatement statement = null;

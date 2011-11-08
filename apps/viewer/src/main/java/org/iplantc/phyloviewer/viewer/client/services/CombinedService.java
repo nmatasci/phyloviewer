@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
-import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -16,7 +15,7 @@ public interface CombinedService extends RemoteService
 {	
 	CombinedResponse getChildrenAndLayout(int parentID, String layoutID) throws TreeDataException;
 	CombinedResponse[] getChildrenAndLayout(int[] parentIDs, String[] layoutIDs) throws TreeDataException;
-	LayoutResponse getLayout(INode node, String layoutID);
+	LayoutResponse getLayout(RemoteNode node, String layoutID);
 	
 	public class CombinedResponse implements IsSerializable
 	{

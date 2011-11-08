@@ -3,7 +3,7 @@ package org.iplantc.phyloviewer.viewer.client.services;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.CombinedResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.LayoutResponse;
 import org.iplantc.phyloviewer.viewer.client.services.CombinedService.NodeResponse;
@@ -56,7 +56,7 @@ public class CombinedServiceAsyncImpl implements CombinedServiceAsync
 	}
 	
 	@Override
-	public void getLayout(INode node, String layoutID, AsyncCallback<LayoutResponse> callback)
+	public void getLayout(RemoteNode node, String layoutID, AsyncCallback<LayoutResponse> callback)
 	{
 		service.getLayout(node, layoutID, callback);
 	}
