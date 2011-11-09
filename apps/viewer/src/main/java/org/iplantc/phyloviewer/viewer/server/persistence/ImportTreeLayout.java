@@ -75,7 +75,7 @@ public class ImportTreeLayout {
 		
 		try { 
 			String filename = UUID.randomUUID().toString();
-			String path = imageDirectory+"/"+filename+".png";
+			String path = imageDirectory + File.separator + filename + ".png";
 		
 			File file = new File(path);
 			try {

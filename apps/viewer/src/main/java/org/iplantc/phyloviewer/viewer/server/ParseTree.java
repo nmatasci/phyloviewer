@@ -1,9 +1,3 @@
-/**
- * Copyright (c) 2009, iPlant Collaborative, Texas Advanced Computing Center
- * This software is licensed under the CC-GNU GPL version 2.0 or later.
- * License: http://creativecommons.org/licenses/GPL/2.0/
- */
-
 package org.iplantc.phyloviewer.viewer.server;
 
 import java.io.BufferedOutputStream;
@@ -16,120 +10,113 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
-import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
+import org.iplantc.phyloviewer.viewer.server.persistence.ImportTreeLayout;
+import org.iplantc.phyloviewer.viewer.server.persistence.PersistTreeData;
+import org.postgresql.ds.PGPoolingDataSource;
 import org.xml.sax.SAXException;
 
-public class ParseTree extends HttpServlet {
-	private static final long serialVersionUID = -2532260393364629170L;
-	private ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
-	private String treeBackupPath = "./";
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-	{
-		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Received tree post request");
-		
-		PrintWriter writer = getWriter(response);
-		
-		Map<String, String[]> parameters = null;
-		try
-		{
-			parameters = getParameters(request);
-		}
-		catch(FileUploadException e)
-		{
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			writer.println(e.getMessage());
-			return;
-		}
-
-		try
-		{
-			List<String> ids = loadTrees(parameters);
-			if (ids.size() > 0) {
-				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Returning response");
-				response.setStatus(HttpServletResponse.SC_ACCEPTED);
-				for (String id : ids) {
-					String viewURL = getViewURL(id, request);
-					response.setHeader("Location", viewURL);
-					writer.println(viewURL);
-				}
-				
-				saveToFile(parameters);
-			} 
-			else 
-			{
-				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "No trees found. Returning response");
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				writer.println("Bad request: No tree data found.");
-			}
-		}
-		catch(ParserException e)
-		{
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			writer.println(e.getMessage());
-			e.printStackTrace(writer);
-		}
-		catch(SAXException e)
-		{
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			writer.println(e.getMessage());
-			e.printStackTrace(writer);
-		}
-		catch(Exception e)
-		{
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			writer.println(e.getMessage());
-			e.printStackTrace(writer);
-		}
-		
-		writer.flush();
+/**
+ * Performs all of the non-HTTPServlet-related functions of the ParseTreeService. Also exposes methods to
+ * reload trees from backup files.
+ */
+public class ParseTree
+{
+	File treeBackupDir = new File(".");
+	private IImportTreeData importer;
+	
+	public ParseTree(IImportTreeData importer) {
+		this.importer = importer;
 	}
 	
-	@Override
-	public void init() throws ServletException
+	public void setImporter(IImportTreeData importer)
 	{
-		ServletContext servletContext = this.getServletContext();
-		String path = servletContext.getInitParameter("treefile.path");
-		path = servletContext.getRealPath(path);
-		this.setTreeBackupPath(path);
+		this.importer = importer;
 	}
-
-	public String getTreeBackupPath()
+	
+	public void setTreeBackupDir(String treeBackupPath)
 	{
-		return treeBackupPath;
+		treeBackupDir = new File(treeBackupPath); 
+		treeBackupDir.mkdir();
 	}
-
-	public void setTreeBackupPath(String treeBackupPath)
+	
+	public File getTreeBackupDir()
 	{
-		this.treeBackupPath = treeBackupPath;
-		new File(treeBackupPath).mkdir();
+		return treeBackupDir;
 	}
-
-	private void saveToFile(Map<String,String[]> parameters)
+	
+	public List<String> saveTrees(Map<String, String[]> parameters) throws ParserException, SAXException, Exception {
+		List<String> ids = loadTrees(parameters);
+		
+		if (ids.size() > 0) {
+			saveToFile(parameters);
+		}
+		
+		return ids;
+	}
+	
+	public void replayBackups() throws ParserException, SAXException, Exception {
+		File[] files = treeBackupDir.listFiles();
+		
+		//order by modified date
+		Arrays.sort(files, new Comparator<File>()
+		{
+			@Override
+			public int compare(File o1, File o2)
+			{
+				Long to1 = Long.valueOf(o1.lastModified());
+				Long t02 = Long.valueOf(o2.lastModified());
+				return to1.compareTo(t02);
+			}
+		});
+		
+		for (File file : files) {
+			@SuppressWarnings("unchecked")
+			Map<String,String[]> parameters = (Map<String,String[]>) getObject(file);
+			loadTrees(parameters);
+		}
+	}
+	
+	private void saveToFile(byte[] data, String fileName)
+	{
+		try
+		{
+			fileName += fileName.endsWith(".gz") ? "" : ".gz";
+			File file = new File(treeBackupDir, fileName);
+			
+			if (file.createNewFile()) {
+				OutputStream out = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(file)));
+				out.write(data);
+				out.flush();
+				out.close();
+				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Saving request parameters to backup location " + file.getAbsolutePath());
+			}
+		}
+		catch(IOException e)
+		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to save backup of newick string to file system", e);
+		}
+	}
+	
+	private void saveToFile(Object o)
 	{
 		try
 		{
@@ -138,13 +125,14 @@ public class ParseTree extends HttpServlet {
 			DigestOutputStream dos = new DigestOutputStream(sink, digest);
 			ObjectOutputStream out = new ObjectOutputStream(dos);
 			
-			out.writeObject(parameters);
+			out.writeObject(o);
 			out.flush();
 			out.close();
 			
 			byte[] data = sink.toByteArray();
 			byte[] hash = dos.getMessageDigest().digest();
-			saveToFile(data, hash);
+			String fileName = Hex.encodeHexString(hash);
+			saveToFile(data, fileName);
 		}
 		catch(NoSuchAlgorithmException e)
 		{
@@ -158,37 +146,14 @@ public class ParseTree extends HttpServlet {
 		}
 	}
 	
-	private void saveToFile(byte[] data, byte[] hash)
-	{
-		String fileName = Hex.encodeHexString(hash);
+	private Object getObject(File file) {
+		Object o = null;
 		
 		try
 		{
-			File file = new File(getTreeBackupPath() + fileName);
+			ObjectInputStream in = new ObjectInputStream(new GZIPInputStream(new FileInputStream(file)));
 			
-			if (file.createNewFile()) {
-				OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-				out.write(data);
-				out.flush();
-				out.close();
-			}
-		}
-		catch(IOException e)
-		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to save backup of newick string to file system", e);
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Map<String,String[]> loadFromFile(File file)
-	{
-		Map<String,String[]> parameters = null;
-		
-		try
-		{
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-			
-			parameters = (Map<String,String[]>)in.readObject();
+			o = in.readObject();
 		}
 		catch(FileNotFoundException e)
 		{
@@ -206,9 +171,9 @@ public class ParseTree extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		return parameters;
+		return o;
 	}
-
+	
 	private List<String> loadTrees(Map<String, String[]> parameters) throws ParserException, SAXException, Exception {
 		List<String> ids = new ArrayList<String>();
 		
@@ -218,10 +183,13 @@ public class ParseTree extends HttpServlet {
 			String[] names = parameters.get("name");
 			for (int i = 0; i < newicks.length; i++)
 			{
+				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
 				String newick = newicks[i];
 				String name = names[i];
 				
-				ids.add(loadNewickString(newick, name));
+				RemoteTree tree = importer.importFromNewick(newick, name);
+				String hash = Hex.encodeHexString(tree.getHash());
+				ids.add(hash);
 			}
 		}
 		
@@ -229,130 +197,47 @@ public class ParseTree extends HttpServlet {
 		{
 			for (String nexml : parameters.get("nexml"))
 			{
-				List<String> newIds = loadNexml(nexml);
-				ids.addAll(newIds);
+				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing nexml");
+				List<RemoteTree> trees = importer.importFromNexml(nexml);
+				for (RemoteTree tree : trees) {
+					String hash = Hex.encodeHexString(tree.getHash());
+					ids.add(hash);
+				}
 			}
 		}
 		
 		return ids;
 	}
 
-	private PrintWriter getWriter(HttpServletResponse response)
-	{
-		PrintWriter writer = null;
+	public static void main(String[] args) throws ParserException, SAXException, Exception {
+		if (args.length > 0 && args[0].equals("replay")) {
+			String server = "localhost";
+			String database = "phyloviewer";
+			String user = "phyloviewer";
+			String password = "phyloviewer";
+			String backupPath = "tree-uploads";
+			String imagePath = "/images/";
+			String persistenceUnitName = "org.iplantc.phyloviewer";
+			
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName);
+			
+			PGPoolingDataSource pool = new PGPoolingDataSource();
+			pool.setServerName(server);
+			pool.setDatabaseName(database);
+			pool.setUser(user);
+			pool.setPassword(password);
+			pool.setMaxConnections(10);
+			
+			ImportTreeLayout layoutImporter = new ImportTreeLayout(pool);
+			layoutImporter.setImageDirectory(imagePath);
+			
+			PersistTreeData importer = new PersistTreeData(emf);
+			importer.setLayoutImporter(layoutImporter);
 		
-		try
-		{
-			writer = response.getWriter();
-		}
-		catch(IOException e1)
-		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to write response");
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-		
-		return writer;
-	}
-
-	private String loadNewickString(String newick, String name ) throws Exception {
-		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
-		IImportTreeData importer = (IImportTreeData) this.getServletContext().getAttribute(Constants.IMPORT_TREE_DATA_KEY);
-		
-		String id = null;
-		
-		if(importer != null) {
-			RemoteTree tree = importer.importFromNewick(newick, name);
-			id = Hex.encodeHexString(tree.getHash());
-		}
-		
-		return id;
-	}
-	
-	private Map<String, String[]> getMultipartParameters(HttpServletRequest request) throws FileUploadException
-	{
-		HashMap<String, List<String>> parameters = new HashMap<String, List<String>>();
-
-		List<?> items = null;
-		try
-		{
-			items = upload.parseRequest(request);
-		}
-		catch(FileUploadException e)
-		{
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to parse request", e);
-			throw e;
-		}
-		
-		for (Object obj : items)
-		{
-			if (obj instanceof FileItem)
-			{
-				FileItem item = (FileItem) obj;
-				
-				String name = item.getFieldName();
-				if (!parameters.containsKey(name))
-				{
-					parameters.put(name, new ArrayList<String>());
-				}
-				parameters.get(name).add(item.getString());
-			}
-		}
-		
-		//convert to match return type of HttpServletRequest.getParameterMap()
-		Map<String, String[]> copy = new HashMap<String, String[]>();
-		for (String key: parameters.keySet())
-		{
-			List<String> value = parameters.get(key);
-			copy.put(key, value.toArray(new String[value.size()]));
-		}
-		
-		return copy;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Map<String, String[]> getParameters(HttpServletRequest request) throws FileUploadException {
-		if (ServletFileUpload.isMultipartContent(request)) 
-		{
-			return getMultipartParameters(request);
-		}
-		else 
-		{
-			return request.getParameterMap();
+			ParseTree pt = new ParseTree(importer);
+			pt.setTreeBackupDir(backupPath);
+			
+			pt.replayBackups();
 		}
 	}
-	
-	private String getViewURL(String id, HttpServletRequest request)
-	{
-		String viewURL =  request.getScheme() + "://" + request.getServerName();
-		
-		if (request.getServerPort() != 80)
-		{
-			viewURL += ":" + request.getServerPort();
-		}
-		
-//		if (request.getContextPath().length() > 0) {
-//			viewURL += request.getContextPath();
-//		}
-		
-		viewURL += "/view/tree/" + id;
-		
-		return viewURL;
-	}
-	
-	private List<String> loadNexml(String nexml) throws Exception
-	{
-		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing nexml");
-		IImportTreeData importer = (IImportTreeData) this.getServletContext().getAttribute(Constants.IMPORT_TREE_DATA_KEY);
-		
-		List<String> list = new ArrayList<String>();
-		if(importer != null) {
-			List<RemoteTree> trees = importer.importFromNexml(nexml);
-			for (RemoteTree tree : trees) {
-				list.add(Hex.encodeHexString(tree.getHash()));
-			}
-		}
-		
-		return list;
-	}
-
 }

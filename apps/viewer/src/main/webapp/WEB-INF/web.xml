@@ -28,7 +28,7 @@
   </context-param>
   <context-param>
     <param-name>treefile.path</param-name>
-    <param-value>/tree-uploads/</param-value>
+    <param-value>tree-uploads</param-value>
   </context-param>
   <context-param>
     <param-name>style.db</param-name>
@@ -42,7 +42,7 @@
   <!-- Servlets -->
   <servlet>
     <servlet-name>parseTree</servlet-name>
-    <servlet-class>org.iplantc.phyloviewer.viewer.server.ParseTree</servlet-class>
+    <servlet-class>org.iplantc.phyloviewer.viewer.server.ParseTreeService</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>treeImage</servlet-name>
