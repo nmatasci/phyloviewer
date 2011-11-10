@@ -28,12 +28,14 @@ import org.nexml.model.Edge;
 public class ImportTreeUtil
 {
 	public static RemoteNode rootNodeFromNewick(String newick, String name) throws ParserException {
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "parsing newick");
 		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name);
 		if (tree == null)
 		{
 			return null;
 		}
 		
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "converting phyloparser.model.Tree to RemoteTree");
 		RemoteNode root = convertDataModels(tree.getRoot());
 		
 		root.reindex();
@@ -109,6 +111,7 @@ public class ImportTreeUtil
 	}
 	
 	public static RemoteTree convertDataModels(org.nexml.model.Tree<Edge> in) {
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "converting nexml to RemoteTree");
 		RemoteTree out = new RemoteTree();
 		out.setName(in.getId());
 		

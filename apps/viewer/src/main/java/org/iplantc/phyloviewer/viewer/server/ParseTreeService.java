@@ -43,12 +43,15 @@ public class ParseTreeService extends HttpServlet {
 		Map<String, String[]> parameters = null;
 		try
 		{
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Reading request parameters");
 			parameters = getParameters(request);
 		}
 		catch(FileUploadException e)
 		{
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			writer.println(e.getMessage());
+			writer.flush();
+			writer.close();
 			return;
 		}
 
@@ -91,6 +94,7 @@ public class ParseTreeService extends HttpServlet {
 		}
 		
 		writer.flush();
+		writer.close();
 	}
 	
 	@Override

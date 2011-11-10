@@ -67,6 +67,7 @@ public class ParseTree
 		List<String> ids = loadTrees(parameters);
 		
 		if (ids.size() > 0) {
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Saving request backup file");
 			saveToFile(parameters);
 		}
 		
@@ -185,7 +186,11 @@ public class ParseTree
 			{
 				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
 				String newick = newicks[i];
-				String name = names[i];
+				String name = "unnamed";
+				if (names != null && names.length > i) 
+				{
+					name = names[i];
+				}
 				
 				RemoteTree tree = importer.importFromNewick(newick, name);
 				String hash = Hex.encodeHexString(tree.getHash());

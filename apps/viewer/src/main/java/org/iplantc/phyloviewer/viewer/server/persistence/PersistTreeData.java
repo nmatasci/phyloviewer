@@ -58,12 +58,14 @@ public class PersistTreeData implements IImportTreeData
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Checking for existing tree match");
 		RemoteTree existingTree = getExistingTree(hash, em);
 		
 		boolean doLayout;
 		
 		if (existingTree != null) {
 			if (existingTree.getName().equals(name)) {
+				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Existing tree match found.  Skipping import.");
 				return existingTree; //same tree, same name, nothing to do
 			} 
 			
@@ -76,6 +78,7 @@ public class PersistTreeData implements IImportTreeData
 			doLayout = true;
 		}
 
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Persisting tree");
 		tx.begin();
 		em.persist(tree);
 		tx.commit();
@@ -86,6 +89,7 @@ public class PersistTreeData implements IImportTreeData
 			layoutImporter.importLayouts(tree);
 		}
 		
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Updating importComplete flag");
 		tree.setImportComplete(true);
 		tx.begin();
 		em.merge(tree);
@@ -104,9 +108,11 @@ public class PersistTreeData implements IImportTreeData
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
-		Document document = DocumentFactory.parse(stream);
-		TreeBlock treeBlock = document.getTreeBlockList().get(0);
 		
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Parsing nexml");
+		Document document = DocumentFactory.parse(stream);
+		
+		TreeBlock treeBlock = document.getTreeBlockList().get(0);
 		List<RemoteTree> trees = new ArrayList<RemoteTree>();
 		if (treeBlock != null) {
 			for (Network<?> network : treeBlock) {
@@ -116,9 +122,11 @@ public class PersistTreeData implements IImportTreeData
 					RemoteTree tree = ImportTreeUtil.convertDataModels(nexmlTree);
 					byte[] hash = hashTree(tree.getRootNode());
 					
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Checking for existing tree match");
 					RemoteTree existingTree = getExistingTree(hash, em);
 					
 					if (existingTree != null) {
+						Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Existing tree match found.  Skipping import.");
 						trees.add(existingTree);
 						continue;
 					}
@@ -126,6 +134,7 @@ public class PersistTreeData implements IImportTreeData
 					tree.setHash(hash);
 					trees.add(tree);
 					
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Persisting tree");
 					em.getTransaction().begin();
 					em.persist(tree);
 					em.getTransaction().commit();
@@ -135,6 +144,7 @@ public class PersistTreeData implements IImportTreeData
 						layoutImporter.importLayouts(tree);
 					}
 					
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Updating importComplete flag");
 					tree.setImportComplete(true);
 					tx.begin();
 					em.merge(tree);
