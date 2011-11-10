@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -111,6 +112,7 @@ public class PersistTreeData implements IImportTreeData
 		
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Parsing nexml");
 		Document document = DocumentFactory.parse(stream);
+		stream.close();
 		
 		TreeBlock treeBlock = document.getTreeBlockList().get(0);
 		List<RemoteTree> trees = new ArrayList<RemoteTree>();
@@ -135,9 +137,18 @@ public class PersistTreeData implements IImportTreeData
 					trees.add(tree);
 					
 					Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Persisting tree");
-					em.getTransaction().begin();
-					em.persist(tree);
-					em.getTransaction().commit();
+					tx.begin();
+					try
+					{
+						em.persist(tree);
+						tx.commit();
+					}
+					catch(RollbackException e)
+					{
+						//FIXME: strange hibernate behavior.  It's assigning ids that have already been used. Always near id# 6050
+						Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Exception persisting tree " + tree.getName());
+						continue; //TODO Just fail altogether?
+					}
 					
 					if(layoutImporter != null) 
 					{

@@ -4,6 +4,8 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
+  <display-name>Phyloviewer</display-name>
+
   <!-- database setup -->
   <context-param>
     <param-name>db.server</param-name>
@@ -24,7 +26,7 @@
   
   <context-param>
     <param-name>image.path</param-name>
-    <param-value>/images/</param-value>
+    <param-value>images</param-value>
   </context-param>
   <context-param>
     <param-name>treefile.path</param-name>

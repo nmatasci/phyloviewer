@@ -221,7 +221,7 @@ public class ParseTree
 			String user = "phyloviewer";
 			String password = "phyloviewer";
 			String backupPath = "tree-uploads";
-			String imagePath = "/images/";
+			String imagePath = "images";
 			String persistenceUnitName = "org.iplantc.phyloviewer";
 			
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName);
