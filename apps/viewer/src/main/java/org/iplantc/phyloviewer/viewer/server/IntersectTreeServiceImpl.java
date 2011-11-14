@@ -26,7 +26,7 @@ public class IntersectTreeServiceImpl extends RemoteServiceServlet implements Tr
 	private static final long serialVersionUID = -3415482053977170710L;
 
 	@Override
-	public String intersectTree(int rootNodeId, double x, double y) {
+	public String intersectTree(int rootNodeId, String layoutID, double x, double y) {
 		
 		DataSource pool = (DataSource) this.getServletContext().getAttribute("db.connectionPool");
 		Connection connection = null;
@@ -41,13 +41,14 @@ public class IntersectTreeServiceImpl extends RemoteServiceServlet implements Tr
 			 double yMax = y + distance;
 			 
 			 String boxGeometry="BOX3D(" + xMin + " " + yMin + "," + xMax + " " + yMax + ")";
-			PreparedStatement statement = connection.prepareStatement("select node_id, asText(point), asText(bounding_box), ST_Distance(point,?)  as distance from node_layout where point && ?::box3d and ST_Distance(point,?) < ? and root_node_id=? order by distance limit 1");
+			PreparedStatement statement = connection.prepareStatement("select node_id, asText(point), asText(bounding_box), ST_Distance(point,?)  as distance from node_layout where point && ?::box3d and ST_Distance(point,?) < ? and root_node_id=? and layout_id=? order by distance limit 1");
 			String geometry = "SRID=-1;POINT(" + x + " " + y + ")";
 			statement.setString(1, geometry);
 			statement.setString(2,boxGeometry);
 			statement.setString(3, geometry);
 			statement.setDouble(4, distance);
 			statement.setInt(5,rootNodeId);
+			statement.setString(6, layoutID);
 			
 			ResultSet rs = statement.executeQuery();
 			if(rs.next()) {
