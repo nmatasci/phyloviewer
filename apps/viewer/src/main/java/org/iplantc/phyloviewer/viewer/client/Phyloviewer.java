@@ -5,6 +5,7 @@
 
 package org.iplantc.phyloviewer.viewer.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.iplantc.phyloviewer.client.tree.viewer.render.svg.SVGGraphics;
@@ -499,10 +500,11 @@ public class Phyloviewer implements EntryPoint
 			@Override
 			public void onSuccess(List<ITree> trees)
 			{	
-				Phyloviewer.this.trees = trees;
+				Phyloviewer.this.trees = new ArrayList<ITree>();
 				for (ITree tree : trees) {
 					if ( ((RemoteTree)tree).isPublic() ) {
 						lb.addItem(tree.getName());
+						Phyloviewer.this.trees.add(tree);
 					}
 				}
 
