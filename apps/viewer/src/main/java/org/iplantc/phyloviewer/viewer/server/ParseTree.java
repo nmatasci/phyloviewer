@@ -75,6 +75,7 @@ public class ParseTree
 	}
 	
 	public void replayBackups() throws ParserException, SAXException, Exception {
+		System.out.println("Replaying backups from " + treeBackupDir.getAbsolutePath());
 		File[] files = treeBackupDir.listFiles();
 		
 		//order by modified date
@@ -90,10 +91,14 @@ public class ParseTree
 		});
 		
 		for (File file : files) {
+			System.out.println(file.getName());
+			
 			@SuppressWarnings("unchecked")
 			Map<String,String[]> parameters = (Map<String,String[]>) getObject(file);
 			loadTrees(parameters);
 		}
+		
+		System.out.println("Re-imported all trees in " + treeBackupDir.getAbsolutePath());
 	}
 	
 	private void saveToFile(byte[] data, String fileName)
