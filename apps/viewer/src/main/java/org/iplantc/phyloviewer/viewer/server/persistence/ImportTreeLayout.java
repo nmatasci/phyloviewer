@@ -14,18 +14,19 @@ import javax.imageio.ImageIO;
 import javax.sql.DataSource;
 
 import org.iplantc.phyloviewer.shared.layout.LayoutCladogram;
-import org.iplantc.phyloviewer.shared.model.Tree;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.server.ImportTreeUtil;
 
 public class ImportTreeLayout {
-	private String imageDirectory = ".";
+	private File imageDirectory;
 	private DataSource pool;
 
 	public ImportTreeLayout(DataSource pool) {
 		this.pool = pool;
+		this.imageDirectory = new File(".");
 	}
 
-	public void importLayouts(Tree tree) throws SQLException {
+	public void importLayouts(RemoteTree tree) throws SQLException {
 		Connection connection = pool.getConnection();
 		ImportLayout layoutImporter = new ImportLayout(connection);
 		
@@ -41,7 +42,7 @@ public class ImportTreeLayout {
 			
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Rendering overview image");
 			BufferedImage image = ImportTreeUtil.renderTreeImage(tree,cladogramLayout,256,1024);
-			putOverviewImage(connection,tree.getId(), layoutID, image);
+			putOverviewImage(connection, tree, layoutID, image);
 			
 			//TODO check if the tree actually has any branch lengths first
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Doing layout with branch lengths");
@@ -68,16 +69,15 @@ public class ImportTreeLayout {
 		}
 	}
 	
-	private void putOverviewImage(Connection connection, int treeId, String layoutId,
+	private void putOverviewImage(Connection connection, RemoteTree tree, String layoutId,
 			BufferedImage image) throws SQLException {
 		
 		PreparedStatement statement = null;
 		
 		try { 
-			String filename = UUID.randomUUID().toString();
-			String path = imageDirectory + File.separator + filename + ".png";
+			String filename = UUID.randomUUID().toString() + ".png";
 		
-			File file = new File(path);
+			File file = new File(this.imageDirectory, filename);
 			try {
 				ImageIO.write(image, "png", file);
 			} catch (IOException e) {
@@ -86,11 +86,11 @@ public class ImportTreeLayout {
 			}
 			
 			statement = connection.prepareStatement("insert into overview_images (tree_id,layout_id,image_width,image_height,image_path) values (?,?,?,?,?)");
-			statement.setInt(1, treeId);
+			statement.setBytes(1, tree.getHash());
 			statement.setString(2, layoutId);
 			statement.setInt(3, image.getWidth());
 			statement.setInt(4, image.getHeight());
-			statement.setString(5, path);
+			statement.setString(5, file.getAbsolutePath());
 			
 			statement.executeUpdate();
 			ConnectionUtil.close(statement);
@@ -101,14 +101,15 @@ public class ImportTreeLayout {
 		}
 	}
 
-	public String getImageDirectory()
+	public File getImageDirectory()
 	{
 		return imageDirectory;
 	}
 
 	public void setImageDirectory(String imageDirectory)
 	{
-		this.imageDirectory = imageDirectory;
-		new File(imageDirectory).mkdir();
+		this.imageDirectory = new File(imageDirectory);
+		this.imageDirectory.mkdir();
+		Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Created overview image directory at " + this.imageDirectory.getAbsolutePath());
 	}
 }

@@ -4,5 +4,5 @@ import java.awt.image.BufferedImage;
 
 public interface IOverviewImageData {
 
-	public abstract BufferedImage getOverviewImage(int treeId, String layoutId);
+	public abstract BufferedImage getOverviewImage(byte[] treeId, String layoutId);
 }

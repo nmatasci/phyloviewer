@@ -193,7 +193,7 @@ public class OverviewView extends AnimatedView
 			final ITree tree = this.getTree();
 
 			String layoutID = this.getLayoutType().toString();
-			treeImageService.getTreeImageURL(tree.getId(), layoutID, width, height, callback);
+			treeImageService.getTreeImageURL(tree, layoutID, width, height, callback);
 		}
 		else
 		{

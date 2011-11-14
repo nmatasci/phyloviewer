@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.sql.DataSource;
@@ -22,7 +24,7 @@ public class DatabaseOverviewImage implements IOverviewImageData {
 	}
 	
 	@Override
-	public BufferedImage getOverviewImage(int treeId, String layoutId) {
+	public BufferedImage getOverviewImage(byte[] treeId, String layoutId) {
 		
 		BufferedImage image = null;
 		Connection connection = null;
@@ -34,20 +36,25 @@ public class DatabaseOverviewImage implements IOverviewImageData {
 		
 			String sql = "Select * from overview_images where tree_id=?";
 			statement = connection.prepareCall(sql);
-			statement.setInt(1, treeId);
+			statement.setBytes(1, treeId);
 			
 			rs = statement.executeQuery();
 			
 			if(rs.next()) {
 				String path = rs.getString("image_path");
-				image = ImageIO.read(new File(path));
+				File file = new File(path);
+				if (file.exists()) {
+					image = ImageIO.read(file);
+				} else {
+					Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Overview image file not found: " + file.getAbsolutePath());
+				}
+			} else {
+				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "No overview image image_path for treeID=" + treeId);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, e.getMessage());
 		}
 		finally {
 			ConnectionUtil.close(connection);

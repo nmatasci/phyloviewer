@@ -57,7 +57,7 @@ WITH (
 ALTER TABLE tree OWNER TO phyloviewer;
 
 create table overview_images (
-	tree_id integer not null,
+	tree_id bytea not null,
 	layout_id varchar not null,
 	image_width integer not null,
 	image_height integer not null,
