@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.viewer.client.render;
 import org.iplantc.phyloviewer.client.tree.viewer.View;
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.render.RenderPreferences;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService.SearchResult;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.SearchResultListener;
@@ -56,12 +57,33 @@ public class SearchHighlighter implements SearchResultListener
 
 		if(tree != null)
 		{
-			renderPreferences.highlightSubtree(tree.getRootNode().getId());
+			highlightSubtree((RemoteNode)tree.getRootNode(), result);
 		}
 
 		if(view != null)
 		{
 			view.requestRender();
+		}
+	}
+	
+	private void highlightSubtree(RemoteNode node, SearchResult[] results)
+	{
+		
+		for(SearchResult result : results)
+		{
+			if(node.getTopology().subtreeContains(result.node.getTopology()))
+			{
+				renderPreferences.highlightNode(node);
+				renderPreferences.highlightBranch(node);
+				
+				if(node.getChildren() != null)
+				{
+					for(RemoteNode child : node.getChildren())
+					{
+						highlightSubtree(child, results);
+					}
+				}
+			}
 		}
 	}
 
