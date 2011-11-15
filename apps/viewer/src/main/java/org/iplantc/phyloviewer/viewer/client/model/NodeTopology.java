@@ -28,6 +28,23 @@ public class NodeTopology implements Serializable
 	{
 	}
 
+	/**
+	 * Creates a shallow copy of the given NodeTopology
+	 */
+	public NodeTopology(NodeTopology topology)
+	{
+		this.setAltLabel(topology.getAltLabel());
+		this.setBranchLengthHeight(topology.getBranchLengthHeight());
+		this.setDepth(topology.getDepth());
+		this.setHeight(topology.getHeight());
+		this.setLeftIndex(topology.getLeftIndex());
+		this.setNumChildren(topology.getNumChildren());
+		this.setNumLeaves(topology.getNumLeaves());
+		this.setNumNodes(topology.getNumNodes());
+		this.setRightIndex(topology.getRightIndex());
+		this.setRootNode(topology.getRootNode());
+	}
+	
 	public int getNumChildren()
 	{
 		return numChildren;

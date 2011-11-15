@@ -104,31 +104,25 @@ public class UnpersistTreeData implements ITreeData
 	}
 	
 	public static RemoteNode clone(RemoteNode node) {
-		RemoteNode clone = new RemoteNode(node.getLabel());
-		clone.setId(node.getId());
-		clone.setBranchLength(node.getBranchLength());
+		RemoteNode clone = new RemoteNode(node);
+		
+		NodeTopology topology = new NodeTopology(node.getTopology());
+		topology.setRootNode(null);
+		clone.setTopology(topology);
 		
 		List<RemoteNode> children = node.getChildren();
+		clone.setChildren(null);
 		if (children != null && Persistence.getPersistenceUtil().isLoaded(node, "children")) {
 			for (RemoteNode child : children) {
 				clone.addChild(clone(child));
 			}
 		}
 		
-		NodeTopology topology = node.getTopology();
-		topology.setRootNode(null);
-		clone.setTopology(topology);
-		
 		return clone;
 	}
 	
 	public static RemoteTree clone(RemoteTree tree) {
-		RemoteTree clone = new RemoteTree();
-		clone.setId(tree.getId());
-		clone.setHash(tree.getHash());
-		clone.setName(tree.getName());
-		clone.setImportComplete(tree.isImportComplete());
-		clone.setPublic(tree.isPublic());
+		RemoteTree clone = new RemoteTree(tree);
 		clone.setRootNode(clone(tree.getRootNode()));
 		
 		return clone;

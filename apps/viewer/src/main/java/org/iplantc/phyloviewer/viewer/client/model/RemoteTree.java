@@ -32,6 +32,18 @@ public class RemoteTree extends Tree implements Serializable
 	public RemoteTree(String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * Creates a shallow copy of the given RemoteTree
+	 */
+	public RemoteTree(RemoteTree tree) {
+		this.setHash(tree.getHash());
+		this.setId(tree.getId());
+		this.setImportComplete(tree.isImportComplete());
+		this.setName(tree.getName());
+		this.setPublic(tree.isPublic());
+		this.setRootNode(tree.getRootNode());
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)

@@ -55,6 +55,18 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	{
 		this.label = label;
 	}
+	
+	/**
+	 * Creates a shallow copy of the given RemoteNode
+	 */
+	public RemoteNode(RemoteNode node)
+	{
+		this.setLabel(node.getLabel());
+		this.setId(node.getId());
+		this.setBranchLength(node.getBranchLength());
+		this.setTopology(node.getTopology());
+		this.children = node.children;
+	}
 
 	protected RemoteNode() 
 	{ 
