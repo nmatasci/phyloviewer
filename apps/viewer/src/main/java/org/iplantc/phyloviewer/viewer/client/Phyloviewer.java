@@ -369,7 +369,7 @@ public class Phyloviewer implements EntryPoint
 					PagedDocument document = new PagedDocument(tree, result.layout);
 					document.setCombinedService(combinedService);
 					document.setEventBus(eventBus);
-					searchService.setTree(document.getTree());
+					searchService.setDocument(document);
 					widget.setDocument(document);
 					updateStyle();
 
@@ -408,7 +408,7 @@ public class Phyloviewer implements EntryPoint
 				PagedDocument document = new PagedDocument(tree, layoutResponse);
 				document.setCombinedService(combinedService);
 				document.setEventBus(eventBus);
-				searchService.setTree(document.getTree());
+				searchService.setDocument(document);
 				widget.setDocument(document);
 				updateStyle();
 

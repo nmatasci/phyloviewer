@@ -139,6 +139,16 @@ public class PagedDocument extends Document implements Serializable
 	{
 		return (RemoteTree)super.getTree();
 	}
+
+	public String getLayoutID()
+	{
+		return layoutID;
+	}
+
+	public void setLayoutID(String layoutID)
+	{
+		this.layoutID = layoutID;
+	}
 	
 	
 }

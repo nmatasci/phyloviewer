@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.viewer.client.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.iplantc.phyloviewer.viewer.client.PagedDocument;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService.SearchResult;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService.SearchType;
@@ -20,8 +21,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	private SearchServiceAsync searchService = GWT.create(SearchService.class);
 	private String lastQuery;
 	private SearchResult[] lastResult = new SearchResult[0];
-	private RemoteTree tree;
-	private String layoutID; //TODO I don't think this search service should have to fetch the layout too.  The client knows what layoutID to use and can fetch it when they get the search result.
+	private PagedDocument document;
 	
 	private ArrayList<SearchResultListener> listeners = new ArrayList<SearchResultListener>();
 	
@@ -69,6 +69,8 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 	@Override
 	public void requestSuggestions(final Request request, final Callback callback)
 	{
+		RemoteTree tree = document.getTree();
+		String layoutID = document.getLayoutID();
 		if (tree != null)
 		{
 			find(request.getQuery(), tree.getHash(), SearchType.PREFIX, layoutID, new AsyncCallback<SearchResult[]>()
@@ -99,12 +101,7 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 		return lastResult;
 	}
 	
-	public void setTree(RemoteTree tree)
-	{
-		this.tree = tree;
-		lastQuery = null;
-		lastResult = new SearchResult[0];
-	}
+	
 	
 	public void addSearchResultListener(SearchResultListener listener)
 	{
@@ -156,10 +153,15 @@ public class SearchServiceAsyncImpl extends SuggestOracle implements SearchServi
 		
 		return filteredList.toArray(new SearchResult[filteredList.size()]);
 	}
-	
-	public void setLayoutID(String layoutID)
+
+	public PagedDocument getDocument()
 	{
-		this.layoutID = layoutID;
+		return document;
+	}
+
+	public void setDocument(PagedDocument document)
+	{
+		this.document = document;
 	}
 
 	public class RemoteNodeSuggestion implements SuggestOracle.Suggestion
