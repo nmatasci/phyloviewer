@@ -139,42 +139,48 @@ public class Phyloviewer implements EntryPoint
 		fileMenu.addItem("Export to SVG", showSVG);
 	
 		MenuBar layoutMenu = new MenuBar(true);
-//		layoutMenu.addItem("Rectangular Cladogram", new Command()
-//		{
-//			@Override
-//			public void execute()
-//			{
-//				widget.setViewType(TreeWidget.ViewType.VIEW_TYPE_CLADOGRAM);
-//				layoutType = "LAYOUT_TYPE_CLADOGRAM";
-//				searchService.setLayoutID(layoutType);
-//				ITree tree = widget.getDocument().getTree();
-//				loadTree(null, ((RemoteTree)tree), layoutType);
-//			}
-//		});
-//		layoutMenu.addItem("Rectangular Phylogram", new Command()
-//		{
-//			@Override
-//			public void execute()
-//			{
-//				widget.setViewType(TreeWidget.ViewType.VIEW_TYPE_CLADOGRAM);
-//				layoutType = "LAYOUT_TYPE_PHYLOGRAM";
-//				searchService.setLayoutID(layoutType);
-//				ITree tree = widget.getDocument().getTree();
-//				loadTree(null, ((RemoteTree)tree), layoutType);
-//			}
-//		});
-//		layoutMenu.addItem("Circular", new Command()
-//		{
-//			@Override
-//			public void execute()
-//			{
-//				widget.setViewType(TreeWidget.ViewType.VIEW_TYPE_RADIAL);
-//				layoutType = "LAYOUT_TYPE_CLADOGRAM";
-//				searchService.setLayoutID(layoutType);
-//				ITree tree = widget.getDocument().getTree();
-//				loadTree(null, ((RemoteTree)tree), layoutType);
-//			}
-//		});
+		layoutMenu.addItem("Rectangular Cladogram", new Command()
+		{
+			@Override
+			public void execute()
+			{
+				ITree tree = widget.getDocument().getTree();
+				byte[] treeID = ((RemoteTree)tree).getHash();
+				widget.setDocument(null);
+				widget.setViewType(TreeWidget.ViewType.VIEW_TYPE_CLADOGRAM);
+				layoutType = "LAYOUT_TYPE_CLADOGRAM";
+				
+				loadTree(null, treeID, layoutType);
+			}
+		});
+		layoutMenu.addItem("Rectangular Phylogram", new Command()
+		{
+			@Override
+			public void execute()
+			{
+				ITree tree = widget.getDocument().getTree();
+				byte[] treeID = ((RemoteTree)tree).getHash();
+				widget.setDocument(null);
+				widget.setViewType(TreeWidget.ViewType.VIEW_TYPE_CLADOGRAM);
+				layoutType = "LAYOUT_TYPE_PHYLOGRAM";
+				
+				loadTree(null, treeID, layoutType);
+			}
+		});
+		layoutMenu.addItem("Circular", new Command()
+		{
+			@Override
+			public void execute()
+			{
+				ITree tree = widget.getDocument().getTree();
+				byte[] treeID = ((RemoteTree)tree).getHash();
+				widget.setDocument(null);
+				widget.setViewType(TreeWidget.ViewType.VIEW_TYPE_RADIAL);
+				layoutType = "LAYOUT_TYPE_CLADOGRAM";
+				
+				loadTree(null, treeID, layoutType);
+			}
+		});
 
 		MenuBar styleMenu = new MenuBar(true);
 		final TextInputPopup styleTextPopup = new TextInputPopup();
@@ -307,15 +313,18 @@ public class Phyloviewer implements EntryPoint
 			if (splitPath[i].equalsIgnoreCase("tree")) {
 				treeIdString = splitPath[i+1];
 			}
-			
-			if (splitPath[i].equalsIgnoreCase("treeId")) {
-				//TODO handle old /treeId/[int] urls
-			}
 		}
 		
 		if(treeIdString != null && !treeIdString.equals(""))
 		{
-			 this.loadTree(null, treeIdString, layoutType);
+			try {
+				final byte[] treeId = Hex.decodeHex(treeIdString.toCharArray());
+				this.loadTree(null, treeId, layoutType);
+			}
+			catch(Exception e)
+			{
+				Window.alert("Unable to parse tree ID string from URL");
+			}
 		}
 		else
 		{
@@ -346,45 +355,41 @@ public class Phyloviewer implements EntryPoint
 		$wnd.jscolor.init();
 	}-*/;
 
-	private void loadTree(final PopupPanel displayTreePanel, String treeId, final String layoutID)
+	private void loadTree(final PopupPanel displayTreePanel, final byte[] treeId, final String layoutID)
 	{
-		try
+		combinedService.getRootNode(treeId, layoutID, new AsyncCallback<CombinedService.NodeResponse>()
 		{
-			final byte[] bytes = Hex.decodeHex(treeId.toCharArray());
-			combinedService.getRootNode(bytes, layoutID, new AsyncCallback<CombinedService.NodeResponse>()
+
+			@Override
+			public void onFailure(Throwable caught)
 			{
+				Window.alert(caught.getMessage());
+			}
 
-				@Override
-				public void onFailure(Throwable caught)
+			@Override
+			public void onSuccess(NodeResponse result)
+			{
+				RemoteTree tree = new RemoteTree();
+				tree.setRootNode(result.node);
+				tree.setHash(treeId);
+				PagedDocument document = new PagedDocument(tree, result.layout);
+				setDocument(document);
+
+				if(displayTreePanel != null)
 				{
-					Window.alert(caught.getMessage());
+					displayTreePanel.hide();
 				}
-
-				@Override
-				public void onSuccess(NodeResponse result)
-				{
-					RemoteTree tree = new RemoteTree();
-					tree.setRootNode(result.node);
-					tree.setHash(bytes);
-					PagedDocument document = new PagedDocument(tree, result.layout);
-					document.setCombinedService(combinedService);
-					document.setEventBus(eventBus);
-					searchService.setDocument(document);
-					widget.setDocument(document);
-					updateStyle();
-
-					if(displayTreePanel != null)
-					{
-						displayTreePanel.hide();
-					}
-				}
-			});
-			
-		}
-		catch(Exception e)
-		{
-			Window.alert("Unable to parse tree ID string from URL");
-		}
+			}
+		});
+	}
+	
+	private void setDocument(PagedDocument document) 
+	{
+		document.setCombinedService(combinedService);
+		document.setEventBus(eventBus);
+		searchService.setDocument(document);
+		widget.setDocument(document);
+		updateStyle();
 	}
 	
 	private void loadTree(final PopupPanel displayTreePanel, final RemoteTree tree, final String layoutID)
@@ -406,12 +411,8 @@ public class Phyloviewer implements EntryPoint
 			public void onSuccess(LayoutResponse layoutResponse)
 			{
 				PagedDocument document = new PagedDocument(tree, layoutResponse);
-				document.setCombinedService(combinedService);
-				document.setEventBus(eventBus);
-				searchService.setDocument(document);
-				widget.setDocument(document);
-				updateStyle();
-
+				setDocument(document);
+				
 				if(displayTreePanel != null)
 				{
 					displayTreePanel.hide();
