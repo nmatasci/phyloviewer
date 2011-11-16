@@ -48,7 +48,7 @@ public class SearchHighlighter implements SearchResultListener
 	}
 
 	@Override
-	public void handleSearchResult(SearchResult[] result, String query, byte[] rootID)
+	public void handleSearchResult(SearchResult[] results, String query, byte[] rootID)
 	{
 		if(renderPreferences != null)
 		{
@@ -57,7 +57,10 @@ public class SearchHighlighter implements SearchResultListener
 
 		if(tree != null)
 		{
-			highlightSubtree((RemoteNode)tree.getRootNode(), result);
+			for(SearchResult result : results)
+			{
+				highlightSubtree((RemoteNode)tree.getRootNode(), result);
+			}
 		}
 
 		if(view != null)
@@ -66,22 +69,18 @@ public class SearchHighlighter implements SearchResultListener
 		}
 	}
 	
-	private void highlightSubtree(RemoteNode node, SearchResult[] results)
+	private void highlightSubtree(RemoteNode node, SearchResult result) 
 	{
-		
-		for(SearchResult result : results)
+		if(node.getTopology().subtreeContains(result.node.getTopology()))
 		{
-			if(node.getTopology().subtreeContains(result.node.getTopology()))
+			renderPreferences.highlightNode(node);
+			renderPreferences.highlightBranch(node);
+			
+			if(node.getChildren() != null)
 			{
-				renderPreferences.highlightNode(node);
-				renderPreferences.highlightBranch(node);
-				
-				if(node.getChildren() != null)
+				for(RemoteNode child : node.getChildren())
 				{
-					for(RemoteNode child : node.getChildren())
-					{
-						highlightSubtree(child, results);
-					}
+					highlightSubtree(child, result);
 				}
 			}
 		}
