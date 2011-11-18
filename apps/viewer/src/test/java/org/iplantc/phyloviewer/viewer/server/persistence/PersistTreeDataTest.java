@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.viewer.server.persistence;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -14,11 +15,14 @@ import org.junit.Test;
 
 public class PersistTreeDataTest extends PersistenceTest
 {
+	String newick = "(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));";
+	String nexml = "<nex:nexml> <otus id=\"otus26\"> <otu id=\"otu27\" label=\"Eurysphindus\"/> </otus> <trees about=\"#trees22\" id=\"trees22\" otus=\"otus26\"> <meta content=\"117855\" datatype=\"xsd:integer\" id=\"meta24\" property=\"dcterms:identifier\" xsi:type=\"nex:LiteralMeta\"/> <meta href=\"http://tolweb.org/117855\" id=\"meta25\" rel=\"owl:sameAs\" xsi:type=\"nex:ResourceMeta\"/> <tree id=\"tree1\" xsi:type=\"nex:IntTree\"> <node about=\"#node2\" id=\"node2\" root=\"true\"> <meta content=\"117851\" datatype=\"xsd:integer\" id=\"meta21\" property=\"tba:ID\" xsi:type=\"nex:LiteralMeta\"/> </node> <node about=\"#node3\" id=\"node3\" label=\"Eurysphindus\" otu=\"otu27\"> <meta content=\"\" datatype=\"xsd:string\" id=\"meta4\" property=\"dc:description\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"Leconte\" datatype=\"xsd:string\" id=\"meta5\" property=\"tbe:AUTHORITY\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1878\" datatype=\"xsd:integer\" id=\"meta6\" property=\"tbe:AUTHDATE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"117851\" datatype=\"xsd:integer\" id=\"meta7\" property=\"tba:ANCESTORWITHPAGE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta8\" property=\"tba:CHILDCOUNT\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"null\" datatype=\"xsd:string\" id=\"meta9\" property=\"tba:COMBINATION_DATE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta10\" property=\"tba:CONFIDENCE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta11\" property=\"tba:EXTINCT\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1\" datatype=\"xsd:integer\" id=\"meta12\" property=\"tba:HASPAGE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"117855\" datatype=\"xsd:integer\" id=\"meta13\" property=\"tba:ID\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta14\" property=\"tba:INCOMPLETESUBGROUPS\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta15\" property=\"tba:IS_NEW_COMBINATION\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1\" datatype=\"xsd:integer\" id=\"meta16\" property=\"tba:ITALICIZENAME\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta17\" property=\"tba:LEAF\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta18\" property=\"tba:PHYLESIS\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta19\" property=\"tba:SHOWAUTHORITY\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1\" datatype=\"xsd:integer\" id=\"meta20\" property=\"tba:SHOWAUTHORITYCONTAINING\" xsi:type=\"nex:LiteralMeta\"/> </node> <edge id=\"edge3\" source=\"node2\" target=\"node3\"/> </tree> </trees> </nex:nexml>";
+	
 	@Test
 	public void testImportFromNewick() throws Exception
 	{
 		PersistTreeData out = new PersistTreeData(entityManagerFactory);
-		RemoteTree tree = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "test");
+		RemoteTree tree = out.importFromNewick(newick, "test");
 		
 		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
 		EntityManager em = entityManagerFactory.createEntityManager();
@@ -37,11 +41,22 @@ public class PersistTreeDataTest extends PersistenceTest
 	}
 	
 	@Test
+	public void testImportFromNexml() throws Exception
+	{
+		PersistTreeData out = new PersistTreeData(entityManagerFactory);
+		
+		List<RemoteTree> trees = out.importFromNexml(nexml);
+		assertEquals(1, trees.size());
+		RemoteTree tree = trees.get(0);
+		assertEquals("tree1", tree.getName());
+	}
+	
+	@Test
 	public void testDuplicateTree() throws Exception
 	{
 		PersistTreeData out = new PersistTreeData(entityManagerFactory);
-		byte[] treeID = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "test").getHash();
-		byte[] treeID2 = out.importFromNewick("(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));", "duplicate").getHash();
+		byte[] treeID = out.importFromNewick(newick, "test").getHash();
+		byte[] treeID2 = out.importFromNewick(newick, "duplicate").getHash();
 		
 		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
 		RemoteNode root = in.getRootNode(treeID);

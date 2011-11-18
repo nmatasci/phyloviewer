@@ -18,6 +18,7 @@ import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
+import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.nexml.model.Edge;
@@ -90,11 +91,11 @@ public class ImportTreeUtil
 		return graphics.getImage();
 	}
 	
-	public static RemoteNode convertDataModels(org.iplantc.phyloparser.model.Node parserNode) 
+	public static AnnotatedNode convertDataModels(org.iplantc.phyloparser.model.Node parserNode) 
 	{
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>(parserNode.getChildren().size());
 
-		RemoteNode rNode = new RemoteNode(parserNode.getName());
+		AnnotatedNode rNode = new AnnotatedNode(parserNode);
 		
 		for (Node parserChild : parserNode.getChildren()) {			
 			children.add(convertDataModels(parserChild));
@@ -140,10 +141,9 @@ public class ImportTreeUtil
 		return root;
 	}
 
-	private static RemoteNode convertDataModels(org.nexml.model.Node in, org.nexml.model.Tree<Edge> tree, Edge parentEdge)
+	private static AnnotatedNode convertDataModels(org.nexml.model.Node in, org.nexml.model.Tree<Edge> tree, Edge parentEdge)
 	{
-		String label = in.getLabel();
-		RemoteNode out = new RemoteNode(label);
+		AnnotatedNode out = new AnnotatedNode(in);
 		
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>();
 		for(org.nexml.model.Node child : tree.getOutNodes(in)) {
