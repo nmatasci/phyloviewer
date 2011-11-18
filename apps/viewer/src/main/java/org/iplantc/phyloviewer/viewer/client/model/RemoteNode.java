@@ -45,16 +45,6 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	
 	@Embedded
 	private NodeTopology topology = new NodeTopology();
-
-	public RemoteNode(String label, NodeTopology topology) {
-		this(label);
-		this.topology = topology;
-	}
-	
-	public RemoteNode(String label)
-	{
-		this.label = label;
-	}
 	
 	/**
 	 * Creates a shallow copy of the given RemoteNode
@@ -68,7 +58,7 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		this.children = node.children;
 	}
 
-	protected RemoteNode() 
+	public RemoteNode() 
 	{ 
 	}
 

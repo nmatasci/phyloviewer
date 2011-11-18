@@ -55,36 +55,45 @@ public class PersistTreeDataTest extends PersistenceTest
 		byte[][] hashes = new byte[trees.length][16];
 		
 		//root, 2 children, empty labels
-		RemoteNode node = new RemoteNode("");
-		node.addChild(new RemoteNode(""));
-		node.addChild(new RemoteNode(""));
+		RemoteNode node = new RemoteNode();
+		node.addChild(new RemoteNode());
+		node.addChild(new RemoteNode());
 		node.reindex();
 		trees[0] = new RemoteTree();
 		trees[0].setRootNode(node);
 		
 		//root, 2 children, with labels
-		node = new RemoteNode("A");
-		node.addChild(new RemoteNode("B"));
-		node.addChild(new RemoteNode("C"));
+		node = new RemoteNode();
+		node.setLabel("A");
+		RemoteNode child = new RemoteNode();
+		child.setLabel("B");
+		node.addChild(child);
+		child = new RemoteNode();
+		child.setLabel("C");
+		node.addChild(child);
 		node.reindex();
 		trees[1] = new RemoteTree();
 		trees[1].setRootNode(node);
 		
 		//root, 2 children swapped, with labels
-		node = new RemoteNode("A");
-		node.addChild(new RemoteNode("C"));
-		node.addChild(new RemoteNode("B"));
+		node = new RemoteNode();
+		node.setLabel("A");
+		child = new RemoteNode();
+		child.setLabel("C");
+		node.addChild(child);
+		child = new RemoteNode();
+		child.setLabel("B");
 		node.reindex();
 		trees[2] = new RemoteTree();
 		trees[2].setRootNode(node);
 		
 		//root, 2 children, empty labels, with different branch lengths
-		node = new RemoteNode("");
+		node = new RemoteNode();
 		node.setBranchLength(2.0);
-		RemoteNode child = new RemoteNode("");
+		child = new RemoteNode();
 		child.setBranchLength(42.0);
 		node.addChild(child);
-		child = new RemoteNode("");
+		child = new RemoteNode();
 		child.setBranchLength(1.0);
 		node.addChild(child);
 		node.reindex();
@@ -92,10 +101,10 @@ public class PersistTreeDataTest extends PersistenceTest
 		trees[3].setRootNode(node);
 		
 		//root, child, grandchild
-		node = new RemoteNode("");
-		child = new RemoteNode("");
+		node = new RemoteNode();
+		child = new RemoteNode();
 		node.addChild(child);
-		child.addChild(new RemoteNode(""));
+		child.addChild(new RemoteNode());
 		node.reindex();
 		trees[4] = new RemoteTree();
 		trees[4].setRootNode(node);

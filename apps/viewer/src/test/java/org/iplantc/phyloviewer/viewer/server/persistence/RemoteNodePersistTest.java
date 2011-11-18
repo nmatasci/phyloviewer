@@ -127,7 +127,7 @@ public class RemoteNodePersistTest extends PersistenceTest
 
 	private RemoteNode createTree(int depth, int numChildren)
 	{
-		RemoteNode node = new RemoteNode("");
+		RemoteNode node = new RemoteNode();
 		nodeCount++;
 		
 		createTree(node, depth, numChildren);
@@ -154,7 +154,7 @@ public class RemoteNodePersistTest extends PersistenceTest
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>();
 		RemoteNode child;
 		for (int i = 0; i < numChildren; i++) {
-			child = new RemoteNode("");
+			child = new RemoteNode();
 			nodeCount++;
 			children.add(child);
 		}

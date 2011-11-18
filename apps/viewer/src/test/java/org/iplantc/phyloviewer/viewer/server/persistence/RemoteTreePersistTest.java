@@ -16,8 +16,8 @@ public class RemoteTreePersistTest extends PersistenceTest
 	public void test()
 	{
 		//make a little tree
-		RemoteNode root = new RemoteNode("root");
-		root.addChild(new RemoteNode("child"));
+		RemoteNode root = new RemoteNode();
+		root.addChild(new RemoteNode());
 		RemoteTree tree = new RemoteTree();
 		tree.setRootNode(root);
 		EntityManager em = entityManagerFactory.createEntityManager();
@@ -37,8 +37,8 @@ public class RemoteTreePersistTest extends PersistenceTest
 		EntityManager em = entityManagerFactory.createEntityManager();
 		
 		//make a little tree
-		RemoteNode root = new RemoteNode("root");
-		root.addChild(new RemoteNode("child"));
+		RemoteNode root = new RemoteNode();
+		root.addChild(new RemoteNode());
 		
 		//make and persist a tree
 		RemoteTree tree = new RemoteTree();
