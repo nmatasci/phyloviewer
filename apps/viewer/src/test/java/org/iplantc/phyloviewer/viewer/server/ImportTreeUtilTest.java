@@ -11,10 +11,7 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.iplantc.phyloparser.exception.ParserException;
-import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
-import org.iplantc.phyloviewer.viewer.client.model.Annotation;
-import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
-import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
+import org.iplantc.phyloviewer.viewer.client.model.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.nexml.model.Document;
