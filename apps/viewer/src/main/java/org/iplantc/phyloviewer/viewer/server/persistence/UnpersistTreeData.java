@@ -2,6 +2,7 @@ package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -11,7 +12,6 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.shared.model.ITree;
-import org.iplantc.phyloviewer.viewer.client.model.NodeTopology;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
@@ -35,7 +35,9 @@ public class UnpersistTreeData implements ITreeData
 		em.detach(root);
 		em.close();
 		
-		return clone(root);
+		cleanForTransfer(root);
+		
+		return root;
 	}
 	
 	/**
@@ -73,7 +75,8 @@ public class UnpersistTreeData implements ITreeData
 		List<ITree> trees = new ArrayList<ITree>(results.size());
 		for(RemoteTree tree : results) {
 			em.detach(tree);
-			trees.add(clone(tree));
+			cleanForTransfer(tree);
+			trees.add(tree);
 		}
 		
 		em.getTransaction().commit();
@@ -94,8 +97,9 @@ public class UnpersistTreeData implements ITreeData
 		RemoteNode parent = query.getSingleResult();
 		parent.getChildren().isEmpty(); //force lazy fetch of children
 		
-		List<RemoteNode> children = clone(parent).getChildren();
 		em.detach(parent);
+		cleanForTransfer(parent);
+		List<RemoteNode> children = parent.getChildren();
 		
 		em.getTransaction().commit();
 		em.close();
@@ -103,28 +107,26 @@ public class UnpersistTreeData implements ITreeData
 		return children;
 	}
 	
-	public static RemoteNode clone(RemoteNode node) {
-		RemoteNode clone = new RemoteNode(node);
-		
-		NodeTopology topology = new NodeTopology(node.getTopology());
-		topology.setRootNode(null);
-		clone.setTopology(topology);
-		
-		List<RemoteNode> children = node.getChildren();
-		clone.setChildren(null);
-		if (children != null && Persistence.getPersistenceUtil().isLoaded(node, "children")) {
-			for (RemoteNode child : children) {
-				clone.addChild(clone(child));
-			}
+	/**
+	 * Makes a clean copy of the subtree, without any persistence proxy objects
+	 */
+	public static void cleanForTransfer(RemoteNode node) {
+		List<RemoteNode> children = Collections.emptyList();
+		if (node.getChildren() != null && Persistence.getPersistenceUtil().isLoaded(node, "children")) {
+			children = node.getChildren();
 		}
 		
-		return clone;
+		node.clean();
+		for (RemoteNode child : children) {
+			child.clean();
+			node.addChild(child);
+		}
 	}
 	
-	public static RemoteTree clone(RemoteTree tree) {
-		RemoteTree clone = new RemoteTree(tree);
-		clone.setRootNode(clone(tree.getRootNode()));
-		
-		return clone;
+	/**
+	 * Makes a clean copy of the tree, without any persistence proxy objects
+	 */
+	public static void cleanForTransfer(RemoteTree tree) {
+		cleanForTransfer((RemoteNode) tree.getRootNode());
 	}
 }

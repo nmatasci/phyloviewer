@@ -11,7 +11,6 @@ import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.SearchService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
-import org.iplantc.phyloviewer.viewer.server.persistence.UnpersistTreeData;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -48,8 +47,10 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		ILayoutData layout = (ILayoutData) this.getServletContext().getAttribute(Constants.LAYOUT_DATA_KEY);
 		
 		for (RemoteNode node : nodes) {
+			em.detach(node);
+			node.clean();
 			SearchResult result = new SearchResult();
-			result.node = UnpersistTreeData.clone(node);
+			result.node = node;
 			result.layout = layout.getLayout(node, layoutID);
 			results.add(result);
 		}

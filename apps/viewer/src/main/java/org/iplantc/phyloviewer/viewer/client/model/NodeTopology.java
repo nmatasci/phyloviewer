@@ -154,4 +154,12 @@ public class NodeTopology implements Serializable
 	{
 		this.rootNode = rootNode;
 	}
+
+	/**
+	 * Sets any FetchType.LAZY fields to null
+	 */
+	public void clean()
+	{
+		this.rootNode = null;
+	}
 }

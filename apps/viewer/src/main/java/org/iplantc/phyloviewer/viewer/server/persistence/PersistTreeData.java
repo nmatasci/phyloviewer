@@ -130,6 +130,7 @@ public class PersistTreeData implements IImportTreeData
 					if (existingTree != null) {
 						Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Existing tree match found.  Skipping import.");
 						trees.add(existingTree);
+						//FIXME: this duplicate tree could have different node annotations.  If so, find some way to persist them.
 						continue;
 					}
 					

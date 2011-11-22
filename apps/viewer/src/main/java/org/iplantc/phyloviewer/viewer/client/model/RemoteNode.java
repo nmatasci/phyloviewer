@@ -46,18 +46,6 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	@Embedded
 	private NodeTopology topology = new NodeTopology();
 	
-	/**
-	 * Creates a shallow copy of the given RemoteNode
-	 */
-	public RemoteNode(RemoteNode node)
-	{
-		this.setLabel(node.getLabel());
-		this.setId(node.getId());
-		this.setBranchLength(node.getBranchLength());
-		this.setTopology(node.getTopology());
-		this.children = node.children;
-	}
-
 	public RemoteNode() 
 	{ 
 	}
@@ -245,5 +233,13 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		return topology.getAltLabel();
 	}
 	
-	
+	/**
+	 * Sets any FetchType.LAZY fields to null
+	 */
+	public void clean()
+	{
+		this.children = null;
+		this.parent = null;
+		this.topology.clean();
+	}
 }

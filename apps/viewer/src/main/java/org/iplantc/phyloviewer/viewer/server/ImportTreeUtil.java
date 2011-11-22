@@ -2,6 +2,8 @@ package org.iplantc.phyloviewer.viewer.server;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -19,6 +21,7 @@ import org.iplantc.phyloviewer.shared.model.Document;
 import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
+import org.iplantc.phyloviewer.viewer.client.model.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.nexml.model.Edge;
@@ -95,7 +98,14 @@ public class ImportTreeUtil
 	{
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>(parserNode.getChildren().size());
 
-		AnnotatedNode rNode = new AnnotatedNode(parserNode);
+		AnnotatedNode rNode = new AnnotatedNode();
+		rNode.setLabel(parserNode.getName());
+		
+		//convert NHX annotations
+		for (org.iplantc.phyloparser.model.Annotation annotation : parserNode.getAnnotations())
+		{
+			rNode.addAnnotation("NHX", annotation.getContent());
+		}
 		
 		for (Node parserChild : parserNode.getChildren()) {			
 			children.add(convertDataModels(parserChild));
@@ -120,7 +130,7 @@ public class ImportTreeUtil
 		RemoteNode outRoot = convertDataModels(inRoot, in, null);
 		out.setRootNode(outRoot);
 		
-		out.getRootNode().reindex();
+		((RemoteNode)out.getRootNode()).reindex();
 		
 		return out;
 	}
@@ -143,8 +153,17 @@ public class ImportTreeUtil
 
 	private static AnnotatedNode convertDataModels(org.nexml.model.Node in, org.nexml.model.Tree<Edge> tree, Edge parentEdge)
 	{
-		AnnotatedNode out = new AnnotatedNode(in);
+		AnnotatedNode out = new AnnotatedNode();
+		out.setLabel(in.getLabel());
 		
+		//convert annotations
+		for (org.nexml.model.Annotation nexmlAnnotation : in.getAllAnnotations()) 
+		{
+			Annotation annotation = convertDataModels(nexmlAnnotation, out);
+			out.addAnnotation(annotation);
+		}
+		
+		//convert children
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>();
 		for(org.nexml.model.Node child : tree.getOutNodes(in)) {
 			Edge e = tree.getEdge(in, child);
@@ -153,10 +172,29 @@ public class ImportTreeUtil
 		
 		out.setChildren(children);
 		
+		//copy branch length if it exists (else note: default branch length = 1.0)
 		if (parentEdge != null && parentEdge.getLength() != null && parentEdge.getLength().doubleValue() > 0) {
 			out.setBranchLength(parentEdge.getLength().doubleValue());
 		}
 		
 		return out;
+	}
+	
+	private static Annotation convertDataModels(org.nexml.model.Annotation nexmlAnnotation, AnnotatedNode node) 
+	{
+		Serializable value = (Serializable) nexmlAnnotation.getValue();
+		String property = nexmlAnnotation.getProperty();
+		
+		URI predicateNamespaceURI = nexmlAnnotation.getPredicateNamespace();
+		String predicateNamespace = null;
+		if (predicateNamespaceURI != null) 
+		{
+			predicateNamespace = predicateNamespaceURI.toString();
+		}
+		
+		String rel = nexmlAnnotation.getRel();
+		String datatype = nexmlAnnotation.getXsdType().toString();
+		
+		return new Annotation(node, value, property, predicateNamespace, rel, datatype);
 	}
 }

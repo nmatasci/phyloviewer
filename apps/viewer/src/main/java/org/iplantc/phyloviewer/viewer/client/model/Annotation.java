@@ -1,9 +1,9 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
 import java.io.Serializable;
-import java.net.URI;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,7 +18,7 @@ public class Annotation implements Serializable
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private int id;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private AnnotatedNode node;
 	
 	private Serializable value;
@@ -27,20 +27,13 @@ public class Annotation implements Serializable
 	private String rel;
 	private String datatype;
 	
-	public Annotation(org.nexml.model.Annotation annotation, AnnotatedNode node)
-	{
+	public Annotation(AnnotatedNode node, Serializable value, String property, String predicateNamespace, String rel, String datatype) {
 		this.node = node;
-		this.value = (Serializable)annotation.getValue();
-		this.property = annotation.getProperty();
-		
-		URI predicateNamespaceURI = annotation.getPredicateNamespace();
-		if (predicateNamespaceURI != null) 
-		{
-			this.predicateNamespace = predicateNamespaceURI.toString();
-		}
-		
-		this.rel = annotation.getRel();
-		this.datatype = annotation.getXsdType().toString();
+		this.value = value;
+		this.property = property;
+		this.predicateNamespace = predicateNamespace;
+		this.rel = rel;
+		this.datatype = datatype;
 	}
 	
 	public Annotation()
@@ -128,6 +121,11 @@ public class Annotation implements Serializable
 	public void setDatatype(String datatype)
 	{
 		this.datatype = datatype;
+	}
+
+	public void clean()
+	{
+		this.node = null;
 	}
 	
 }
