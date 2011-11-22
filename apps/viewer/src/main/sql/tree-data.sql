@@ -11,6 +11,7 @@ ALTER TABLE hibernate_sequence OWNER TO phyloviewer;
 
 CREATE TABLE node
 (
+  dtype character varying(31) NOT NULL,
   node_id integer NOT NULL,
   branchlength double precision,
   label character varying(255),
@@ -55,6 +56,25 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE tree OWNER TO phyloviewer;
+
+CREATE TABLE annotation
+(
+  id integer NOT NULL,
+  datatype character varying(255),
+  predicatenamespace character varying(255),
+  property character varying(255),
+  rel character varying(255),
+  "value" bytea,
+  node_node_id integer,
+  CONSTRAINT annotation_pkey PRIMARY KEY (id),
+  CONSTRAINT fk1a21c74f1f6282ba FOREIGN KEY (node_node_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE annotation OWNER TO phyloviewer;
 
 create table overview_images (
 	tree_id bytea not null,
