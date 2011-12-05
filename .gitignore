@@ -17,3 +17,4 @@ tomcat
 www-test
 # Not sure where this is coming from, but ignore it
 .gwt/
+gwt-unitCache
