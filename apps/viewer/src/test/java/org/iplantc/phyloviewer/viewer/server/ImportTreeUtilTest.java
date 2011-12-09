@@ -57,7 +57,8 @@ public class ImportTreeUtilTest
 		node = (AnnotatedNode) node.getChild(0);
 		assertEquals(1.0, node.getBranchLength().doubleValue(), 0.0);
 		assertEquals("ba", node.getLabel());
-		assertEquals("&&NHX:someAnnotation", node.getAnnotations("NHX").iterator().next().getValue());
+		LiteralMetaAnnotation annotation = (LiteralMetaAnnotation) node.getAnnotations("NHX").iterator().next();
+		assertEquals("&&NHX:someAnnotation", annotation.getValue());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,22 +88,22 @@ public class ImportTreeUtilTest
 
 		Set<Annotation> annotations = childOut.getAnnotations("tbe:AUTHORITY");
 		assertEquals(1, annotations.size());
-		Annotation annotation = annotations.iterator().next();
+		LiteralMetaAnnotation annotation = (LiteralMetaAnnotation) annotations.iterator().next();
 		assertEquals("Leconte", annotation.getValue());
 		
 		annotations = childOut.getAnnotations("tba:ANCESTORWITHPAGE");
 		assertEquals(1, annotations.size());
-		annotation = annotations.iterator().next();
+		annotation = (LiteralMetaAnnotation) annotations.iterator().next();
 		assertEquals(BigInteger.valueOf(117851), annotation.getValue());
 		
 		annotations = childOut.getAnnotations("cdao:has_tag");
 		assertEquals(1, annotations.size());
-		annotation = annotations.iterator().next();
+		annotation = (LiteralMetaAnnotation) annotations.iterator().next();
 		assertEquals(true, annotation.getValue());
 		
 		annotations = childOut.getAnnotations("tb:output.analysisstep");
 		assertEquals(1, annotations.size());
-		annotation = annotations.iterator().next();
+		annotation = (LiteralMetaAnnotation) annotations.iterator().next();
 		assertEquals("http://purl.org/phylo/treebase/phylows/study/TB2:As1269", annotation.getValue().toString());
 	}
 

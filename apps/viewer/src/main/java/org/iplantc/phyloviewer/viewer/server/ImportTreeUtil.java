@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,8 +23,10 @@ import org.iplantc.phyloviewer.shared.model.Tree;
 import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
 import org.iplantc.phyloviewer.viewer.client.model.Annotation;
+import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
+import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;
 import org.nexml.model.Edge;
 
 /**
@@ -104,7 +107,11 @@ public class ImportTreeUtil
 		//convert NHX annotations
 		for (org.iplantc.phyloparser.model.Annotation annotation : parserNode.getAnnotations())
 		{
-			rNode.addAnnotation("NHX", annotation.getContent());
+			LiteralMetaAnnotation a = new LiteralMetaAnnotation();
+			a.setAnnotated(rNode);
+	    	a.setProperty("NHX");
+	    	a.setValue(annotation.getContent());
+	    	rNode.addAnnotation(a);
 		}
 		
 		for (Node parserChild : parserNode.getChildren()) {			
@@ -159,7 +166,7 @@ public class ImportTreeUtil
 		//convert annotations
 		for (org.nexml.model.Annotation nexmlAnnotation : in.getAllAnnotations()) 
 		{
-			Annotation annotation = convertDataModels(nexmlAnnotation, out);
+			Annotation annotation = convertDataModels(nexmlAnnotation);
 			out.addAnnotation(annotation);
 		}
 		
@@ -180,21 +187,50 @@ public class ImportTreeUtil
 		return out;
 	}
 	
-	private static Annotation convertDataModels(org.nexml.model.Annotation nexmlAnnotation, AnnotatedNode node) 
+	private static Annotation convertDataModels(org.nexml.model.Annotation nexmlAnnotation) 
 	{
-		Serializable value = (Serializable) nexmlAnnotation.getValue();
-		String property = nexmlAnnotation.getProperty();
-		
-		URI predicateNamespaceURI = nexmlAnnotation.getPredicateNamespace();
-		String predicateNamespace = null;
-		if (predicateNamespaceURI != null) 
+		Object value = nexmlAnnotation.getValue();
+		Annotation a = null;
+		if (value instanceof Set)
 		{
-			predicateNamespace = predicateNamespaceURI.toString();
+			a = createResourceAnnotation(nexmlAnnotation);
+		}
+		else
+		{
+			a = createLiteralAnnotation(nexmlAnnotation);
 		}
 		
-		String rel = nexmlAnnotation.getRel();
-		String datatype = nexmlAnnotation.getXsdType().toString();
+		URI predicateNamespaceURI = nexmlAnnotation.getPredicateNamespace();
+		if (predicateNamespaceURI != null) 
+		{
+			a.setPredicateNamespace(predicateNamespaceURI.toString());
+		}
 		
-		return new Annotation(node, value.toString(), property, predicateNamespace, rel, datatype);
+		return a;
+	}
+	
+	private static LiteralMetaAnnotation createLiteralAnnotation(org.nexml.model.Annotation nexmlAnnotation)
+	{
+		LiteralMetaAnnotation a = new LiteralMetaAnnotation();
+		
+		a.setProperty(nexmlAnnotation.getProperty());
+		a.setDatatype(nexmlAnnotation.getXsdType().toString());
+		a.setValue(nexmlAnnotation.getValue().toString());
+		
+		return a;
+	}
+	
+	private static ResourceMetaAnnotation createResourceAnnotation(org.nexml.model.Annotation nexmlAnnotation)
+	{
+		ResourceMetaAnnotation a = new ResourceMetaAnnotation();
+		
+		a.setRel(nexmlAnnotation.getRel());
+
+		for (org.nexml.model.Annotation nestedAnnotation : nexmlAnnotation.getAllAnnotations())
+		{
+			a.addAnnotation(convertDataModels(nestedAnnotation));
+		}
+		
+		return a;
 	}
 }

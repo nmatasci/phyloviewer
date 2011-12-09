@@ -10,11 +10,11 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 @Entity
-public class AnnotatedNode extends RemoteNode implements Serializable
+public class AnnotatedNode extends RemoteNode implements Serializable, Annotatable
 {
 	private static final long serialVersionUID = 602683128059592856L;
 	
-	@OneToMany(mappedBy="node", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@OneToMany(mappedBy="annotated", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
 	private Set<Annotation> annotations;
 
 	public AnnotatedNode()
@@ -35,30 +35,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable
      * @see org.nexml.model.Annotatable#getAnnotations(java.lang.String)
      */
     public Set<Annotation> getAnnotations(String propertyOrRel) {
-    	Set<Annotation> annotations = new HashSet<Annotation>();
-    	if ( propertyOrRel == null ) {
-    		return annotations;
-    	}
-    	for ( Annotation annotation : this.annotations ) {
-    		if ( propertyOrRel.equals(annotation.getProperty()) || propertyOrRel.equals(annotation.getRel()) ) {
-    			annotations.add(annotation);
-    		}
-    	}
-    	return annotations;
-    }
-
-    /**
-     * For adding phyloparser NHX annotations.
-     */
-    public Annotation addAnnotation(String property, String value) 
-    {
-    	Annotation annotation = new Annotation();
-    	annotation.setNode(this);
-    	annotation.setProperty(property);
-    	annotation.setValue(value);
-    	addAnnotation(annotation);
-    	
-    	return annotation;
+    	return Annotation.getAnnotations(propertyOrRel, this.annotations);
     }
     
     public void addAnnotation(Annotation annotation) {
@@ -66,6 +43,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable
     		this.annotations = new HashSet<Annotation>();
     	}
     	
+    	annotation.setAnnotated(this);
     	this.annotations.add(annotation);
     }
     
@@ -80,6 +58,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable
 		for (Annotation annotation : annotations) 
     	{
     		annotation.clean();
+    		addAnnotation(annotation);
     	}
 
     }
