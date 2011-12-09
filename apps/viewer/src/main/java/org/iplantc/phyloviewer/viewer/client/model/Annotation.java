@@ -21,13 +21,13 @@ public class Annotation implements Serializable
 	@ManyToOne(fetch = FetchType.LAZY)
 	private AnnotatedNode node;
 	
-	private Serializable value;
+	private String value;
 	private String property;
 	private String predicateNamespace;
 	private String rel;
 	private String datatype;
 	
-	public Annotation(AnnotatedNode node, Serializable value, String property, String predicateNamespace, String rel, String datatype) {
+	public Annotation(AnnotatedNode node, String value, String property, String predicateNamespace, String rel, String datatype) {
 		this.node = node;
 		this.value = value;
 		this.property = property;
@@ -102,15 +102,15 @@ public class Annotation implements Serializable
     /**
      * @see org.nexml.model.Annotation#getValue()
      */
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
     
     /**
      * @see org.nexml.model.Annotation#setValue(java.lang.Object)
      */
-    public void setValue(Object value) {
-    	this.value = (Serializable)value;
+    public void setValue(String value) {
+    	this.value = value;
     }
 
 	public String getDatatype()

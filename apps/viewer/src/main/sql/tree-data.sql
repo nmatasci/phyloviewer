@@ -64,7 +64,7 @@ CREATE TABLE annotation
   predicatenamespace character varying(255),
   property character varying(255),
   rel character varying(255),
-  "value" bytea,
+  "value" character varying(255),
   node_node_id integer,
   CONSTRAINT annotation_pkey PRIMARY KEY (id),
   CONSTRAINT fk1a21c74f1f6282ba FOREIGN KEY (node_node_id)
@@ -75,6 +75,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE annotation OWNER TO phyloviewer;
+
 
 create table overview_images (
 	tree_id bytea not null,

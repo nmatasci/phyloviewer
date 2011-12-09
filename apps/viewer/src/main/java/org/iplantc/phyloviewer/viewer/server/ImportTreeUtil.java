@@ -195,6 +195,6 @@ public class ImportTreeUtil
 		String rel = nexmlAnnotation.getRel();
 		String datatype = nexmlAnnotation.getXsdType().toString();
 		
-		return new Annotation(node, value, property, predicateNamespace, rel, datatype);
+		return new Annotation(node, value.toString(), property, predicateNamespace, rel, datatype);
 	}
 }
