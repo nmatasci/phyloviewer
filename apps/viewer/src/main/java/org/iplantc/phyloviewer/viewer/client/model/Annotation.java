@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.FetchType;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
 
-@MappedSuperclass
+@Entity
 public abstract class Annotation implements Serializable
 {
 	private static final long serialVersionUID = 5343384601854251292L;
@@ -19,9 +17,6 @@ public abstract class Annotation implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private int id;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Annotatable annotated;
 
 	private String predicateNamespace;
 	
@@ -31,6 +26,7 @@ public abstract class Annotation implements Serializable
 	}
 	
 	public abstract String getKey();
+	public abstract void clean();
 	
 	public int getId()
 	{
@@ -42,16 +38,6 @@ public abstract class Annotation implements Serializable
 		this.id = id;
 	}
 
-	public Annotatable getAnnotated()
-	{
-		return annotated;
-	}
-
-	public void setAnnotated(Annotatable annotated)
-	{
-		this.annotated = annotated;
-	}
-
     public String getPredicateNamespace()
 	{
 		return predicateNamespace;
@@ -60,11 +46,6 @@ public abstract class Annotation implements Serializable
 	public void setPredicateNamespace(String predicateNamespace)
 	{
 		this.predicateNamespace = predicateNamespace;
-	}
-	
-	public void clean()
-	{
-		this.annotated = null;
 	}
 	
     public static Set<Annotation> getAnnotations(String key, Set<Annotation> annotations) {

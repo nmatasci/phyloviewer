@@ -2,36 +2,31 @@ package org.iplantc.phyloviewer.viewer.server;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
+import java.net.URL;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.iplantc.phyloparser.exception.ParserException;
-import org.iplantc.phyloviewer.viewer.client.model.*;
-import org.junit.Before;
+import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
+import org.iplantc.phyloviewer.viewer.client.model.Annotation;
+import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
+import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
+import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;
 import org.junit.Test;
 import org.nexml.model.Document;
 import org.nexml.model.DocumentFactory;
 import org.nexml.model.Edge;
 import org.nexml.model.Node;
 import org.nexml.model.Tree;
-import org.nexml.model.TreeBlock;
 import org.xml.sax.SAXException;
 
 public class ImportTreeUtilTest
 {
 	String newick = "(a:1,(ba:1[&&NHX:someAnnotation],bb:2)b:2)r;";
-	String nexml = "<nex:nexml> <otus id=\"otus26\"> <otu id=\"otu27\" label=\"Eurysphindus\"/> </otus> <trees about=\"#trees22\" id=\"trees22\" otus=\"otus26\"> <meta content=\"117855\" datatype=\"xsd:integer\" id=\"meta24\" property=\"dcterms:identifier\" xsi:type=\"nex:LiteralMeta\"/> <meta href=\"http://tolweb.org/117855\" id=\"meta25\" rel=\"owl:sameAs\" xsi:type=\"nex:ResourceMeta\"/> <tree id=\"tree1\" xsi:type=\"nex:IntTree\"> <node about=\"#node2\" id=\"node2\" root=\"true\"> <meta content=\"117851\" datatype=\"xsd:integer\" id=\"meta21\" property=\"tba:ID\" xsi:type=\"nex:LiteralMeta\"/> </node> <node about=\"#node3\" id=\"node3\" label=\"Eurysphindus\" otu=\"otu27\"> <meta content=\"\" datatype=\"xsd:string\" id=\"meta4\" property=\"dc:description\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"Leconte\" datatype=\"xsd:string\" id=\"meta5\" property=\"tbe:AUTHORITY\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1878\" datatype=\"xsd:integer\" id=\"meta6\" property=\"tbe:AUTHDATE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"117851\" datatype=\"xsd:integer\" id=\"meta7\" property=\"tba:ANCESTORWITHPAGE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta8\" property=\"tba:CHILDCOUNT\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"null\" datatype=\"xsd:string\" id=\"meta9\" property=\"tba:COMBINATION_DATE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta10\" property=\"tba:CONFIDENCE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta11\" property=\"tba:EXTINCT\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1\" datatype=\"xsd:integer\" id=\"meta12\" property=\"tba:HASPAGE\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"117855\" datatype=\"xsd:integer\" id=\"meta13\" property=\"tba:ID\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta14\" property=\"tba:INCOMPLETESUBGROUPS\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta15\" property=\"tba:IS_NEW_COMBINATION\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1\" datatype=\"xsd:integer\" id=\"meta16\" property=\"tba:ITALICIZENAME\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta17\" property=\"tba:LEAF\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta18\" property=\"tba:PHYLESIS\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"0\" datatype=\"xsd:integer\" id=\"meta19\" property=\"tba:SHOWAUTHORITY\" xsi:type=\"nex:LiteralMeta\"/> <meta content=\"1\" datatype=\"xsd:integer\" id=\"meta20\" property=\"tba:SHOWAUTHORITYCONTAINING\" xsi:type=\"nex:LiteralMeta\"/> <meta id=\"dict1\" property=\"cdao:has_tag\" content=\"true\" xsi:type=\"nex:LiteralMeta\" datatype=\"xsd:boolean\"/> <meta href=\"http://purl.org/phylo/treebase/phylows/study/TB2:As1269\" id=\"meta1841\" rel=\"tb:output.analysisstep\" xsi:type=\"nex:ResourceMeta\"/> </node> <edge id=\"edge3\" source=\"node2\" target=\"node3\"/> </tree> </trees> </nex:nexml>";
-	
-	@Before
-	public void setUp() 
-	{
-		
-	}
+	Tree<Edge> nexmlTree;
 
 	@Test
 	public void testConvertDataModelsNewick() throws ParserException
@@ -61,50 +56,61 @@ public class ImportTreeUtilTest
 		assertEquals("&&NHX:someAnnotation", annotation.getValue());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testConvertDataModelsNexml() throws SAXException, IOException, ParserConfigurationException
 	{
-		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
-		Document document = DocumentFactory.parse(stream);
-		stream.close();
+		URL url = this.getClass().getResource("/trees.xml");
+		nexmlTree = getFirstTree(url);
 		
-		TreeBlock treeBlock = document.getTreeBlockList().get(0);
-		Tree<Edge> in = (Tree<Edge>) treeBlock.iterator().next();
+		RemoteTree out = ImportTreeUtil.convertDataModels(nexmlTree);
+		assertEquals(nexmlTree.getId(), out.getName());
 		
-		RemoteTree out = ImportTreeUtil.convertDataModels(in);
-		assertEquals(in.getId(), out.getName());
+		Node rootIn = nexmlTree.getRoot();
+		AnnotatedNode rootOut = (AnnotatedNode) out.getRootNode();
+		assertEquals(rootIn.getLabel(), rootOut.getLabel());
 		
-		Node rootIn = in.getRoot();
-		RemoteNode nodeOut = out.getRootNode();
-		assertEquals(rootIn.getLabel(), nodeOut.getLabel());
-		
-		Node childIn = in.getOutNodes(rootIn).iterator().next();
-		AnnotatedNode childOut = (AnnotatedNode) nodeOut.getChild(0);
+		Node childIn = nexmlTree.getOutNodes(rootIn).iterator().next();
+		AnnotatedNode childOut = (AnnotatedNode) rootOut.getChild(0);
 		assertEquals(childIn.getLabel(), childOut.getLabel());
-		assertEquals(childIn.getAllAnnotations().size(), childOut.getAnnotations().size());
+		assertEquals(rootIn.getAllAnnotations().size(), rootOut.getAnnotations().size());
 //		Edge edge = in.getEdge(rootIn, childIn);
 //		assertEquals(edge.getLength().doubleValue(), nodeOut.getBranchLength().doubleValue(), 0.0); //FIXME get rid of RemoteNode default branch length = 1.0?
 
-		Set<Annotation> annotations = childOut.getAnnotations("tbe:AUTHORITY");
+		Set<Annotation> annotations = rootOut.getAnnotations("intmeta");
 		assertEquals(1, annotations.size());
 		LiteralMetaAnnotation annotation = (LiteralMetaAnnotation) annotations.iterator().next();
-		assertEquals("Leconte", annotation.getValue());
+		assertEquals("1", annotation.getValue());
 		
-		annotations = childOut.getAnnotations("tba:ANCESTORWITHPAGE");
+		annotations = rootOut.getAnnotations("stringmeta");
 		assertEquals(1, annotations.size());
 		annotation = (LiteralMetaAnnotation) annotations.iterator().next();
-		assertEquals(BigInteger.valueOf(117851), annotation.getValue());
+		assertEquals("some string", annotation.getValue());
 		
-		annotations = childOut.getAnnotations("cdao:has_tag");
+		annotations = rootOut.getAnnotations("booleanmeta");
 		assertEquals(1, annotations.size());
 		annotation = (LiteralMetaAnnotation) annotations.iterator().next();
-		assertEquals(true, annotation.getValue());
+		assertEquals(Boolean.TRUE.toString(), annotation.getValue());
 		
-		annotations = childOut.getAnnotations("tb:output.analysisstep");
+		annotations = rootOut.getAnnotations("urimeta");
+		assertEquals(1, annotations.size());
+		ResourceMetaAnnotation resourceMetaAnnotation = (ResourceMetaAnnotation) annotations.iterator().next();
+		assertEquals("http://example.org/path/to/resource", resourceMetaAnnotation.getHref());
+		
+		//now some nested meta elements
+		annotations = resourceMetaAnnotation.getAnnotations("nestedresourcemeta");
+		assertEquals(1, annotations.size());
+		resourceMetaAnnotation = (ResourceMetaAnnotation) annotations.iterator().next();
+		annotations = resourceMetaAnnotation.getAnnotations("nestedliteralmeta");
 		assertEquals(1, annotations.size());
 		annotation = (LiteralMetaAnnotation) annotations.iterator().next();
-		assertEquals("http://purl.org/phylo/treebase/phylows/study/TB2:As1269", annotation.getValue().toString());
+		assertEquals("some other string", annotation.getValue());
+		
 	}
 
+	private Tree<Edge> getFirstTree(URL url) throws SAXException, IOException, ParserConfigurationException
+	{
+		File file = new File(url.getFile());
+		Document document = DocumentFactory.parse(file);
+		return ImportTreeUtil.getAllTrees(document).get(0);
+	}
 }

@@ -1,14 +1,18 @@
 package org.iplantc.phyloviewer.viewer.server;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloparser.model.FileData;
@@ -27,7 +31,11 @@ import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;
+import org.nexml.model.DocumentFactory;
 import org.nexml.model.Edge;
+import org.nexml.model.Network;
+import org.nexml.model.TreeBlock;
+import org.xml.sax.SAXException;
 
 /**
  * Static methods removed from org.iplantc.phyloviewer.viewer.server.db.ImportTreeData
@@ -108,7 +116,6 @@ public class ImportTreeUtil
 		for (org.iplantc.phyloparser.model.Annotation annotation : parserNode.getAnnotations())
 		{
 			LiteralMetaAnnotation a = new LiteralMetaAnnotation();
-			a.setAnnotated(rNode);
 	    	a.setProperty("NHX");
 	    	a.setValue(annotation.getContent());
 	    	rNode.addAnnotation(a);
@@ -191,7 +198,9 @@ public class ImportTreeUtil
 	{
 		Object value = nexmlAnnotation.getValue();
 		Annotation a = null;
-		if (value instanceof Set)
+		if (value instanceof org.nexml.model.Annotation
+				|| value instanceof Set
+				|| value instanceof URI)
 		{
 			a = createResourceAnnotation(nexmlAnnotation);
 		}
@@ -220,17 +229,69 @@ public class ImportTreeUtil
 		return a;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private static ResourceMetaAnnotation createResourceAnnotation(org.nexml.model.Annotation nexmlAnnotation)
 	{
 		ResourceMetaAnnotation a = new ResourceMetaAnnotation();
-		
 		a.setRel(nexmlAnnotation.getRel());
-
-		for (org.nexml.model.Annotation nestedAnnotation : nexmlAnnotation.getAllAnnotations())
+		
+		Object value = nexmlAnnotation.getValue();
+		Set<org.nexml.model.Annotation> nestedAnnotations;
+		if(value instanceof org.nexml.model.Annotation)
 		{
-			a.addAnnotation(convertDataModels(nestedAnnotation));
+			a.addAnnotation(convertDataModels((org.nexml.model.Annotation) value));
+		}
+		else if (value instanceof Set)
+		{
+			//note: in this case both nexmlAnnotation.getValue() and nexmlAnnotation.getAllAnnotations() will return different Set objects, but they both seem to have the same contents
+			nestedAnnotations = (Set<org.nexml.model.Annotation>) value;
+			for (org.nexml.model.Annotation nestedAnnotation : nestedAnnotations)
+			{
+				a.addAnnotation(convertDataModels(nestedAnnotation));
+			}
+		}
+		else if (value instanceof URI)
+		{
+			a.setHref(value.toString());
+			
+			nestedAnnotations = nexmlAnnotation.getAllAnnotations();
+			for (org.nexml.model.Annotation nestedAnnotation : nestedAnnotations)
+			{
+				a.addAnnotation(convertDataModels(nestedAnnotation));
+			}
 		}
 		
 		return a;
+	}
+
+	public static org.nexml.model.Document parse(String nexml) throws UnsupportedEncodingException,
+			ParserConfigurationException, SAXException, IOException
+	{
+		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
+		org.nexml.model.Document document = DocumentFactory.parse(stream);
+		stream.close();
+		return document;
+	}
+	
+	/**
+	 * @return a flattened list of all of the trees in all of the tree blocks in the document
+	 */
+	public static List<org.nexml.model.Tree<Edge>> getAllTrees(org.nexml.model.Document document) 
+	{
+		List<org.nexml.model.Tree<Edge>> trees = new ArrayList<org.nexml.model.Tree<Edge>>();
+		
+		for(TreeBlock block : document.getTreeBlockList())
+		{
+			for (Network<?> network : block) 
+			{
+				if (network instanceof org.nexml.model.Tree) {
+					@SuppressWarnings("unchecked")
+					org.nexml.model.Tree<Edge> tree = (org.nexml.model.Tree<Edge>) network;
+					trees.add(tree);
+				}
+			}
+		}
+		
+		return trees;
 	}
 }

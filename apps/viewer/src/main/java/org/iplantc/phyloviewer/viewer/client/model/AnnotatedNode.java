@@ -10,11 +10,11 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 @Entity
-public class AnnotatedNode extends RemoteNode implements Serializable, Annotatable
+public class AnnotatedNode extends RemoteNode implements Serializable
 {
 	private static final long serialVersionUID = 602683128059592856L;
 	
-	@OneToMany(mappedBy="annotated", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
 	private Set<Annotation> annotations;
 
 	public AnnotatedNode()
@@ -42,8 +42,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable, Annotatab
     	if (this.annotations == null) {
     		this.annotations = new HashSet<Annotation>();
     	}
-    	
-    	annotation.setAnnotated(this);
+
     	this.annotations.add(annotation);
     }
     
@@ -57,7 +56,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable, Annotatab
 	
 		for (Annotation annotation : annotations) 
     	{
-    		annotation.clean();
+			annotation.clean();
     		addAnnotation(annotation);
     	}
 

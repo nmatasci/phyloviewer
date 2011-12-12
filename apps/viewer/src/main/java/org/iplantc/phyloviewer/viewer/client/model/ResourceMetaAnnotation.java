@@ -4,17 +4,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 @SuppressWarnings("serial")
 @Entity
-public class ResourceMetaAnnotation extends Annotation implements Annotatable
+public class ResourceMetaAnnotation extends Annotation
 {
 	private String rel;
+	private String href;
 	
-	@OneToMany(mappedBy="annotated", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@CollectionTable(name="nested_annotation")
 	private Set<Annotation> nestedAnnotations;
 
 	/**
@@ -31,20 +34,27 @@ public class ResourceMetaAnnotation extends Annotation implements Annotatable
     	this.rel = relValue;
     }
 
-	@Override
+	public String getHref()
+	{
+		return href;
+	}
+
+	public void setHref(String href)
+	{
+		this.href = href;
+	}
+
 	public Set<Annotation> getAnnotations(String propertyOrRel)
 	{
 		return Annotation.getAnnotations(propertyOrRel, this.nestedAnnotations);
 	}
 
-	@Override
 	public void addAnnotation(Annotation annotation)
 	{
     	if (this.nestedAnnotations == null) {
     		this.nestedAnnotations = new HashSet<Annotation>();
     	}
 		
-		annotation.setAnnotated(this);
 		this.nestedAnnotations.add(annotation);
 	}
 
@@ -52,5 +62,18 @@ public class ResourceMetaAnnotation extends Annotation implements Annotatable
 	public String getKey()
 	{
 		return rel;
+	}
+
+	@Override
+	public void clean()
+	{
+		Set<Annotation> annotations = this.nestedAnnotations; //possibly a persistence collection -- not serializable. But can't check directly, since hibernate classes aren't available on the client.
+		this.nestedAnnotations = new HashSet<Annotation>();
+	
+		for (Annotation annotation : annotations) 
+    	{
+			annotation.clean();
+    		addAnnotation(annotation);
+    	}
 	}
 }

@@ -53,4 +53,10 @@ public class LiteralMetaAnnotation extends Annotation
 	{
 		return property;
 	}
+
+	@Override
+	public void clean()
+	{
+		//do nothing
+	}
 }
