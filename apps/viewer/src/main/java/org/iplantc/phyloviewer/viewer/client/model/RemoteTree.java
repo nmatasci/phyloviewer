@@ -113,4 +113,9 @@ public class RemoteTree extends Tree implements Serializable
 	{
 		this.importComplete = importComplete;
 	}
+	
+	public void clean()
+	{
+		//nothing to clean.  subclasses will override
+	}
 }
