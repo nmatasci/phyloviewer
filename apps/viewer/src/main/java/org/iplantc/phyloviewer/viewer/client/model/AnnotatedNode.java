@@ -9,8 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+
 @Entity
-public class AnnotatedNode extends RemoteNode implements Serializable
+public class AnnotatedNode extends RemoteNode implements Serializable, Annotated
 {
 	private static final long serialVersionUID = 602683128059592856L;
 	

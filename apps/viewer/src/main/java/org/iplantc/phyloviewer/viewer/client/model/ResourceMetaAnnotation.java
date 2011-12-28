@@ -11,14 +11,14 @@ import javax.persistence.OneToMany;
 
 @SuppressWarnings("serial")
 @Entity
-public class ResourceMetaAnnotation extends Annotation
+public class ResourceMetaAnnotation extends Annotation implements Annotated
 {
 	private String rel;
 	private String href;
 	
 	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
 	@CollectionTable(name="nested_annotation")
-	private Set<Annotation> nestedAnnotations;
+	private Set<Annotation> annotations;
 
 	/**
      * @see org.nexml.model.Annotation#getRel()
@@ -44,18 +44,30 @@ public class ResourceMetaAnnotation extends Annotation
 		this.href = href;
 	}
 
+	@Override
+	public Set<Annotation> getAnnotations()
+	{
+		return this.annotations;
+	}
+
+	@Override
+	public void setAnnotations(Set<Annotation> annotations)
+	{
+		this.annotations = annotations;
+	}
+	
 	public Set<Annotation> getAnnotations(String propertyOrRel)
 	{
-		return Annotation.getAnnotations(propertyOrRel, this.nestedAnnotations);
+		return Annotation.getAnnotations(propertyOrRel, this.annotations);
 	}
 
 	public void addAnnotation(Annotation annotation)
 	{
-    	if (this.nestedAnnotations == null) {
-    		this.nestedAnnotations = new HashSet<Annotation>();
+    	if (this.annotations == null) {
+    		this.annotations = new HashSet<Annotation>();
     	}
 		
-		this.nestedAnnotations.add(annotation);
+		this.annotations.add(annotation);
 	}
 
 	@Override
@@ -67,8 +79,8 @@ public class ResourceMetaAnnotation extends Annotation
 	@Override
 	public void clean()
 	{
-		Set<Annotation> annotations = this.nestedAnnotations; //possibly a persistence collection -- not serializable. But can't check directly, since hibernate classes aren't available on the client.
-		this.nestedAnnotations = new HashSet<Annotation>();
+		Set<Annotation> annotations = this.annotations; //possibly a persistence collection -- not serializable. But can't check directly, since hibernate classes aren't available on the client.
+		this.annotations = new HashSet<Annotation>();
 	
 		for (Annotation annotation : annotations) 
     	{

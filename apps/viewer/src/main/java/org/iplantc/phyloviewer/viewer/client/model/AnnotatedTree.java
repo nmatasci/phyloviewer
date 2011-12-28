@@ -8,7 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 @SuppressWarnings("serial")
-public class AnnotatedTree extends RemoteTree
+public class AnnotatedTree extends RemoteTree implements Annotated
 {
 	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
 	private Set<Annotation> annotations;
