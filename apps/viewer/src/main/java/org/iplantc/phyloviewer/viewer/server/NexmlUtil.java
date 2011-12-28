@@ -1,6 +1,5 @@
 package org.iplantc.phyloviewer.viewer.server;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,17 +13,6 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.iplantc.phyloparser.exception.ParserException;
-import org.iplantc.phyloparser.model.FileData;
-import org.iplantc.phyloparser.model.Node;
-import org.iplantc.phyloparser.model.block.Block;
-import org.iplantc.phyloparser.model.block.TreesBlock;
-import org.iplantc.phyloviewer.server.render.ImageGraphics;
-import org.iplantc.phyloviewer.shared.layout.ILayoutData;
-import org.iplantc.phyloviewer.shared.math.Matrix33;
-import org.iplantc.phyloviewer.shared.model.Document;
-import org.iplantc.phyloviewer.shared.model.Tree;
-import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
 import org.iplantc.phyloviewer.viewer.client.model.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
@@ -37,104 +25,60 @@ import org.nexml.model.Network;
 import org.nexml.model.TreeBlock;
 import org.xml.sax.SAXException;
 
-/**
- * Static methods removed from org.iplantc.phyloviewer.viewer.server.db.ImportTreeData
- */
-public class ImportTreeUtil
+public class NexmlUtil
 {
-	public static RemoteNode rootNodeFromNewick(String newick, String name) throws ParserException {
-		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "parsing newick");
-		org.iplantc.phyloparser.model.Tree tree = treeFromNewick(newick, name);
-		if (tree == null)
-		{
-			return null;
-		}
-		
-		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "converting phyloparser.model.Tree to RemoteTree");
-		RemoteNode root = convertDataModels(tree.getRoot());
-		
-		root.reindex();
-		
-		return root;
-	}
-	
-	public static org.iplantc.phyloparser.model.Tree treeFromNewick(String newick, String name) throws ParserException
+
+	public static org.nexml.model.Document parse(String nexml) throws UnsupportedEncodingException,
+			ParserConfigurationException, SAXException, IOException
 	{
-		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Parsing newick string");
-		org.iplantc.phyloparser.parser.NewickParser parser = new org.iplantc.phyloparser.parser.NewickParser();
-		FileData data = null;
-		try {
-			data = parser.parse(newick);
-		} catch (IOException e) {
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "IOException parsing tree string: " + newick);
-		} catch (ParserException e) {
-			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "ParserException parsing tree string: " + newick);
-			throw e;
-		}
+		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
+		org.nexml.model.Document document = DocumentFactory.parse(stream);
+		stream.close();
+		return document;
+	}
+
+	/**
+	 * @return a flattened list of all of the trees in all of the tree blocks in the document
+	 */
+	public static List<org.nexml.model.Tree<Edge>> getAllTrees(org.nexml.model.Document document) 
+	{
+		List<org.nexml.model.Tree<Edge>> trees = new ArrayList<org.nexml.model.Tree<Edge>>();
 		
-		org.iplantc.phyloparser.model.Tree tree = null;
-		
-		List<Block> blocks = data.getBlocks();
-		for ( Block block : blocks ) {
-			if ( block instanceof TreesBlock ) {
-				TreesBlock trees = (TreesBlock) block;
-				tree = trees.getTrees().get( 0 );
+		for(TreeBlock block : document.getTreeBlockList())
+		{
+			for (Network<?> network : block) 
+			{
+				if (network instanceof org.nexml.model.Tree) {
+					@SuppressWarnings("unchecked")
+					org.nexml.model.Tree<Edge> tree = (org.nexml.model.Tree<Edge>) network;
+					trees.add(tree);
+				}
 			}
 		}
 		
-		return tree;
+		return trees;
 	}
-	
-	public static BufferedImage renderTreeImage(Tree tree, ILayoutData layout,
-			int width, int height) {
 
-		ImageGraphics graphics = new ImageGraphics(width, height);
-
-		RenderTreeCladogram renderer = new RenderTreeCladogram();
-		renderer.getRenderPreferences().setCollapseOverlaps(false);
-		renderer.getRenderPreferences().setDrawLabels(false);
-		renderer.getRenderPreferences().setDrawPoints(false);
-
-		Document document = new Document();
-		document.setTree(tree);
-		document.setLayout(layout);
-		
-		renderer.setDocument(document);
-		renderer.renderTree(graphics, Matrix33.makeScale(width, height));
-
-		return graphics.getImage();
-	}
-	
-	public static AnnotatedNode convertDataModels(org.iplantc.phyloparser.model.Node parserNode) 
+	/**
+	 * @return the first Tree in the document
+	 */
+	public static org.nexml.model.Tree<Edge> getFirstTree(org.nexml.model.Document document)
 	{
-		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>(parserNode.getChildren().size());
-
-		AnnotatedNode rNode = new AnnotatedNode();
-		rNode.setLabel(parserNode.getName());
-		
-		//convert NHX annotations
-		for (org.iplantc.phyloparser.model.Annotation annotation : parserNode.getAnnotations())
+		for(TreeBlock block : document.getTreeBlockList())
 		{
-			LiteralMetaAnnotation a = new LiteralMetaAnnotation();
-	    	a.setProperty("NHX");
-	    	a.setValue(annotation.getContent());
-	    	rNode.addAnnotation(a);
+			for (Network<?> network : block) 
+			{
+				if (network instanceof org.nexml.model.Tree) {
+					@SuppressWarnings("unchecked")
+					org.nexml.model.Tree<Edge> tree = (org.nexml.model.Tree<Edge>) network;
+					return tree;
+				}
+			}
 		}
 		
-		for (Node parserChild : parserNode.getChildren()) {			
-			children.add(convertDataModels(parserChild));
-		}
-		
-		rNode.setChildren(children);
-		
-		Double branchLength = parserNode.getBranchLength();
-		if (branchLength != null && branchLength > 0) {
-			rNode.setBranchLength(branchLength);
-		}
-		
-		return rNode;
+		return null;
 	}
-	
+
 	public static RemoteTree convertDataModels(org.nexml.model.Tree<Edge> in) {
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "converting nexml to RemoteTree");
 		RemoteTree out = new RemoteTree();
@@ -262,36 +206,5 @@ public class ImportTreeUtil
 		}
 		
 		return a;
-	}
-
-	public static org.nexml.model.Document parse(String nexml) throws UnsupportedEncodingException,
-			ParserConfigurationException, SAXException, IOException
-	{
-		InputStream stream = new ByteArrayInputStream(nexml.getBytes("UTF-8"));
-		org.nexml.model.Document document = DocumentFactory.parse(stream);
-		stream.close();
-		return document;
-	}
-	
-	/**
-	 * @return a flattened list of all of the trees in all of the tree blocks in the document
-	 */
-	public static List<org.nexml.model.Tree<Edge>> getAllTrees(org.nexml.model.Document document) 
-	{
-		List<org.nexml.model.Tree<Edge>> trees = new ArrayList<org.nexml.model.Tree<Edge>>();
-		
-		for(TreeBlock block : document.getTreeBlockList())
-		{
-			for (Network<?> network : block) 
-			{
-				if (network instanceof org.nexml.model.Tree) {
-					@SuppressWarnings("unchecked")
-					org.nexml.model.Tree<Edge> tree = (org.nexml.model.Tree<Edge>) network;
-					trees.add(tree);
-				}
-			}
-		}
-		
-		return trees;
 	}
 }

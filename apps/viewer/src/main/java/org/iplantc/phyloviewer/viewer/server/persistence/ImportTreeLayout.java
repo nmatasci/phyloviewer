@@ -13,9 +13,14 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.sql.DataSource;
 
+import org.iplantc.phyloviewer.server.render.ImageGraphics;
+import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.layout.LayoutCladogram;
+import org.iplantc.phyloviewer.shared.math.Matrix33;
+import org.iplantc.phyloviewer.shared.model.Document;
+import org.iplantc.phyloviewer.shared.model.Tree;
+import org.iplantc.phyloviewer.shared.render.RenderTreeCladogram;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
-import org.iplantc.phyloviewer.viewer.server.ImportTreeUtil;
 
 public class ImportTreeLayout {
 	private File imageDirectory;
@@ -41,7 +46,7 @@ public class ImportTreeLayout {
 			layoutImporter.addLayout(layoutID, cladogramLayout, tree);
 			
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Rendering overview image");
-			BufferedImage image = ImportTreeUtil.renderTreeImage(tree,cladogramLayout,256,1024);
+			BufferedImage image = renderTreeImage(tree,cladogramLayout,256,1024);
 			putOverviewImage(connection, tree, layoutID, image);
 			
 			//TODO check if the tree actually has any branch lengths first
@@ -111,5 +116,25 @@ public class ImportTreeLayout {
 		this.imageDirectory = new File(imageDirectory);
 		this.imageDirectory.mkdir();
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Created overview image directory at " + this.imageDirectory.getAbsolutePath());
+	}
+	
+	public static BufferedImage renderTreeImage(Tree tree, ILayoutData layout,
+			int width, int height) {
+
+		ImageGraphics graphics = new ImageGraphics(width, height);
+
+		RenderTreeCladogram renderer = new RenderTreeCladogram();
+		renderer.getRenderPreferences().setCollapseOverlaps(false);
+		renderer.getRenderPreferences().setDrawLabels(false);
+		renderer.getRenderPreferences().setDrawPoints(false);
+
+		Document document = new Document();
+		document.setTree(tree);
+		document.setLayout(layout);
+		
+		renderer.setDocument(document);
+		renderer.renderTree(graphics, Matrix33.makeScale(width, height));
+
+		return graphics.getImage();
 	}
 }
