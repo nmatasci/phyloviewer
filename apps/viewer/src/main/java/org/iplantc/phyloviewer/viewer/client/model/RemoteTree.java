@@ -1,6 +1,7 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -118,4 +119,23 @@ public class RemoteTree extends Tree implements Serializable
 	{
 		//nothing to clean.  subclasses will override
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof RemoteTree && super.equals(obj))
+		{
+			RemoteTree other = (RemoteTree) obj;
+			return this.name.equals(other.name)
+					&& Arrays.equals(this.hash, other.hash)
+					&& this.importComplete == other.importComplete
+					&& this.isPublic == other.isPublic;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
 }

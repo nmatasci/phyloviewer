@@ -62,4 +62,21 @@ public class AnnotatedNode extends RemoteNode implements Serializable, Annotated
     	}
 
     }
+    
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof AnnotatedNode && super.equals(obj))
+		{
+			//FIXME: PersistentSet.equals, PersistentSet.contains and PersistentSet.containsAll are all returning false for (sets of) annotations that are the same when I inspect them in the debugger...
+//			AnnotatedNode other = (AnnotatedNode) obj;
+//			return this.annotations == null && other.annotations == null || this.annotations.equals(other.annotations);
+			
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
+	}
 }

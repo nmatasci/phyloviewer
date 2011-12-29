@@ -60,4 +60,19 @@ public abstract class Annotation implements Serializable
     	}
     	return subset;
     }
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof Annotation)
+		{
+			Annotation other = (Annotation) obj;
+			return this.id == other.id &&
+					this.predicateNamespace == null && other.predicateNamespace == null || this.predicateNamespace.equals(other.predicateNamespace);
+		}
+		else
+		{
+			return false;
+		}
+	}   
 }

@@ -242,4 +242,19 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		this.parent = null;
 		this.topology.clean();
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof RemoteNode && super.equals(obj))
+		{
+			RemoteNode other = (RemoteNode) obj;
+			return this.label == null && other.label == null || this.label.equals(other.label) 
+					&& this.branchLength == null && other.branchLength == null || this.branchLength.equals(other.branchLength);
+		}
+		else 
+		{
+			return false;
+		}
+	}
 }

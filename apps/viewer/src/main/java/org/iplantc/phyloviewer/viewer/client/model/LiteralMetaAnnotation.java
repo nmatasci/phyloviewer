@@ -59,4 +59,20 @@ public class LiteralMetaAnnotation extends Annotation
 	{
 		//do nothing
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof LiteralMetaAnnotation && super.equals(obj))
+		{
+			LiteralMetaAnnotation other = (LiteralMetaAnnotation) obj;
+			return	this.value.equals(other.value) &&
+					this.property.equals(other.property) &&
+					this.datatype.equals(other.datatype);
+		}
+		else
+		{
+			return false;
+		}
+	}   
 }

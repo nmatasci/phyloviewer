@@ -88,4 +88,20 @@ public class ResourceMetaAnnotation extends Annotation implements Annotated
     		addAnnotation(annotation);
     	}
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof ResourceMetaAnnotation && super.equals(obj))
+		{
+			ResourceMetaAnnotation other = (ResourceMetaAnnotation) obj;
+			return this.rel.equals(other.rel) &&
+					this.href == null && other.href == null || this.href.equals(other.href) && 
+					this.annotations.equals(other.annotations);
+		}
+		else
+		{
+			return false;
+		}
+	}   
 }
