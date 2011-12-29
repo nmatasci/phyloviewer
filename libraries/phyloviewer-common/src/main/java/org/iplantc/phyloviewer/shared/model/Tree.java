@@ -48,7 +48,9 @@ public class Tree implements ITree, Serializable {
 		}
 
 		Tree that = (Tree)obj;
-		return this.id == that.getId() && this.rootNode.equals(that.getRootNode());
+		
+		return this.id == that.getId()
+				&& (this.rootNode == null && that.rootNode == null) || this.rootNode.equals(that.getRootNode());
 	}
 
 	@Override
