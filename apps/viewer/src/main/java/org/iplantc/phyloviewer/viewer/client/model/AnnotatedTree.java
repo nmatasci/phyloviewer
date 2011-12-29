@@ -4,13 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 @SuppressWarnings("serial")
+@Entity
 public class AnnotatedTree extends RemoteTree implements Annotated
 {
-	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
 	private Set<Annotation> annotations;
 	
 	public AnnotatedTree()
@@ -18,6 +19,7 @@ public class AnnotatedTree extends RemoteTree implements Annotated
 		
 	}
 	
+	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
 	public Set<Annotation> getAnnotations()
 	{
 		return annotations;

@@ -126,7 +126,7 @@ public class RemoteTree extends Tree implements Serializable
 		if (obj instanceof RemoteTree && super.equals(obj))
 		{
 			RemoteTree other = (RemoteTree) obj;
-			return this.name.equals(other.name)
+			return this.name == null && other.name == null || this.name.equals(other.name)
 					&& Arrays.equals(this.hash, other.hash)
 					&& this.importComplete == other.importComplete
 					&& this.isPublic == other.isPublic;
