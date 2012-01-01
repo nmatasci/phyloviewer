@@ -46,6 +46,12 @@
 			A tree with float edges. 
 		-->
 		<tree id="tree1" xsi:type="nex:FloatTree" label="tree1">
+			<meta 
+			        id="treemeta" 
+			        property="intmeta" 
+			        content="1" 
+			        xsi:type="nex:LiteralMeta"
+			        datatype="xsd:integer"/>
 			<node id="n1" label="n1" root="true">
 				<meta 
 			        id="meta1" 

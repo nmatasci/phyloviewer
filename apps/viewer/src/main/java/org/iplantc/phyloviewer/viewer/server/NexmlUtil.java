@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
+import org.iplantc.phyloviewer.viewer.client.model.AnnotatedTree;
 import org.iplantc.phyloviewer.viewer.client.model.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
-import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;
 import org.nexml.model.DocumentFactory;
 import org.nexml.model.Edge;
@@ -79,10 +79,17 @@ public class NexmlUtil
 		return null;
 	}
 
-	public static RemoteTree convertDataModels(org.nexml.model.Tree<Edge> in) {
+	public static AnnotatedTree convertDataModels(org.nexml.model.Tree<Edge> in) {
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "converting nexml to RemoteTree");
-		RemoteTree out = new RemoteTree();
+		AnnotatedTree out = new AnnotatedTree();
 		out.setName(in.getId());
+		
+		//convert annotations
+		for (org.nexml.model.Annotation nexmlAnnotation : in.getAllAnnotations()) 
+		{
+			Annotation annotation = convertDataModels(nexmlAnnotation);
+			out.addAnnotation(annotation);
+		}
 		
 		org.nexml.model.Node inRoot = findRoot(in);
 		RemoteNode outRoot = convertDataModels(inRoot, in, null);
