@@ -4,19 +4,17 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,12 +23,16 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.server.persistence.ImportTreeLayout;
 import org.iplantc.phyloviewer.viewer.server.persistence.PersistTreeData;
+import org.nexml.model.Document;
+import org.nexml.model.Edge;
+import org.nexml.model.Tree;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.xml.sax.SAXException;
 
@@ -42,16 +44,23 @@ public class ParseTree
 {
 	File treeBackupDir = new File(".");
 	private IImportTreeData importer;
+	private ImportTreeLayout layoutImporter;
 	
-	public ParseTree(IImportTreeData importer) {
+	public ParseTree(IImportTreeData importer, ImportTreeLayout layoutImporter) {
 		this.importer = importer;
+		this.layoutImporter = layoutImporter;
 	}
 	
 	public void setImporter(IImportTreeData importer)
 	{
 		this.importer = importer;
 	}
-	
+
+	public void setLayoutImporter(ImportTreeLayout layoutImporter)
+	{
+		this.layoutImporter = layoutImporter;
+	}
+
 	public void setTreeBackupDir(String treeBackupPath)
 	{
 		treeBackupDir = new File(treeBackupPath); 
@@ -63,15 +72,15 @@ public class ParseTree
 		return treeBackupDir;
 	}
 	
-	public List<String> saveTrees(Map<String, String[]> parameters) throws ParserException, SAXException, Exception {
-		List<String> ids = loadTrees(parameters);
+	public String saveTree(Map<String, String[]> parameters) throws ParserException, SAXException, Exception {
+		String id = importTree(parameters);
 		
-		if (ids.size() > 0) {
+		if (id != null) {
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Saving request backup file");
 			saveToFile(parameters);
 		}
 		
-		return ids;
+		return id;
 	}
 	
 	public void replayBackups() throws ParserException, SAXException, Exception {
@@ -95,7 +104,7 @@ public class ParseTree
 			
 			@SuppressWarnings("unchecked")
 			Map<String,String[]> parameters = (Map<String,String[]>) getObject(file);
-			loadTrees(parameters);
+			importTree(parameters);
 		}
 		
 		System.out.println("Re-imported all trees in " + treeBackupDir.getAbsolutePath());
@@ -121,8 +130,17 @@ public class ParseTree
 			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to save backup of newick string to file system", e);
 		}
 	}
-	
+
 	private void saveToFile(Object o)
+	{
+		byte[][] bytesAndDigest = getByteArrayWithDigest(o);
+		byte[] data = bytesAndDigest[0];
+		byte[] digest = bytesAndDigest[1];
+		String fileName = Hex.encodeHexString(digest);
+		saveToFile(data, fileName);
+	}
+	
+	private byte[][] getByteArrayWithDigest(Object o)
 	{
 		try
 		{
@@ -137,19 +155,14 @@ public class ParseTree
 			
 			byte[] data = sink.toByteArray();
 			byte[] hash = dos.getMessageDigest().digest();
-			String fileName = Hex.encodeHexString(hash);
-			saveToFile(data, fileName);
+			return new byte[][] {data, hash};
 		}
-		catch(NoSuchAlgorithmException e)
+		catch(Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.SEVERE, "Unable to save backup of newick string to file system", e);
 		}
-		catch(IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		return null;
 	}
 	
 	private Object getObject(File file) {
@@ -161,62 +174,56 @@ public class ParseTree
 			
 			o = in.readObject();
 		}
-		catch(FileNotFoundException e)
+		catch(Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(ClassNotFoundException e)
-		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return o;
 	}
 	
-	private List<String> loadTrees(Map<String, String[]> parameters) throws ParserException, SAXException, Exception {
-		List<String> ids = new ArrayList<String>();
+	private String importTree(Map<String, String[]> parameters) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ParserException, ImportException, SQLException {
+		RemoteTree tree = null;
+		byte[] hash = getByteArrayWithDigest(parameters)[1]; //same request should always get the same hash.  (for re-importing in replayBackups)
 		
 		if (parameters.containsKey("newickData")) 
 		{
 			String[] newicks = parameters.get("newickData");
 			String[] names = parameters.get("name");
-			for (int i = 0; i < newicks.length; i++)
+			
+			int i = 0; //only get the first newickData and name
+
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
+			String newick = newicks[i];
+			String name = "unnamed";
+			if (names != null && names.length > i) 
 			{
-				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing newick string");
-				String newick = newicks[i];
-				String name = "unnamed";
-				if (names != null && names.length > i) 
-				{
-					name = names[i];
-				}
-				
-				RemoteTree tree = importer.importFromNewick(newick, name);
-				String hash = Hex.encodeHexString(tree.getHash());
-				ids.add(hash);
+				name = names[i];
 			}
+			
+
+			tree = NewickUtil.treeFromNewick(newick, name);
+
 		}
 		
-		if (parameters.containsKey("nexml")) 
+		else if (parameters.containsKey("nexml")) 
 		{
-			for (String nexml : parameters.get("nexml"))
-			{
-				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing nexml");
-				List<RemoteTree> trees = importer.importFromNexml(nexml);
-				for (RemoteTree tree : trees) {
-					String hash = Hex.encodeHexString(tree.getHash());
-					ids.add(hash);
-				}
-			}
+			String nexml = parameters.get("nexml")[0];
+
+			Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Importing nexml");
+			Document document = NexmlUtil.parse(nexml);
+			Tree<Edge> nexmlTree = NexmlUtil.getFirstTree(document);
+			tree = NexmlUtil.convertDataModels(nexmlTree);
 		}
 		
-		return ids;
+		tree.setHash(hash);
+		importer.importTree(tree);
+
+		layoutImporter.importLayouts(tree);
+		importer.setImportComplete(tree);
+		
+		String id = Hex.encodeHexString(tree.getHash());
+		return id;
 	}
 
 	public static void main(String[] args) throws ParserException, SAXException, Exception {
@@ -242,9 +249,8 @@ public class ParseTree
 			layoutImporter.setImageDirectory(imagePath);
 			
 			PersistTreeData importer = new PersistTreeData(emf);
-			importer.setLayoutImporter(layoutImporter);
 		
-			ParseTree pt = new ParseTree(importer);
+			ParseTree pt = new ParseTree(importer, layoutImporter);
 			pt.setTreeBackupDir(backupPath);
 			
 			pt.replayBackups();

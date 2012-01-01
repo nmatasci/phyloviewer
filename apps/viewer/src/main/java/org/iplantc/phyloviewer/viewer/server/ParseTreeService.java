@@ -27,6 +27,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.iplantc.phyloparser.exception.ParserException;
 import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
+import org.iplantc.phyloviewer.viewer.server.persistence.ImportTreeLayout;
 import org.xml.sax.SAXException;
 
 public class ParseTreeService extends HttpServlet {
@@ -57,15 +58,15 @@ public class ParseTreeService extends HttpServlet {
 
 		try
 		{
-			List<String> ids = parseTree.saveTrees(parameters);
-			if (ids.size() > 0) {
+			String id = parseTree.saveTree(parameters);
+			
+			if (id != null) {
 				Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Returning response");
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
-				for (String id : ids) {
-					String viewURL = getViewURL(id, request);
-					response.setHeader("Location", viewURL);
-					writer.println(viewURL);
-				}
+
+				String viewURL = getViewURL(id, request);
+				response.setHeader("Location", viewURL);
+				writer.println(viewURL);
 			} 
 			else 
 			{
@@ -102,12 +103,13 @@ public class ParseTreeService extends HttpServlet {
 	{
 		ServletContext servletContext = this.getServletContext();
 		
-		IImportTreeData i = (IImportTreeData) servletContext.getAttribute(Constants.IMPORT_TREE_DATA_KEY);
+		IImportTreeData treeImporter = (IImportTreeData) servletContext.getAttribute(Constants.IMPORT_TREE_DATA_KEY);
+		ImportTreeLayout layoutImporter = (ImportTreeLayout) servletContext.getAttribute(Constants.IMPORT_TREE_LAYOUT_KEY);
 		
 		String path = servletContext.getInitParameter("treefile.path");
 		path = servletContext.getRealPath(path);
 		
-		parseTree = new ParseTree(i);
+		parseTree = new ParseTree(treeImporter, layoutImporter);
 		parseTree.setTreeBackupDir(path);
 		
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.INFO, "Setting parseTree file backup path to " + parseTree.getTreeBackupDir().getAbsolutePath());

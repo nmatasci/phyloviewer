@@ -53,14 +53,12 @@ public class DatabaseListener implements ServletContextListener
 		IImportTreeData importer = new PersistTreeData(emf);
 		servletContext.setAttribute(Constants.IMPORT_TREE_DATA_KEY, importer);
 		
-		{
-			//temporary.  TODO: Hope to be moving layouts to hibernate too.
-			String imagePath = servletContext.getInitParameter("image.path");
-			imagePath = servletContext.getRealPath(imagePath);
-			ImportTreeLayout layoutImporter = new ImportTreeLayout(pool);
-			layoutImporter.setImageDirectory(imagePath);
-			((PersistTreeData)importer).setLayoutImporter(layoutImporter);
-		}
+		//TODO: move layouts to hibernate too.
+		String imagePath = servletContext.getInitParameter("image.path");
+		imagePath = servletContext.getRealPath(imagePath);
+		ImportTreeLayout layoutImporter = new ImportTreeLayout(pool);
+		layoutImporter.setImageDirectory(imagePath);
+		servletContext.setAttribute(Constants.IMPORT_TREE_LAYOUT_KEY, layoutImporter);
 	}
 
 	@Override
