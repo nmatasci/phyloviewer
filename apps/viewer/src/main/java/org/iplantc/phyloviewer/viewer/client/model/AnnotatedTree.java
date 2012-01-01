@@ -44,21 +44,4 @@ public class AnnotatedTree extends RemoteTree implements Annotated
 
     	this.annotations.add(annotation);
     }
-
-	@Override
-	public void clean()
-	{
-		super.clean();
-		
-		Set<Annotation> annotations = this.annotations; //possibly a persistence collection -- not serializable. But can't check directly, since hibernate classes aren't available on the client.
-		this.annotations = new HashSet<Annotation>();
-	
-		for (Annotation annotation : annotations) 
-    	{
-			annotation.clean();
-    		addAnnotation(annotation);
-    	}
-	}
-    
-    
 }

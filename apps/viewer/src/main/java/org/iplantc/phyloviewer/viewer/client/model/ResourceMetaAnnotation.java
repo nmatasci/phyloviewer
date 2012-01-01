@@ -77,19 +77,6 @@ public class ResourceMetaAnnotation extends Annotation implements Annotated
 	}
 
 	@Override
-	public void clean()
-	{
-		Set<Annotation> annotations = this.annotations; //possibly a persistence collection -- not serializable. But can't check directly, since hibernate classes aren't available on the client.
-		this.annotations = new HashSet<Annotation>();
-	
-		for (Annotation annotation : annotations) 
-    	{
-			annotation.clean();
-    		addAnnotation(annotation);
-    	}
-	}
-	
-	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj instanceof ResourceMetaAnnotation && super.equals(obj))

@@ -2,13 +2,11 @@ package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.iplantc.phyloviewer.shared.model.ITree;
@@ -34,8 +32,6 @@ public class UnpersistTreeData implements ITreeData
 		RemoteNode root = getRootNode(rootID, em);
 		em.detach(root);
 		em.close();
-		
-		cleanForTransfer(root);
 		
 		return root;
 	}
@@ -99,7 +95,6 @@ public class UnpersistTreeData implements ITreeData
 		List<ITree> trees = new ArrayList<ITree>(results.size());
 		for(RemoteTree tree : results) {
 			em.detach(tree);
-			cleanForTransfer(tree);
 			trees.add(tree);
 		}
 		
@@ -122,38 +117,11 @@ public class UnpersistTreeData implements ITreeData
 		parent.getChildren().isEmpty(); //force lazy fetch of children
 		
 		em.detach(parent);
-		cleanForTransfer(parent);
 		List<RemoteNode> children = parent.getChildren();
 		
 		em.getTransaction().commit();
 		em.close();
 		
 		return children;
-	}
-	
-	/**
-	 * Makes a clean copy of the subtree, without any persistence proxy objects
-	 */
-	public static void cleanForTransfer(RemoteNode node) {
-		List<RemoteNode> children = Collections.emptyList();
-		if (node.getChildren() != null && Persistence.getPersistenceUtil().isLoaded(node, "children")) {
-			children = node.getChildren();
-		}
-		
-		node.clean();
-		for (RemoteNode child : children) {
-			child.clean();
-			node.addChild(child);
-		}
-	}
-	
-	/**
-	 * Makes a clean copy of the tree, without any persistence proxy objects
-	 */
-	public static void cleanForTransfer(RemoteTree tree) {
-		if (tree.getRootNode() != null) 
-		{
-			cleanForTransfer((RemoteNode) tree.getRootNode());
-		}
 	}
 }

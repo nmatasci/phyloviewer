@@ -55,12 +55,6 @@ public class LiteralMetaAnnotation extends Annotation
 	}
 
 	@Override
-	public void clean()
-	{
-		//do nothing
-	}
-	
-	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj instanceof LiteralMetaAnnotation && super.equals(obj))

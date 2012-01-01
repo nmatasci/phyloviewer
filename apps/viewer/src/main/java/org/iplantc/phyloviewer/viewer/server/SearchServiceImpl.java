@@ -48,7 +48,6 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		
 		for (RemoteNode node : nodes) {
 			em.detach(node);
-			node.clean();
 			SearchResult result = new SearchResult();
 			result.node = node;
 			result.layout = layout.getLayout(node, layoutID);

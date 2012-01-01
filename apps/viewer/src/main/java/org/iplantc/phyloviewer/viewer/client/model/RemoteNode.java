@@ -232,16 +232,6 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	{
 		return topology.getAltLabel();
 	}
-	
-	/**
-	 * Sets any FetchType.LAZY fields to null
-	 */
-	public void clean()
-	{
-		this.children = null;
-		this.parent = null;
-		this.topology.clean();
-	}
 
 	@Override
 	public boolean equals(Object obj)

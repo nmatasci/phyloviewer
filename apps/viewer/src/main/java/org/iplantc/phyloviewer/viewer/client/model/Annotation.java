@@ -26,7 +26,6 @@ public abstract class Annotation implements Serializable
 	}
 	
 	public abstract String getKey();
-	public abstract void clean();
 	
 	public int getId()
 	{
