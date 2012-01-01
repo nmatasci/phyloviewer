@@ -115,6 +115,11 @@
           <artifactId>commons-codec</artifactId>
           <version>1.5</version>
         </dependency>
+        <dependency>
+          <groupId>net.sf.beanlib</groupId>
+          <artifactId>beanlib-hibernate</artifactId>
+          <version>5.0.2beta</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<finalName>phyloviewer</finalName>
