@@ -1,152 +1,218 @@
 package org.iplantc.phyloviewer.viewer.server.persistence;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-import java.io.File;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
-import junit.framework.Assert;
-
+import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
+import org.iplantc.phyloviewer.viewer.client.model.AnnotatedTree;
+import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
+import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;
+import org.iplantc.phyloviewer.viewer.server.ImportException;
+import org.iplantc.phyloviewer.viewer.server.NewickUtil;
 import org.junit.Test;
-import org.nexml.model.Document;
-import org.nexml.model.DocumentFactory;
 
 public class PersistTreeDataTest extends PersistenceTest
 {
-	String newick = "(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));";
-	
 	@Test
-	public void testImportFromNewick() throws Exception
+	public void testImportRemoteTree() throws ImportException
 	{
-		PersistTreeData out = new PersistTreeData(entityManagerFactory);
-		RemoteTree tree = out.importFromNewick(newick, "test");
+		RemoteNode root = rn(null,
+			rn("Protomyces_inouyei"),
+			rn(null, 
+				rn("Taphrina_wiesneri"),
+				rn("Taphrina_deformans")
+			)
+		);
 		
-		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
+		RemoteTree tree = new RemoteTree();
+		tree.setHash(new byte[] {42, 42, 42, 42, 42, 42, 42, 42});
+		tree.setName("test");
+		
+		tree.setRootNode(root);
+		
+		PersistTreeData out = new PersistTreeData(entityManagerFactory);
+		out.importTree(tree);
+
 		EntityManager em = entityManagerFactory.createEntityManager();
-		RemoteNode root = in.getRootNode(tree.getHash(), em);
 		
-		RemoteNode node = (RemoteNode) root.getChild(0);
-		assertEquals("Protomyces_inouyei", node.getLabel());
+		Object found = em.find(RemoteTree.class, tree.getId());
+		assertNotNull(found);
 		
-		node = (RemoteNode) root.getChild(1).getChild(0);
-		assertEquals("Taphrina_wiesneri", node.getLabel());
+		found = em.find(RemoteNode.class, root.getId());
+		assertNotNull(found);
 		
-		node = (RemoteNode) root.getChild(1).getChild(1);
-		assertEquals("Taphrina_deformans", node.getLabel());
-		
-		em.close();
+		 //imported tree was detached from the persistence context
+		assertFalse(em.contains(tree));
+		assertFalse(em.contains(root));
 	}
 	
 	@Test
-	public void testImportFromNexml() throws Exception
+	public void testImportAnnotatedTree() throws ImportException
 	{
+		LiteralMetaAnnotation literal = new LiteralMetaAnnotation();
+		literal.setPredicateNamespace("predicateNamespace");
+		literal.setDatatype("datatype");
+		literal.setProperty("property");
+		literal.setValue("value");
+		
+		ResourceMetaAnnotation resource = new ResourceMetaAnnotation();
+		resource.setRel("rel");
+		
+		ResourceMetaAnnotation nestedResource = new ResourceMetaAnnotation();
+		nestedResource.setHref("href");
+		nestedResource.setRel("rel");
+		resource.addAnnotation(nestedResource);
+		
+		AnnotatedNode node = new AnnotatedNode();
+		node.addAnnotation(literal);
+		
+		AnnotatedTree tree = new AnnotatedTree();
+		tree.setRootNode(node);
+		tree.addAnnotation(resource);
+		
 		PersistTreeData out = new PersistTreeData(entityManagerFactory);
+		out.importTree(tree);
+
+		EntityManager em = entityManagerFactory.createEntityManager();
 		
-		URL url = this.getClass().getResource("/trees.xml");
-		File file = new File(url.getFile());
-		Document document = DocumentFactory.parse(file);
+		Object found = em.find(RemoteTree.class, tree.getId());
+		assertNotNull(found);
 		
-		List<RemoteTree> trees = out.importFromNexml(document);
-		assertEquals(2, trees.size());
-		RemoteTree tree = trees.get(0);
-		assertEquals("tree1", tree.getName());
+		found = em.find(RemoteNode.class, node.getId());
+		assertNotNull(found);
+		
+		found = em.find(LiteralMetaAnnotation.class, literal.getId());
+		assertNotNull(found);
+		
+		found = em.find(ResourceMetaAnnotation.class, resource.getId());
+		assertNotNull(found);
+		
+		found = em.find(ResourceMetaAnnotation.class, nestedResource.getId());
+		assertNotNull(found);
 	}
-	
+
 	@Test
 	public void testDuplicateTree() throws Exception
 	{
+		String newick = "(Protomyces_inouyei,(Taphrina_wiesneri,Taphrina_deformans));";
+
 		PersistTreeData out = new PersistTreeData(entityManagerFactory);
-		byte[] treeID = out.importFromNewick(newick, "test").getHash();
-		byte[] treeID2 = out.importFromNewick(newick, "duplicate").getHash();
+		
+		RemoteTree tree = NewickUtil.treeFromNewick(newick, "test");
+		byte[] treeID = {4,4,4,4,4,4,4,4};
+		tree.setHash(treeID);
+		out.importTree(tree);
+		
+		tree = NewickUtil.treeFromNewick(newick, "duplicate");
+		byte[] treeID2 = {5,5,5,5,5,5,5,5};
+		tree.setHash(treeID2);
+		out.importTree(tree);
 		
 		UnpersistTreeData in = new UnpersistTreeData(entityManagerFactory);
-		RemoteNode root = in.getRootNode(treeID);
-		RemoteNode root2 = in.getRootNode(treeID2);
-		assertEquals("not the same root node", root, root2);
+		RemoteTree tree1 = in.getTree(treeID);
+		RemoteTree tree2 = in.getTree(treeID2);
+		
+		assertNotSame(tree1, tree2);
+		assertNotSame(tree1.getRootNode(), tree2.getRootNode());
 	}
 	
-	@Test
-	public void testHashTree() {
-		RemoteTree[] trees = new RemoteTree[5];
-		byte[][] hashes = new byte[trees.length][16];
-		
-		//root, 2 children, empty labels
+	private RemoteNode rn(String label, RemoteNode... children) 
+	{
 		RemoteNode node = new RemoteNode();
-		node.addChild(new RemoteNode());
-		node.addChild(new RemoteNode());
-		node.reindex();
-		trees[0] = new RemoteTree();
-		trees[0].setRootNode(node);
-		
-		//root, 2 children, with labels
-		node = new RemoteNode();
-		node.setLabel("A");
-		RemoteNode child = new RemoteNode();
-		child.setLabel("B");
-		node.addChild(child);
-		child = new RemoteNode();
-		child.setLabel("C");
-		node.addChild(child);
-		node.reindex();
-		trees[1] = new RemoteTree();
-		trees[1].setRootNode(node);
-		
-		//root, 2 children swapped, with labels
-		node = new RemoteNode();
-		node.setLabel("A");
-		child = new RemoteNode();
-		child.setLabel("C");
-		node.addChild(child);
-		child = new RemoteNode();
-		child.setLabel("B");
-		node.reindex();
-		trees[2] = new RemoteTree();
-		trees[2].setRootNode(node);
-		
-		//root, 2 children, empty labels, with different branch lengths
-		node = new RemoteNode();
-		node.setBranchLength(2.0);
-		child = new RemoteNode();
-		child.setBranchLength(42.0);
-		node.addChild(child);
-		child = new RemoteNode();
-		child.setBranchLength(1.0);
-		node.addChild(child);
-		node.reindex();
-		trees[3] = new RemoteTree();
-		trees[3].setRootNode(node);
-		
-		//root, child, grandchild
-		node = new RemoteNode();
-		child = new RemoteNode();
-		node.addChild(child);
-		child.addChild(new RemoteNode());
-		node.reindex();
-		trees[4] = new RemoteTree();
-		trees[4].setRootNode(node);
-		
-		for (int t = 0; t < trees.length; t++) {
-			hashes[t] = PersistTreeData.hashTree(trees[t].getRootNode());
+
+		if (label != null)
+		{
+			node.setLabel(label);
 		}
 		
-		//loop over hashes
-		for (int i = 0; i < hashes.length; i++) {
-			//loop over other hashes
-			for (int j = i + 1; j < hashes.length; j++) {
-				boolean same = true;
-				//loop over bytes
-				for (int b = 0; b < hashes[i].length; b++) {
-					same &= hashes[i][b] == hashes[j][b];
-				}
-				Assert.assertFalse("hashes " + i + " and " + j + " are the same: \n" + Arrays.toString(hashes[i]) + "\n" + Arrays.toString(hashes[j]), same);
+		if (children != null)
+		{
+			node.setChildren(Arrays.asList(children));
+		}
+		
+		return node;
+	}
+	
+	//@Test
+	public void testBigTree()
+	{
+		int depth = 10;
+		int numChildren = 2;
+		long startTime;
+		
+		System.out.print("building tree...");
+		startTime = System.currentTimeMillis();
+		RemoteNode root = createTree(depth, numChildren);
+		root.reindex();
+		System.out.println(System.currentTimeMillis() - startTime + " ms");
+		
+		System.out.print("persisting tree...");
+		startTime = System.currentTimeMillis();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		entityManager.getTransaction().begin();
+		entityManager.persist(root);
+		entityManager.getTransaction().commit();
+		entityManager.close();
+		System.out.println(System.currentTimeMillis() - startTime + " ms");
+		
+		//pull the root back out
+		entityManager = entityManagerFactory.createEntityManager();
+		
+		System.out.print("unpersisting root...");
+		startTime = System.currentTimeMillis();
+		TypedQuery<RemoteNode> query = entityManager.createQuery("SELECT n FROM RemoteNode n WHERE n.id = :id ", RemoteNode.class)
+				.setParameter("id", root.getId());
+		
+		@SuppressWarnings("unused")
+		RemoteNode copyOfRoot = query.getSingleResult();
+		System.out.println(System.currentTimeMillis() - startTime + " ms");
+		
+		entityManager.close();
+		
+		assertTrue(true);
+		
+	}
+	
+	private RemoteNode createTree(int depth, int numChildren)
+	{
+		RemoteNode node = new RemoteNode();
+		
+		createTree(node, depth, numChildren);
+		
+		return node;
+	}
+
+	private void createTree(RemoteNode node, int depth, int numChildren)
+	{
+		if (depth == 0) {
+			return;
+		} else {
+			List<RemoteNode> children = createChildren(numChildren);
+			node.setChildren(children);
+			
+			for (RemoteNode child : children) {
+				createTree(child, depth - 1, numChildren);
 			}
 		}
 	}
 
+	private List<RemoteNode> createChildren(int numChildren)
+	{
+		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>();
+		RemoteNode child;
+		for (int i = 0; i < numChildren; i++) {
+			child = new RemoteNode();
+			children.add(child);
+		}
+		
+		return children;
+	}
 }

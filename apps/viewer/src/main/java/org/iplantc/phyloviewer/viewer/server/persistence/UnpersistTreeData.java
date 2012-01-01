@@ -62,6 +62,30 @@ public class UnpersistTreeData implements ITreeData
 		
 		return node;
 	}
+	
+	public RemoteTree getTree(byte[] treeID) throws TreeDataException
+	{
+		EntityManager em = emf.createEntityManager();
+		
+		em.getTransaction().begin();
+		TypedQuery<RemoteTree> query = em.createQuery("SELECT t FROM RemoteTree t WHERE t.hash = :id", RemoteTree.class)
+				.setParameter("id", treeID);
+
+		RemoteTree tree;
+		try
+		{
+			tree = query.getSingleResult();
+			em.getTransaction().commit();
+		}
+		catch(NoResultException e)
+		{
+			throw new TreeDataException("Tree not found for ID " + Arrays.toString(treeID));
+		}
+		
+		em.detach(tree);
+		
+		return tree;
+	}
 
 	@Override
 	public List<ITree> getTrees() throws TreeDataException
@@ -127,6 +151,9 @@ public class UnpersistTreeData implements ITreeData
 	 * Makes a clean copy of the tree, without any persistence proxy objects
 	 */
 	public static void cleanForTransfer(RemoteTree tree) {
-		cleanForTransfer((RemoteNode) tree.getRootNode());
+		if (tree.getRootNode() != null) 
+		{
+			cleanForTransfer((RemoteNode) tree.getRootNode());
+		}
 	}
 }
