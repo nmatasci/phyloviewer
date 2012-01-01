@@ -41,6 +41,7 @@ ALTER TABLE node OWNER TO phyloviewer;
 
 CREATE TABLE tree
 (
+  dtype character varying(31) NOT NULL,
   tree_id integer NOT NULL,
   hash bytea,
   importcomplete boolean NOT NULL,
@@ -62,11 +63,11 @@ CREATE TABLE annotation
   dtype character varying(31) NOT NULL,
   id integer NOT NULL,
   predicatenamespace character varying(255),
+  href character varying(255),
+  rel character varying(255),
   datatype character varying(255),
   property character varying(255),
   "value" character varying(255),
-  href character varying(255),
-  rel character varying(255),
   CONSTRAINT annotation_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -95,20 +96,38 @@ ALTER TABLE node_annotation OWNER TO phyloviewer;
 CREATE TABLE nested_annotation
 (
   annotation_id integer NOT NULL,
-  nestedannotations_id integer NOT NULL,
-  CONSTRAINT nested_annotation_pkey PRIMARY KEY (annotation_id, nestedannotations_id),
-  CONSTRAINT fk5cde6f775e62ed57 FOREIGN KEY (nestedannotations_id)
+  annotations_id integer NOT NULL,
+  CONSTRAINT nested_annotation_pkey PRIMARY KEY (annotation_id, annotations_id),
+  CONSTRAINT fk5cde6f77bfdd08a0 FOREIGN KEY (annotations_id)
       REFERENCES annotation (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk5cde6f77d8ebb7c8 FOREIGN KEY (annotation_id)
       REFERENCES annotation (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT nested_annotation_nestedannotations_id_key UNIQUE (nestedannotations_id)
+  CONSTRAINT nested_annotation_annotations_id_key UNIQUE (annotations_id)
 )
 WITH (
   OIDS=FALSE
 );
 ALTER TABLE nested_annotation OWNER TO phyloviewer;
+
+CREATE TABLE tree_annotation
+(
+  tree_tree_id integer NOT NULL,
+  annotations_id integer NOT NULL,
+  CONSTRAINT tree_annotation_pkey PRIMARY KEY (tree_tree_id, annotations_id),
+  CONSTRAINT fkc9f7da904318b6d6 FOREIGN KEY (tree_tree_id)
+      REFERENCES tree (tree_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fkc9f7da90bfdd08a0 FOREIGN KEY (annotations_id)
+      REFERENCES annotation (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT tree_annotation_annotations_id_key UNIQUE (annotations_id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE tree_annotation OWNER TO phyloviewer;
 
 create table overview_images (
 	tree_id bytea not null,
