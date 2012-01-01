@@ -9,6 +9,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import net.sf.beanlib.hibernate3.Hibernate3BeanReplicator;
+
 import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
@@ -30,16 +32,15 @@ public class UnpersistTreeData implements ITreeData
 		EntityManager em = emf.createEntityManager();
 		
 		RemoteNode root = getRootNode(rootID, em);
-		em.detach(root);
 		em.close();
 		
-		return root;
+		return getBeanReplicator().deepCopy(root);
 	}
 	
 	/**
 	* @return the tree's root node.  Still attached to the persistence context so, for example, children can be lazily fetched by calling node.getChild().
 	*/
-	public RemoteNode getRootNode(byte[] rootID, EntityManager em) throws TreeDataException
+	private RemoteNode getRootNode(byte[] rootID, EntityManager em) throws TreeDataException
 	{
 		em.getTransaction().begin();
 		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteTree t JOIN t.rootNode n WHERE t.hash = :id", RemoteNode.class)
@@ -91,17 +92,20 @@ public class UnpersistTreeData implements ITreeData
 		em.getTransaction().begin();
 		TypedQuery<RemoteTree> query = em.createQuery("SELECT t FROM RemoteTree t", RemoteTree.class);
 
-		List<RemoteTree> results = query.getResultList();
-		List<ITree> trees = new ArrayList<ITree>(results.size());
-		for(RemoteTree tree : results) {
-			em.detach(tree);
-			trees.add(tree);
+		List<RemoteTree> trees = query.getResultList();
+		List<ITree> replicatedList = new ArrayList<ITree>();
+		Hibernate3BeanReplicator beanReplicator = getBeanReplicator();
+		
+		for (RemoteTree tree : trees)
+		{
+			RemoteTree replicatedTree = beanReplicator.deepCopy(tree);
+			replicatedList.add(replicatedTree);
 		}
 		
 		em.getTransaction().commit();
 		em.close();
 
-		return trees;
+		return replicatedList;
 	}
 
 	@Override
@@ -109,19 +113,24 @@ public class UnpersistTreeData implements ITreeData
 	{
 		EntityManager em = emf.createEntityManager();
 		
-		em.getTransaction().begin();
 		TypedQuery<RemoteNode> query = em.createQuery("SELECT n FROM RemoteNode n WHERE n.id = :id", RemoteNode.class)
 				.setParameter("id", parentID);
 
 		RemoteNode parent = query.getSingleResult();
 		parent.getChildren().isEmpty(); //force lazy fetch of children
 		
-		em.detach(parent);
+		parent = getBeanReplicator().deepCopy(parent);
 		List<RemoteNode> children = parent.getChildren();
 		
-		em.getTransaction().commit();
 		em.close();
 		
 		return children;
+	}
+	
+	private Hibernate3BeanReplicator getBeanReplicator()
+	{
+		Hibernate3BeanReplicator beanReplicator = new Hibernate3BeanReplicator();
+		beanReplicator.initCustomTransformerFactory(new PersistenceBeanTransformerFactory());
+		return beanReplicator;
 	}
 }
