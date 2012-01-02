@@ -29,10 +29,9 @@ import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsyncImpl;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl;
 import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.RemoteNodeSuggestion;
 import org.iplantc.phyloviewer.viewer.client.services.StyleServiceClient;
+import org.iplantc.phyloviewer.viewer.client.services.StyleServiceClient.StyleServiceException;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListService;
 import org.iplantc.phyloviewer.viewer.client.services.TreeListServiceAsync;
-import org.iplantc.phyloviewer.viewer.client.style.StyleMapFactory;
-import org.iplantc.phyloviewer.viewer.client.style.StyleMapFactory.StyleParseException;
 import org.iplantc.phyloviewer.viewer.client.ui.BranchStyleWidget;
 import org.iplantc.phyloviewer.viewer.client.ui.ColorBox;
 import org.iplantc.phyloviewer.viewer.client.ui.ContextMenu;
@@ -193,11 +192,11 @@ public class Phyloviewer implements EntryPoint
 				
 				try
 				{
-					IStyleMap styleMap = StyleMapFactory.parseJSON(style);
+					IStyleMap styleMap = StyleServiceClient.parseJSON(style);
 					widget.getView().getDocument().setStyleMap(styleMap);
 					widget.render();
 				}
-				catch(StyleParseException e)
+				catch(StyleServiceException e)
 				{
 					Window.alert("Unable to parse style document. See https://pods.iplantcollaborative.org/wiki/display/iptol/Using+Phyloviewer+GWT+client+library#UsingPhyloviewerGWTclientlibrary-Addingstylingmarkuptoviewer for help.");
 				}
@@ -515,17 +514,6 @@ public class Phyloviewer implements EntryPoint
 		});
 	}
 	
-	private void setStyle(String style) throws StyleParseException {
-		IStyleMap styleMap = StyleMapFactory.parseJSON(style);
-		
-		//tree may not have been loaded yet, so document may be null 
-		IDocument document = widget.getView().getDocument();
-		if (document != null) {
-			document.setStyleMap(styleMap);
-			widget.render();
-		}
-	}
-	
 	private void updateStyle() {
 		final String styleID = Window.Location.getParameter("styleID");
 		
@@ -533,24 +521,21 @@ public class Phyloviewer implements EntryPoint
 			return;
 		}
 		
-		AsyncCallback<String> callback = new AsyncCallback<String>()
+		AsyncCallback<IStyleMap> callback = new AsyncCallback<IStyleMap>()
 		{
 			@Override
 			public void onFailure(Throwable caught)
 			{
-				Window.alert("Failed to get style " + styleID);
+				Window.alert("Failed to get style " + styleID + "\n" + caught.getMessage());
 			}
 
 			@Override
-			public void onSuccess(String style)
+			public void onSuccess(IStyleMap style)
 			{
-				try
-				{
-					setStyle(style);
-				}
-				catch(StyleParseException e)
-				{
-					Window.alert("Unable to parse style " + styleID);
+				IDocument document = widget.getView().getDocument();
+				if (document != null) {
+					document.setStyleMap(style);
+					widget.render();
 				}
 			}
 		};
