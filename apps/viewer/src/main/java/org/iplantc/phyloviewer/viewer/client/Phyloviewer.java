@@ -193,7 +193,7 @@ public class Phyloviewer implements EntryPoint
 				
 				try
 				{
-					IStyleMap styleMap = StyleMapFactory.createStyleMap(style);
+					IStyleMap styleMap = StyleMapFactory.parseJSON(style);
 					widget.getView().getDocument().setStyleMap(styleMap);
 					widget.render();
 				}
@@ -516,7 +516,7 @@ public class Phyloviewer implements EntryPoint
 	}
 	
 	private void setStyle(String style) throws StyleParseException {
-		IStyleMap styleMap = StyleMapFactory.createStyleMap(style);
+		IStyleMap styleMap = StyleMapFactory.parseJSON(style);
 		
 		//tree may not have been loaded yet, so document may be null 
 		IDocument document = widget.getView().getDocument();
