@@ -14,6 +14,8 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.render.Defaults;
 import org.iplantc.phyloviewer.shared.render.style.CompositeStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
+import org.iplantc.phyloviewer.shared.render.style.MutableStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.Style;
 
 import com.google.gwt.user.client.ui.FlexTable;
@@ -44,13 +46,14 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 	 */
 	public IStyle getStyle(INode node, boolean create)
 	{
-		IStyle style = document.getStyleMap().get(node);
+		IStyleMap styleMap = document.getStyleMap();
+		IStyle style = styleMap.get(node);
 		
-		if (create && style == null)
+		if (create && style == null && styleMap instanceof MutableStyleMap)
 		{	
 			style = new Style(String.valueOf(node.getId()));
 			style = new CompositeStyle(style, Defaults.DEFAULT_STYLE);
-			document.getStyleMap().put(node, style);
+			((MutableStyleMap)styleMap).put(node, style);
 		}
 		
 		return style;

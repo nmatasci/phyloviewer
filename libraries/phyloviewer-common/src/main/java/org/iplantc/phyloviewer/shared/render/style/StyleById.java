@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 
-public class StyleById implements IStyleMap
+public class StyleById implements MutableStyleMap, HasBranchDecoration
 {
 	private HashMap<String,IStyle> map = new HashMap<String,IStyle>();
 	private HashMap<Integer,String> nodeStyleMappings = new HashMap<Integer,String>(); 

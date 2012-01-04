@@ -12,30 +12,10 @@ public class SingleValueStyleMap implements IStyleMap
 		this.style = style;
 	}
 	
-	
 	@Override
 	public IStyle get(INode node)
 	{
 		return style;
-	}
-
-	@Override
-	public void put(INode node, IStyle style)
-	{
-		//not implemented
-	}
-
-	@Override
-	public boolean hasBranchDecoration(int nodeId)
-	{
-		//not implemented
-		return false;
-	}
-
-	@Override
-	public String getBranchLabel(INode node)
-	{
-		return null;
 	}
 	
 	@Override

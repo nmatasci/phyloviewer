@@ -8,6 +8,7 @@ import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.model.IDocument;
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.render.style.HasBranchDecoration;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 public class DrawableBuilderCladogram implements IDrawableBuilder
@@ -59,9 +60,9 @@ public class DrawableBuilderCladogram implements IDrawableBuilder
 			String label = null;
 			
 			IStyleMap styleMap = document.getStyleMap();
-			if(styleMap != null)
+			if(styleMap != null && styleMap instanceof HasBranchDecoration)
 			{
-				label = styleMap.getBranchLabel(child);
+				label = ((HasBranchDecoration)styleMap).getBranchLabel(child);
 			}
 			
 			if (label != null)

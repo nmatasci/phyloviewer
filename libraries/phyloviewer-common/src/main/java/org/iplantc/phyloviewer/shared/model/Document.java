@@ -2,6 +2,7 @@ package org.iplantc.phyloviewer.shared.model;
 
 import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.render.Defaults;
+import org.iplantc.phyloviewer.shared.render.style.HasBranchDecoration;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.StyleById;
@@ -91,9 +92,9 @@ public class Document implements IDocument
 	@Override
 	public boolean hasBranchDecoration(int nodeId)
 	{
-		if(this.styleMap != null)
+		if(this.styleMap != null && this.styleMap instanceof HasBranchDecoration)
 		{
-			return styleMap.hasBranchDecoration(nodeId);
+			return ((HasBranchDecoration)styleMap).hasBranchDecoration(nodeId);
 		}
 		
 		return false;

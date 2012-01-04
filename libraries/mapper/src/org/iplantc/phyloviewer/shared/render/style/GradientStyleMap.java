@@ -54,25 +54,4 @@ public class GradientStyleMap implements IStyleMap
 		//TODO check performance, cache the interpolated style if necessary
 		return minStyle;
 	}
-
-	@Override
-	public void put(INode node, IStyle style)
-	{
-		// not implemented
-	}
-
-	@Override
-	public boolean hasBranchDecoration(int nodeId)
-	{
-		// not implemented
-		return false;
-	}
-
-	@Override
-	public String getBranchLabel(INode node)
-	{
-		// not implemented
-		return null;
-	}
-
 }

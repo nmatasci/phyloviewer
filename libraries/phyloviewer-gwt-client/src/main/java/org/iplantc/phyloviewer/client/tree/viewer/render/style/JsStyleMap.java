@@ -1,12 +1,13 @@
 package org.iplantc.phyloviewer.client.tree.viewer.render.style;
 
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.render.style.HasBranchDecoration;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class JsStyleMap extends JavaScriptObject implements IStyleMap
+public class JsStyleMap extends JavaScriptObject implements IStyleMap, HasBranchDecoration
 {
 	protected JsStyleMap()
 	{
@@ -47,13 +48,6 @@ public class JsStyleMap extends JavaScriptObject implements IStyleMap
 	}-*/;
 
 	private final native JsStyle getStyleNative(String styleId) /*-{return this.styles[styleId];}-*/;
-
-	@Override
-	public final void put(INode node, IStyle style)
-	{
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public final native boolean hasBranchDecoration(int nodeId) /*-{

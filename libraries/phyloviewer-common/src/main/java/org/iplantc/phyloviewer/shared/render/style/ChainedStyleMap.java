@@ -39,26 +39,6 @@ public class ChainedStyleMap implements IStyleMap
 		
 		return finalStyle;
 	}
-
-	@Override
-	public void put(INode node, IStyle style)
-	{
-		//not implemented.  Consider putting in a base stylemap that would take any puts and get applied before the list
-	}
-
-	@Override
-	public boolean hasBranchDecoration(int nodeId)
-	{
-		// TODO ? Planning to add this to the IStyle object
-		return false;
-	}
-
-	@Override
-	public String getBranchLabel(INode node)
-	{
-		// TODO ? Planning to add this to the IStyle object
-		return null;
-	}
 	
 	public boolean addStyleMap(IStyleMap map)
 	{

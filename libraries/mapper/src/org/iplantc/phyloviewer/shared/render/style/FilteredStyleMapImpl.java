@@ -35,27 +35,6 @@ public class FilteredStyleMapImpl implements FilteredStyleMap
 	}
 
 	@Override
-	public void put(INode node, IStyle style)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean hasBranchDecoration(int nodeId)
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public String getBranchLabel(INode node)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public ValueForNode<Boolean> getFilter()
 	{
 		return filter;
