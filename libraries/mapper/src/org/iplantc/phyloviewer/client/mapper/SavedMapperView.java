@@ -3,6 +3,7 @@ package org.iplantc.phyloviewer.client.mapper;
 import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -14,7 +15,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class SavedMapperView extends Composite
 {
-
 	private static SavedMapperViewUiBinder uiBinder = GWT.create(SavedMapperViewUiBinder.class);
 	@UiField HorizontalPanel panel;
 	@UiField InlineLabel filterField;
@@ -30,7 +30,7 @@ public class SavedMapperView extends Composite
 		ValueForNode<Boolean> filter = map.getFilter();
 		filterField.setText(filter.toString());
 		
-		IStyle style = map.getPassStyle();
+		IStyleMap style = map.getPassStyleMap();
 		styleField.setText(style.toString());
 	}
 

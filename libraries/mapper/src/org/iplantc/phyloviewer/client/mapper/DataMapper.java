@@ -1,11 +1,13 @@
 package org.iplantc.phyloviewer.client.mapper;
 
 import org.iplantc.phyloviewer.client.mapper.mocks.MockAnnotationFilter;
-import org.iplantc.phyloviewer.client.mapper.mocks.MockStyleMap;
+import org.iplantc.phyloviewer.client.mapper.mocks.SingleValueStyleMap;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataInfo;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
 import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataProperty;
+import org.iplantc.phyloviewer.shared.render.style.ChainedStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMap;
+import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMapImpl;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
 import com.google.gwt.core.client.GWT;
@@ -26,6 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class DataMapper extends Composite
 {
 	//TODO: add a checkbox to show/hide the second style widget.  When it is shown, keep the same tab showing on both StyleWidgets, and add some validation to check if both widgets have a value for any edited fields.
+	//TODO: add remove or undo button for saved styles
 	
 	interface DataMapperUiBinder extends UiBinder<Widget,DataMapper> {}
 	private static DataMapperUiBinder uiBinder = GWT.create(DataMapperUiBinder.class);
@@ -42,11 +45,14 @@ public class DataMapper extends Composite
 	@UiField Panel savedPanel;
 	
 	private MetadataInfo info;
+	private ChainedStyleMap styles;
 
 	public DataMapper(MetadataInfo info)
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		this.info = info;
+		this.styles = new ChainedStyleMap();
+		
 		propertiesField.setAcceptableValues(this.info.getProperties());
 		minOrOnlyStyleLabel.setVisible(false);
 		maxStyleLabel.setVisible(false);
@@ -74,11 +80,11 @@ public class DataMapper extends Composite
 		filter.value = filterValueField.getText();
 		
 		IStyle style = styleWidget1.getStyle();
-		FilteredStyleMap map = new MockStyleMap(filter, style);
+		FilteredStyleMap map = new FilteredStyleMapImpl(filter, style);
 		
 		//TODO check if interpolated style (numeric datatype and styleWidget2 has values set) and, if so, make a GradientStyleMap
 		
-		//TODO save the map to a ChainedStyleMap
+		this.styles.addStyleMap(map);
 		
 		//display saved values
 		Widget savedMapping = new SavedMapperView(map);
