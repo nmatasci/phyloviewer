@@ -10,7 +10,7 @@ public class MockAnnotationFilter implements ValueForNode<Boolean>
 	public String value;
 	
 	@Override
-	public Boolean value(INode node)
+	public Boolean get(INode node)
 	{
 		return false;
 	}

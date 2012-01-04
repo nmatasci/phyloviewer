@@ -26,7 +26,7 @@ public class FilteredStyleMapImpl implements FilteredStyleMap
 	@Override
 	public IStyle get(INode node)
 	{
-		if (filter.value(node))
+		if (filter.get(node))
 		{
 			return passStyleMap.get(node);
 		}

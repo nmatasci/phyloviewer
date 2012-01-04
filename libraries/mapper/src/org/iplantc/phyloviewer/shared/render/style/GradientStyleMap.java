@@ -31,7 +31,7 @@ public class GradientStyleMap implements IStyleMap
 	public IStyle get(INode node)
 	{
 		IStyle style = null;
-		Double value = evaluator.value(node);
+		Double value = evaluator.get(node);
 		style = interpolate(value);
 
 		return style;

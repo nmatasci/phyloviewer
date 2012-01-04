@@ -22,7 +22,7 @@ public class AnnotationEvaluator implements ValueForNode<Double>
 	 * 			Ignores any matched annotations after the first.
 	 */
 	@Override
-	public Double value(INode node)
+	public Double get(INode node)
 	{
 		Double value = null;
 		
