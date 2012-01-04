@@ -1,11 +1,12 @@
-package org.iplantc.phyloviewer.viewer.client.style;
+package org.iplantc.phyloviewer.shared.render.style;
 
 import java.util.ArrayList;
 
 import org.iplantc.phyloviewer.shared.model.INode;
-import org.iplantc.phyloviewer.shared.render.style.IStyle;
-import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
+/**
+ * ChainedStyleMap queries a list of IStyleMaps and returns the style provided by the last matching IStyleMap.
+ */
 public class ChainedStyleMap implements IStyleMap
 {
 	private ArrayList<IStyleMap> styleMaps;
@@ -18,6 +19,8 @@ public class ChainedStyleMap implements IStyleMap
 	@Override
 	public IStyle get(INode node)
 	{
+		//TODO cache the final values if performance is bad, e.g. for large styleMaps list or slow styleMap.get() implementations
+		
 		IStyle finalStyle = null;
 		
 		for (IStyleMap styleMap : styleMaps)
