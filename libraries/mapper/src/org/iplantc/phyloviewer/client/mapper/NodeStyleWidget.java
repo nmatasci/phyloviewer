@@ -29,7 +29,15 @@ public class NodeStyleWidget extends Composite
 	{
 		NodeStyle style = new NodeStyle();
 		style.setColor(colorField.getValue());
-		style.setPointSize(sizeField.getValue());
+		
+		Double size = sizeField.getValue();
+		if (size != null)
+		{
+			style.setPointSize(size);
+		}
+		
+		//TODO handle shape field. may want to change it to a valuebox with the Shape enum values in it.
+		
 		return style;
 	}
 

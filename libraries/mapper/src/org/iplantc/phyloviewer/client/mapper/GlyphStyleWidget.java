@@ -33,7 +33,12 @@ public class GlyphStyleWidget extends Composite
 		IGlyphStyle style = new GlyphStyle();
 		style.setFillColor(fillColorField.getValue());
 		style.setStrokeColor(strokeColorField.getValue());
-		style.setLineWidth(lineWidthField.getValue());
+		
+		Double width = lineWidthField.getValue();
+		if (width != null)
+		{
+			style.setLineWidth(width);
+		}
 		
 		return style;
 	}

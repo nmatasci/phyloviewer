@@ -31,7 +31,13 @@ public class BranchStyleWidget extends Composite
 	{
 		BranchStyle style = new BranchStyle();
 		style.setStrokeColor(colorField.getValue());
-		style.setLineWidth(widthField.getValue());
+		
+		Double width = widthField.getValue();
+		if (width != null)
+		{
+			style.setLineWidth(width);
+		}
+		
 		return style;
 	}
 
