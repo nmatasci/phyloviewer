@@ -21,6 +21,7 @@ public class GradientStyleMap implements IStyleMap
 	 */
 	public GradientStyleMap(ValueForNode<Double> evaluator, IStyle minStyle, IStyle maxStyle)
 	{
+		//TODO check that minStyle and maxStyle have all of the same properties set?
 		this.evaluator = evaluator;
 		this.minStyle = minStyle;
 		this.maxStyle = maxStyle;
