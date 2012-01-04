@@ -11,12 +11,12 @@ import javax.persistence.OneToMany;
 
 @SuppressWarnings("serial")
 @Entity
-public class ResourceMetaAnnotation extends Annotation implements Annotated
+public class ResourceMetaAnnotation extends AnnotationEntity implements Annotated
 {
 	private String rel;
 	private String href;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH}, targetEntity=AnnotationEntity.class)
 	@CollectionTable(name="nested_annotation")
 	private Set<Annotation> annotations;
 
@@ -58,7 +58,7 @@ public class ResourceMetaAnnotation extends Annotation implements Annotated
 	
 	public Set<Annotation> getAnnotations(String propertyOrRel)
 	{
-		return Annotation.getAnnotations(propertyOrRel, this.annotations);
+		return AnnotationEntity.getAnnotations(propertyOrRel, this.annotations);
 	}
 
 	public void addAnnotation(Annotation annotation)
@@ -90,5 +90,11 @@ public class ResourceMetaAnnotation extends Annotation implements Annotated
 		{
 			return false;
 		}
+	}
+
+	@Override
+	public Object getValue()
+	{
+		return annotations;
 	}   
 }

@@ -19,7 +19,7 @@ public class AnnotatedTree extends RemoteTree implements Annotated
 		
 	}
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH}, targetEntity=AnnotationEntity.class)
 	public Set<Annotation> getAnnotations()
 	{
 		return annotations;
@@ -34,7 +34,7 @@ public class AnnotatedTree extends RemoteTree implements Annotated
      * @see org.nexml.model.Annotatable#getAnnotations(java.lang.String)
      */
     public Set<Annotation> getAnnotations(String propertyOrRel) {
-    	return Annotation.getAnnotations(propertyOrRel, this.annotations);
+    	return AnnotationEntity.getAnnotations(propertyOrRel, this.annotations);
     }
     
     public void addAnnotation(Annotation annotation) {

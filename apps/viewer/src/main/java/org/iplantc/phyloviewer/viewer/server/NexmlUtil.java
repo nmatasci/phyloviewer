@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedTree;
 import org.iplantc.phyloviewer.viewer.client.model.Annotation;
+import org.iplantc.phyloviewer.viewer.client.model.AnnotationEntity;
 import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;
@@ -148,7 +149,7 @@ public class NexmlUtil
 	private static Annotation convertDataModels(org.nexml.model.Annotation nexmlAnnotation) 
 	{
 		Object value = nexmlAnnotation.getValue();
-		Annotation a = null;
+		AnnotationEntity a = null;
 		if (value instanceof org.nexml.model.Annotation
 				|| value instanceof Set
 				|| value instanceof URI)

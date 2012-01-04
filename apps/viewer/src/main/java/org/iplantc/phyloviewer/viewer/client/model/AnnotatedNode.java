@@ -15,7 +15,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable, Annotated
 {
 	private static final long serialVersionUID = 602683128059592856L;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH})
+	@OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.DETACH}, targetEntity=AnnotationEntity.class)
 	private Set<Annotation> annotations;
 
 	public AnnotatedNode()
@@ -36,7 +36,7 @@ public class AnnotatedNode extends RemoteNode implements Serializable, Annotated
      * @see org.nexml.model.Annotatable#getAnnotations(java.lang.String)
      */
     public Set<Annotation> getAnnotations(String propertyOrRel) {
-    	return Annotation.getAnnotations(propertyOrRel, this.annotations);
+    	return AnnotationEntity.getAnnotations(propertyOrRel, this.annotations);
     }
     
     public void addAnnotation(Annotation annotation) {

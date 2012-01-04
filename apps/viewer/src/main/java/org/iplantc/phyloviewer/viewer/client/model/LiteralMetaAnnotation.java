@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 @SuppressWarnings("serial")
 @Entity
-public class LiteralMetaAnnotation extends Annotation
+public class LiteralMetaAnnotation extends AnnotationEntity
 {
 	private String value;
 	private String property;
