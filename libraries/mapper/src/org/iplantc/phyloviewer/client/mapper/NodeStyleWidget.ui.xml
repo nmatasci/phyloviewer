@@ -1,0 +1,32 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <ui:style>
+
+  </ui:style>
+  <g:HTMLPanel>
+    <g:Grid>
+      <g:row>
+        <g:cell>Color</g:cell>
+        <g:customCell>
+          <g:TextBox ui:field="colorField" visibleLength="7" />
+        </g:customCell>
+      </g:row>
+      <g:row>
+        <g:cell>Size</g:cell>
+        <g:customCell>
+          <g:DoubleBox ui:field="sizeField" visibleLength="7" />
+        </g:customCell>
+      </g:row>
+      <g:row>
+        <g:cell>Shape</g:cell>
+        <g:customCell>
+          <g:ListBox ui:field="shapeField">
+            <g:item>Circle</g:item>
+            <g:item>Square</g:item>
+          </g:ListBox>
+        </g:customCell>
+      </g:row>
+    </g:Grid>
+  </g:HTMLPanel>
+</ui:UiBinder> 
