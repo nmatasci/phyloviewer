@@ -1,10 +1,10 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
 
-public interface IStyleMap
+public interface IStyleMap extends ValueForNode<IStyle>
 {
-	public IStyle get(INode node);
 	public void put(INode node, IStyle style);
 	
 	public boolean hasBranchDecoration(int nodeId);

@@ -4,5 +4,5 @@ import org.iplantc.phyloviewer.shared.model.INode;
 
 public interface ValueForNode<T>
 {
-	public T value(INode node);
+	public T get(INode node);
 }
