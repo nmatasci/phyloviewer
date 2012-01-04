@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+import org.iplantc.phyloviewer.shared.model.metadata.Annotated;
+import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
+
 @SuppressWarnings("serial")
 @Entity
 public class AnnotatedTree extends RemoteTree implements Annotated

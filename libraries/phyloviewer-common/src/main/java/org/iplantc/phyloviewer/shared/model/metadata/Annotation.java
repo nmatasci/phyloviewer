@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.viewer.client.model;
+package org.iplantc.phyloviewer.shared.model.metadata;
 
 public interface Annotation
 {

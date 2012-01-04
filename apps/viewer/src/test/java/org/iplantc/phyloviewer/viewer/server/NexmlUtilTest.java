@@ -9,8 +9,8 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
-import org.iplantc.phyloviewer.viewer.client.model.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 import org.iplantc.phyloviewer.viewer.client.model.ResourceMetaAnnotation;

@@ -9,6 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+import org.iplantc.phyloviewer.shared.model.metadata.Annotated;
+import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
+
 
 @Entity
 public class AnnotatedNode extends RemoteNode implements Serializable, Annotated

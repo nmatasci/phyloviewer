@@ -5,8 +5,8 @@ import java.util.Set;
 import org.iplantc.phyloviewer.client.events.NodeSelectionEvent;
 import org.iplantc.phyloviewer.client.events.NodeSelectionHandler;
 import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
-import org.iplantc.phyloviewer.viewer.client.model.Annotation;
 import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 
 import com.google.gwt.user.client.ui.FlexTable;

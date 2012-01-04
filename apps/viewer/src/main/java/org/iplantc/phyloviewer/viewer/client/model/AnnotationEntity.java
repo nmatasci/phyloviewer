@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
+
 @Entity
 @Table(name="annotation")
 public abstract class AnnotationEntity implements Serializable, Annotation
