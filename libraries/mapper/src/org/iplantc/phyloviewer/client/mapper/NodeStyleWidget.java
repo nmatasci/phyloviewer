@@ -1,6 +1,7 @@
 package org.iplantc.phyloviewer.client.mapper;
 
 import org.iplantc.phyloviewer.shared.render.style.INodeStyle;
+import org.iplantc.phyloviewer.shared.render.style.INodeStyle.Shape;
 import org.iplantc.phyloviewer.shared.render.style.NodeStyle;
 
 import com.google.gwt.core.client.GWT;
@@ -27,17 +28,17 @@ public class NodeStyleWidget extends Composite
 
 	public INodeStyle getStyle()
 	{
-		NodeStyle style = new NodeStyle();
-		style.setColor(colorField.getValue());
+		String color = colorField.getValue();
 		
 		Double size = sizeField.getValue();
-		if (size != null)
+		if (size == null)
 		{
-			style.setPointSize(size);
+			size = Double.NaN;
 		}
+
+		Shape shape = Shape.valueOf(shapeField.getItemText(shapeField.getSelectedIndex()));
 		
-		//TODO handle shape field. may want to change it to a valuebox with the Shape enum values in it.
-		
+		NodeStyle style = new NodeStyle(color, size, shape);
 		return style;
 	}
 

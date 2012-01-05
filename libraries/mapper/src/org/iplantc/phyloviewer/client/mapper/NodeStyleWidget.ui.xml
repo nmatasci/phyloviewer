@@ -22,8 +22,8 @@
         <g:cell>Shape</g:cell>
         <g:customCell>
           <g:ListBox ui:field="shapeField">
-            <g:item>Circle</g:item>
-            <g:item>Square</g:item>
+            <g:item>CIRCLE</g:item>
+            <g:item>SQUARE</g:item>
           </g:ListBox>
         </g:customCell>
       </g:row>
