@@ -4,8 +4,8 @@ public interface INodeStyle
 {
 	public enum Shape
 	{
-		SHAPE_CIRCLE,
-		SHAPE_SQUARE
+		CIRCLE,
+		SQUARE
 	}
 	
 	/**

@@ -72,4 +72,20 @@ public class Style implements IStyle, Serializable {
 		this.isInheritable = isInheritable;
 	}
 
+	@Override
+	public String toString()
+	{
+		//TODO allow the element styles to be null?  It would make this a lot more concise is most cases, but would involve a lot of null checks elsewhere
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("\"id\":\"" + this.getId() + '"');
+		sb.append(",\"nodeStyle\":" + nodeStyle.toString());
+		sb.append(",\"labelStyle\":" + labelStyle.toString());
+		sb.append(",\"branchStyle\":" + branchStyle.toString());
+		sb.append(",\"glyphStyle\":" + glyphStyle.toString());
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }

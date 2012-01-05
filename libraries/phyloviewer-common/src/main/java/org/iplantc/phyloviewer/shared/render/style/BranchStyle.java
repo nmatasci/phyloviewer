@@ -41,4 +41,30 @@ public class BranchStyle implements IBranchStyle, Serializable
 	{
 		this.strokeWidth = width;
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		boolean previous = false;
+		
+		sb.append("{");
+
+		if (strokeColor != null && !strokeColor.isEmpty())
+		{
+			sb.append("\"strokeColor\":\"" + strokeColor + '"');
+			previous = true;
+		}
+		
+		if (!Double.isNaN(strokeWidth))
+		{
+			if (previous) sb.append(",");
+			sb.append("\"lineWidth\":" + strokeWidth);
+			previous = true;
+		}
+		
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }

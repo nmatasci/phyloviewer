@@ -27,4 +27,21 @@ public class LabelStyle implements ILabelStyle, Serializable
 	{
 		this.color = color;
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("{");
+
+		if (color != null && !color.isEmpty())
+		{
+			sb.append("\"color\":\"" + color + '"');
+		}
+		
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }

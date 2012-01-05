@@ -26,8 +26,7 @@ public class Point extends Drawable
 	{
 		if(graphics != null)
 		{
-			// Assume circle.
-			Shape shape = Shape.SHAPE_CIRCLE;
+			Shape shape = null;
 			double pointSize = Defaults.POINT_SIZE;
 			
 			if(style != null)
@@ -42,11 +41,12 @@ public class Point extends Drawable
 				}
 			}
 			
-			if(shape == Shape.SHAPE_CIRCLE)
+			//assume circle
+			if(shape == null || shape == Shape.CIRCLE)
 			{
 				graphics.drawPoint(point);
 			}
-			else if(shape == Shape.SHAPE_SQUARE)
+			else if(shape == Shape.SQUARE)
 			{
 				Matrix33 matrix = graphics.getObjectToScreenMatrix();
 				

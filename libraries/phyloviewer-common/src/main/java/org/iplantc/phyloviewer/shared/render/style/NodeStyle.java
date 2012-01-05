@@ -7,7 +7,7 @@ public class NodeStyle implements INodeStyle, Serializable
 	private static final long serialVersionUID = 1L;
 	String color = null;
 	double pointSize = Double.NaN;
-	private Shape shape = Shape.SHAPE_CIRCLE;
+	private Shape shape = null;
 
 	public NodeStyle(String color, double pointSize)
 	{
@@ -54,5 +54,38 @@ public class NodeStyle implements INodeStyle, Serializable
 	public Shape getShape()
 	{
 		return shape;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		boolean previous = false;
+		
+		sb.append("{");
+
+		if (color != null && !color.isEmpty())
+		{
+			sb.append("\"color\":\"" + color + '"');
+			previous = true;
+		}
+		
+		if (!Double.isNaN(pointSize))
+		{
+			if (previous) sb.append(",");
+			sb.append("\"pointSize\":" + pointSize);
+			previous = true;
+		}
+		
+		if (shape != null)
+		{
+			if (previous) sb.append(",");
+			sb.append("\"nodeShape\":\"" + shape.toString() + '"');
+			previous = true;
+		}
+		
+		sb.append("}");
+		
+		return sb.toString();
 	}
 }

@@ -30,9 +30,9 @@ public class JsNodeStyle extends JavaScriptObject implements INodeStyle
 		String shape = this.getShapeNative();
 		if(shape.equalsIgnoreCase("square"))
 		{
-			return Shape.SHAPE_SQUARE;
+			return Shape.SQUARE;
 		}
 
-		return Shape.SHAPE_CIRCLE;
+		return Shape.CIRCLE;
 	}
 }
