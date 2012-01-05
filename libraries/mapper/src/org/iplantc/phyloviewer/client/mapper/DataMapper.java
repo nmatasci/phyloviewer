@@ -1,10 +1,11 @@
 package org.iplantc.phyloviewer.client.mapper;
 
 import org.iplantc.phyloviewer.client.mapper.mocks.MockAnnotationFilter;
-import org.iplantc.phyloviewer.client.mapper.mocks.SingleValueStyleMap;
+import org.iplantc.phyloviewer.shared.model.metadata.AllPassFilter;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataInfo;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
 import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataProperty;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
 import org.iplantc.phyloviewer.shared.render.style.ChainedStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMapImpl;
@@ -72,12 +73,20 @@ public class DataMapper extends Composite
 	@UiHandler("saveButton")
 	void save(ClickEvent event)
 	{
-		//TODO check that all the necessary fields are set
-		
-		MockAnnotationFilter filter = new MockAnnotationFilter();
-		filter.propertyName = propertiesField.getValue().getName();
-		filter.description = filterField.getItemText(filterField.getSelectedIndex());
-		filter.value = filterValueField.getText();
+		ValueForNode<Boolean> filter = null;
+		MetadataProperty property = propertiesField.getValue();
+		if (property != null)
+		{
+			MockAnnotationFilter aFilter = new MockAnnotationFilter();
+			aFilter.propertyName = property.getName();
+			aFilter.description = filterField.getItemText(filterField.getSelectedIndex());
+			aFilter.value = filterValueField.getText();
+			filter = aFilter;
+		}
+		else 
+		{
+			filter = new AllPassFilter();
+		}
 		
 		IStyle style = styleWidget1.getStyle();
 		FilteredStyleMap map = new FilteredStyleMapImpl(filter, style);
@@ -141,16 +150,16 @@ public class DataMapper extends Composite
 		String name = datatype.getName();
 		if (name.equals("java.lang.String"))
 		{
-			return new String[] {"equals", "does not equal", "contains", "does not contain"};
+			return new String[] {"", "equals", "does not equal", "contains", "does not contain", "starts with", "ends with"};
 		}
 		
 		else if (datatype.getName().equals("java.lang.Number") || datatype.getName().equals("java.lang.Integer") || datatype.getName().equals("java.lang.Double"))
 		{
-			return new String[] {"equals", "greater than", "less than"};
+			return new String[] {"", "equals", "greater than", "less than"};
 		}
 		else if (datatype.getName().equals("java.lang.Boolean"))
 		{
-			return new String[] {"is true", "is false"};
+			return new String[] {"", "is true", "is false"};
 		}
 		else
 		{

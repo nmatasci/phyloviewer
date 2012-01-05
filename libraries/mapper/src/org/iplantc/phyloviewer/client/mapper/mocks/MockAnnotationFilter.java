@@ -5,9 +5,9 @@ import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
 
 public class MockAnnotationFilter implements ValueForNode<Boolean>
 {
-	public String propertyName;
-	public String description;
-	public String value;
+	public String propertyName = "";
+	public String description = "";
+	public String value = "";
 	
 	@Override
 	public Boolean get(INode node)
