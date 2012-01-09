@@ -2,22 +2,22 @@ package org.iplantc.phyloviewer.shared.render.style;
 
 import org.iplantc.phyloviewer.client.mapper.mocks.SingleValueStyleMap;
 import org.iplantc.phyloviewer.shared.model.INode;
-import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 public class FilteredStyleMapImpl implements FilteredStyleMap
 {
-	ValueForNode<Boolean> filter;
+	ValueMap<INode, Boolean> filter;
 	IStyleMap passStyleMap;
 	
-	public FilteredStyleMapImpl(ValueForNode<Boolean> filter, IStyleMap passStyleMap)
+	public FilteredStyleMapImpl(ValueMap<INode, Boolean> filter, IStyleMap passStyleMap)
 	{
 		this.filter = filter;
 		this.passStyleMap = passStyleMap;
 	}
 	
-	public FilteredStyleMapImpl(ValueForNode<Boolean> filter, IStyle passStyle)
+	public FilteredStyleMapImpl(ValueMap<INode, Boolean> filter, IStyle passStyle)
 	{
 		this.filter = filter;
 		this.passStyleMap = new SingleValueStyleMap(passStyle);
@@ -35,7 +35,7 @@ public class FilteredStyleMapImpl implements FilteredStyleMap
 	}
 
 	@Override
-	public ValueForNode<Boolean> getFilter()
+	public ValueMap<INode, Boolean> getFilter()
 	{
 		return filter;
 	}

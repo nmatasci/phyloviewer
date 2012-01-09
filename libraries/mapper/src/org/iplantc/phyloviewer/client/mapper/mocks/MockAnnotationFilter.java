@@ -1,9 +1,9 @@
 package org.iplantc.phyloviewer.client.mapper.mocks;
 
 import org.iplantc.phyloviewer.shared.model.INode;
-import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 
-public class MockAnnotationFilter implements ValueForNode<Boolean>
+public class MockAnnotationFilter implements ValueMap<INode, Boolean>
 {
 	public String propertyName = "";
 	public String description = "";

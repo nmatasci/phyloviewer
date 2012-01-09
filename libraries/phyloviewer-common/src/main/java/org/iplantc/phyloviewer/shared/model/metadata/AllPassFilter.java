@@ -2,7 +2,7 @@ package org.iplantc.phyloviewer.shared.model.metadata;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 
-public class AllPassFilter implements ValueForNode<Boolean>
+public class AllPassFilter implements ValueMap<INode, Boolean>
 {
 	@Override
 	public Boolean get(INode node)
@@ -15,5 +15,4 @@ public class AllPassFilter implements ValueForNode<Boolean>
 	{
 		return "All nodes";
 	}
-
 }

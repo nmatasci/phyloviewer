@@ -1,7 +1,7 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
 import org.iplantc.phyloviewer.shared.model.INode;
-import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
@@ -11,7 +11,7 @@ public class GradientStyleMap implements IStyleMap
 	private IStyle maxStyle;
 	
 	/** @return a value [0, 1) or null for any given node */
-	private ValueForNode<Double> evaluator;
+	private ValueMap<INode, Double> evaluator;
 	
 	/**
 	 * Create a new GradientStyleMap that interpolates between the given styles based on the given evaluator.
@@ -19,7 +19,7 @@ public class GradientStyleMap implements IStyleMap
 	 * @param minStyle
 	 * @param maxStyle
 	 */
-	public GradientStyleMap(ValueForNode<Double> evaluator, IStyle minStyle, IStyle maxStyle)
+	public GradientStyleMap(ValueMap<INode, Double> evaluator, IStyle minStyle, IStyle maxStyle)
 	{
 		//TODO check that minStyle and maxStyle have all of the same properties set?
 		this.evaluator = evaluator;

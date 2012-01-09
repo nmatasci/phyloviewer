@@ -1,6 +1,7 @@
 package org.iplantc.phyloviewer.client.mapper;
 
-import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
+import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
@@ -27,7 +28,7 @@ public class SavedMapperView extends Composite
 	public SavedMapperView(FilteredStyleMap map)
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		ValueForNode<Boolean> filter = map.getFilter();
+		ValueMap<INode, Boolean> filter = map.getFilter();
 		filterField.setText(filter.toString());
 		
 		IStyleMap style = map.getPassStyleMap();

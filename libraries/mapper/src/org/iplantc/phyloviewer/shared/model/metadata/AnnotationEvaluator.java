@@ -7,7 +7,7 @@ import org.iplantc.phyloviewer.shared.model.INode;
 /**
  * Gets annotations matching a given key (property or rel) from nodes.  
  */
-public class AnnotationEvaluator implements ValueForNode<Double>
+public class AnnotationEvaluator implements ValueMap<INode, Double>
 {
 	String annotationKey;
 	
