@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.client.mapper;
+package org.iplantc.phyloviewer.client.mapper.style;
 
 import org.iplantc.phyloviewer.shared.render.style.ILabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.LabelStyle;

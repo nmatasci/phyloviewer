@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:mapper.style='urn:import:org.iplantc.phyloviewer.client.mapper.style'>
+  <ui:style>
+
+  </ui:style>
+  <g:HTMLPanel>
+  	<g:TabLayoutPanel barHeight="2" barUnit="EM" width="300px" height="150px">
+      <g:tab><g:header>Node</g:header><mapper.style:NodeStyleWidget ui:field="nodeWidget"/></g:tab>
+      <g:tab><g:header>Branch</g:header><mapper.style:BranchStyleWidget ui:field="branchWidget"/></g:tab>
+      <g:tab><g:header>Label</g:header><mapper.style:LabelStyleWidget ui:field="labelWidget"/></g:tab>
+      <g:tab><g:header>Glyph</g:header><mapper.style:GlyphStyleWidget ui:field="glyphWidget"/></g:tab>
+    </g:TabLayoutPanel>
+  </g:HTMLPanel>
+</ui:UiBinder> 
