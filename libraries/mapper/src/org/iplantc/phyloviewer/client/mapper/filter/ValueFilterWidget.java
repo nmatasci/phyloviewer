@@ -12,21 +12,20 @@ import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.ValueBox;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ValueFilterWidget<I> extends Composite
 {
 
-	private static NodeFilterWidgetUiBinder uiBinder = GWT.create(NodeFilterWidgetUiBinder.class);
+	private static ValueFilterWidgetUiBinder uiBinder = GWT.create(ValueFilterWidgetUiBinder.class);
 
 	@SuppressWarnings("rawtypes")
-	interface NodeFilterWidgetUiBinder extends UiBinder<Widget,ValueFilterWidget>
+	interface ValueFilterWidgetUiBinder extends UiBinder<Widget,ValueFilterWidget>
 	{
 	}
 	
-	@UiField ValueBox<ValueFilter<I>> filterField;
+	@UiField ValueListBox<ValueFilter<I>> filterField;
 	@UiField TextBox filterValueField;
 	
 	private List<ValueFilter<I>> filters;
@@ -35,6 +34,10 @@ public class ValueFilterWidget<I> extends Composite
 				@Override
 				public String render(ValueFilter<I> filter)
 				{
+					if (filter == null) {
+						return "no filter";
+					}
+					
 					return filter.getDescription();
 				}
 			};
@@ -45,6 +48,9 @@ public class ValueFilterWidget<I> extends Composite
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
+	/**
+	 * @return the currently selected value filter.  Default value is null, "no filter" is selected.
+	 */
 	public ValueFilter<I> getSelectedFilter()
 	{
 		return filterField.getValue();

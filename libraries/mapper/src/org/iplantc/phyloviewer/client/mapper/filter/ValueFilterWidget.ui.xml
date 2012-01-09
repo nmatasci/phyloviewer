@@ -11,7 +11,7 @@
         <g:cell>Filter Value (optional)</g:cell>
       </g:row>
       <g:row>
-        <g:customCell><g:ListBox width="120px" ui:field="filterField" /></g:customCell>
+        <g:customCell><g:ValueListBox width="120px" ui:field="filterField" /></g:customCell>
         <g:customCell><g:TextBox visibleLength="16" ui:field="filterValueField" /></g:customCell>
       </g:row>
     </g:Grid>
