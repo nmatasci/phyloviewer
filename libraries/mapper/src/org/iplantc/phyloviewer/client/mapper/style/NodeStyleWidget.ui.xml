@@ -21,11 +21,13 @@
       <g:row>
         <g:cell>Shape</g:cell>
         <g:customCell>
-          <g:ListBox ui:field="shapeField">
+          <g:ValueListBox ui:field="shapeField" />
+        
+          <!-- <g:ListBox ui:field="shapeField">
             <g:item></g:item>
             <g:item>CIRCLE</g:item>
             <g:item>SQUARE</g:item>
-          </g:ListBox>
+          </g:ListBox> -->
         </g:customCell>
       </g:row>
     </g:Grid>
