@@ -38,13 +38,12 @@ public class ValueFilterWidget<I> extends Composite
 						return "no filter";
 					}
 					
-					return filter.getDescription();
+					return filter.toString();
 				}
 			};
 
-	public ValueFilterWidget(List<ValueFilter<I>> filters)
+	public ValueFilterWidget()
 	{
-		this.filters = filters;
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -61,9 +60,20 @@ public class ValueFilterWidget<I> extends Composite
 		return this.filters;
 	}
 	
+	public void setFilters(List<ValueFilter<I>> filters)
+	{
+		this.filters = filters;
+		filterField.setAcceptableValues(getFilters());
+	}
+	
 	public Renderer<ValueFilter<I>> getFilterRenderer()
 	{
 		return this.filterRenderer;
+	}
+	
+	public void reset()
+	{
+		filterField.setValue(null);
 	}
 	
 	@UiFactory ValueListBox<ValueFilter<I>> createFilterField()
