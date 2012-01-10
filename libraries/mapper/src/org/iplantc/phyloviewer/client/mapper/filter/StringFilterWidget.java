@@ -67,9 +67,13 @@ public class StringFilterWidget extends ValueFilterWidget<String>
 	
 	public ValueFilter<String> getSelectedFilter()
 	{
-		String targetValue = filterValueField.getValue();
 		ValueFilter<String> filter = filterField.getValue();
-		((StringFilter)filter).setTargetValue(targetValue);
+		
+		if (filter != null)
+		{
+			String targetValue = filterValueField.getValue();
+			((StringFilter)filter).setTargetValue(targetValue);
+		}
 		
 		return filter;
 	}

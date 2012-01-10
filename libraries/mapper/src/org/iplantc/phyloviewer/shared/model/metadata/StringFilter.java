@@ -36,7 +36,7 @@ public abstract class StringFilter implements ValueFilter<String>
 		@Override
 		public Boolean get(String value)
 		{
-			return value.contains(targetValue);
+			return targetValue == null ? false : value.contains(targetValue);
 		}
 	}
 	
