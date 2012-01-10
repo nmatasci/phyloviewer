@@ -61,6 +61,7 @@ public class StringFilterWidget extends ValueFilterWidget<String>
 
 	public void reset()
 	{
+		filterField.setValue(null);
 		filterField.setAcceptableValues(createFilters());
 		filterValueField.setText("");
 	}
