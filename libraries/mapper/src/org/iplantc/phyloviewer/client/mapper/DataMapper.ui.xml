@@ -1,7 +1,9 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:mapper='urn:import:org.iplantc.phyloviewer.client.mapper'>
+  xmlns:mapper='urn:import:org.iplantc.phyloviewer.client.mapper'
+  xmlns:mapper.filter='urn:import:org.iplantc.phyloviewer.client.mapper.filter'
+  xmlns:mapper.style='urn:import:org.iplantc.phyloviewer.client.mapper.style'>
   <ui:style>
   
   </ui:style>
@@ -11,25 +13,24 @@
         <g:cell>Property</g:cell>
         <g:cell>Datatype</g:cell>
         <g:cell>Data Range</g:cell>
-        <g:cell>Filter Type (optional)</g:cell>
-        <g:cell>Filter Value (optional)</g:cell>
       </g:row>
       <g:row>
         <g:customCell><mapper:PropertyListBox width="120px"  ui:field="propertiesField" /></g:customCell>
         <g:customCell><g:TextBox readOnly="true" visibleLength="16" ui:field="datatypeField" /></g:customCell>
         <g:customCell><g:TextBox ui:field="rangeField" visibleLength="16" readOnly="true" /></g:customCell>
-        <g:customCell><g:ListBox width="120px" ui:field="filterField" /></g:customCell>
-        <g:customCell><g:TextBox visibleLength="16" ui:field="filterValueField" /></g:customCell>
       </g:row>
     </g:Grid>
+    <mapper.filter:BooleanFilterWidget ui:field="booleanFilterWidget"/>
+    <mapper.filter:StringFilterWidget ui:field="stringFilterWidget"/>
+    <mapper.filter:NumberFilterWidget ui:field="numberFilterWidget"/>
     <g:Grid>
       <g:row>
         <g:customCell><g:Label ui:field="minOrOnlyStyleLabel">Interpolated: Min Style</g:Label></g:customCell>
         <g:customCell><g:Label ui:field="maxStyleLabel">Interpolated: Max Style</g:Label></g:customCell>
       </g:row>
       <g:row>
-        <g:customCell><mapper:StyleWidget ui:field="styleWidget1" /></g:customCell>
-        <g:customCell><mapper:StyleWidget ui:field="styleWidget2" /></g:customCell>
+        <g:customCell><mapper.style:StyleWidget ui:field="styleWidget1" /></g:customCell>
+        <g:customCell><mapper.style:StyleWidget ui:field="styleWidget2" /></g:customCell>
       </g:row>
     </g:Grid>
     <g:Button ui:field="saveButton">Save</g:Button>

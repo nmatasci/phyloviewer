@@ -1,0 +1,21 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <ui:style>
+    
+  </ui:style>
+  <g:HTMLPanel>
+    <g:Grid>
+      <g:row>
+        <g:cell>Filter Type (optional)</g:cell>
+        <g:cell>Min. Value (optional)</g:cell>
+        <g:cell>Max. Value (optional)</g:cell>
+      </g:row>
+      <g:row>
+        <g:customCell><g:ValueListBox width="120px" ui:field="filterField"/></g:customCell>
+        <g:customCell><g:DoubleBox visibleLength="16" ui:field="minField"/></g:customCell>
+        <g:customCell><g:DoubleBox visibleLength="16" ui:field="maxField"/></g:customCell>
+      </g:row>
+    </g:Grid>
+  </g:HTMLPanel>
+</ui:UiBinder> 

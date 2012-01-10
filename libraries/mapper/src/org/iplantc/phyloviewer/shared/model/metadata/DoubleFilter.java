@@ -1,14 +1,20 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
-public class NumberFilter implements ValueFilter<Number>
+public class DoubleFilter implements ValueFilter<Double>
 {
-	private double minValue = -Double.MAX_VALUE;
-	private double maxValue = Double.MAX_VALUE;
+	private double minValue;
+	private double maxValue;
 	
-	public NumberFilter(double minValue, double maxValue)
+	public DoubleFilter(double minValue, double maxValue)
 	{
 		this.minValue = minValue;
 		this.maxValue = maxValue;
+	}
+	
+	public DoubleFilter()
+	{
+		minValue = -Double.MAX_VALUE;
+		maxValue = Double.MAX_VALUE;
 	}
 	
 	public double getMinValue()
@@ -45,7 +51,7 @@ public class NumberFilter implements ValueFilter<Number>
 	}
 
 	@Override
-	public Boolean get(Number value)
+	public Boolean get(Double value)
 	{
 		int minComp = Double.compare(minValue, value.doubleValue());
 		int maxComp = Double.compare(maxValue, value.doubleValue());

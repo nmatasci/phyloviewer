@@ -1,15 +1,26 @@
 package org.iplantc.phyloviewer.client.mapper;
 
-import org.iplantc.phyloviewer.client.mapper.mocks.MockAnnotationFilter;
+import org.iplantc.phyloviewer.client.mapper.filter.BooleanFilterWidget;
+import org.iplantc.phyloviewer.client.mapper.filter.NumberFilterWidget;
+import org.iplantc.phyloviewer.client.mapper.filter.StringFilterWidget;
+import org.iplantc.phyloviewer.client.mapper.filter.ValueFilterWidget;
+import org.iplantc.phyloviewer.client.mapper.style.StyleWidget;
+import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.metadata.AllPassFilter;
+import org.iplantc.phyloviewer.shared.model.metadata.AnnotationEvaluator;
+import org.iplantc.phyloviewer.shared.model.metadata.BooleanEvaluator;
+import org.iplantc.phyloviewer.shared.model.metadata.DoubleEvaluator;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataInfo;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
+import org.iplantc.phyloviewer.shared.model.metadata.NodeValueFilter;
 import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataProperty;
-import org.iplantc.phyloviewer.shared.model.metadata.ValueForNode;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueFilter;
+import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 import org.iplantc.phyloviewer.shared.render.style.ChainedStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.FilteredStyleMapImpl;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
+import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -21,7 +32,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,8 +46,9 @@ public class DataMapper extends Composite
 	@UiField PropertyListBox propertiesField;
 	@UiField TextBox datatypeField;
 	@UiField TextBox rangeField;
-	@UiField ListBox filterField;
-	@UiField TextBox filterValueField;
+	@UiField BooleanFilterWidget booleanFilterWidget;
+	@UiField StringFilterWidget stringFilterWidget;
+	@UiField NumberFilterWidget numberFilterWidget;
 	@UiField Label minOrOnlyStyleLabel;
 	@UiField Label maxStyleLabel;
 	@UiField StyleWidget styleWidget1;
@@ -58,6 +69,8 @@ public class DataMapper extends Composite
 		minOrOnlyStyleLabel.setVisible(false);
 		maxStyleLabel.setVisible(false);
 		styleWidget2.setVisible(false);
+		
+		hideFilterWidgets();
 	}
 	
 	@UiHandler("propertiesField")
@@ -73,23 +86,9 @@ public class DataMapper extends Composite
 	@UiHandler("saveButton")
 	void save(ClickEvent event)
 	{
-		ValueForNode<Boolean> filter = null;
-		MetadataProperty property = propertiesField.getValue();
-		if (property != null)
-		{
-			MockAnnotationFilter aFilter = new MockAnnotationFilter();
-			aFilter.propertyName = property.getName();
-			aFilter.description = filterField.getItemText(filterField.getSelectedIndex());
-			aFilter.value = filterValueField.getText();
-			filter = aFilter;
-		}
-		else 
-		{
-			filter = new AllPassFilter();
-		}
-		
+		ValueMap<INode, Boolean> nodeFilter = createNodeFilter();		
 		IStyle style = styleWidget1.getStyle();
-		FilteredStyleMap map = new FilteredStyleMapImpl(filter, style);
+		FilteredStyleMap map = new FilteredStyleMapImpl(nodeFilter, style);
 		
 		//TODO check if interpolated style (numeric datatype and styleWidget2 has values set) and, if so, make a GradientStyleMap
 		
@@ -98,41 +97,116 @@ public class DataMapper extends Composite
 		//display saved values
 		Widget savedMapping = new SavedMapperView(map);
 		savedPanel.add(savedMapping);
-		this.clear();
+		this.clearInputs();
 	}
 	
-	public void clear()
+	public IStyleMap getStyleMap()
 	{
-		filterValueField.setText("");
+		return styles;
+	}
+	
+	private ValueMap<INode, Boolean> createNodeFilter()
+	{
+		ValueMap<INode, Boolean> nodeFilter = new AllPassFilter();
+		
+		MetadataProperty property = propertiesField.getValue();
+		
+		if (property != null)
+		{
+			Class<?> datatype = property.getDatatype();
+			String annotationKey = property.getName();
+			
+			if (datatype.equals(Boolean.class))
+			{
+				ValueFilter<Boolean> valueFilter = booleanFilterWidget.getSelectedFilter();
+				if (valueFilter != null)
+				{
+					BooleanEvaluator evaluator = new BooleanEvaluator(annotationKey);
+					nodeFilter = new NodeValueFilter<Boolean>(evaluator, valueFilter);
+				}
+			}
+			else if (datatype.equals(Number.class))
+			{
+				ValueFilter<Double> valueFilter = numberFilterWidget.getSelectedFilter();
+				if (valueFilter != null)
+				{
+					DoubleEvaluator evaluator = new DoubleEvaluator(annotationKey);
+					nodeFilter = new NodeValueFilter<Double>(evaluator, valueFilter);
+				}
+			}
+			else if (datatype.equals(String.class))
+			{
+				ValueFilter<String> valueFilter = stringFilterWidget.getSelectedFilter();
+				
+				ValueMap<INode, String> evaluator = new AnnotationEvaluator<String>(annotationKey)
+				{
+					@Override
+					public String parseValue(Object annotationValue)
+					{
+						return annotationValue.toString();
+					}
+					
+				};
+				
+				if (valueFilter != null)
+				{
+					nodeFilter = new NodeValueFilter<String>(evaluator, valueFilter);
+				}
+			}
+		}
+		
+		return nodeFilter;
+	}
+	
+	private void clearInputs()
+	{
+		resetFilterWidgets();
 		styleWidget1.clear();
 		styleWidget2.clear();
+	}
+	
+	private void resetFilterWidgets()
+	{
+		booleanFilterWidget.reset();
+		stringFilterWidget.reset();
+		numberFilterWidget.reset();
 	}
 
 	private void selectProperty(MetadataProperty property)
 	{
+		//show the appropriate widgets for the selected property
+		
 		Class<?> datatype = property.getDatatype();
 		datatypeField.setValue(datatype.toString());
 		
-		if (property instanceof NumericMetadataProperty)
+		if(property instanceof NumericMetadataProperty)
 		{
-			showValueRange((NumericMetadataProperty) property);
-			minOrOnlyStyleLabel.setVisible(true);
-			maxStyleLabel.setVisible(true);
-			styleWidget2.setVisible(true);
+			showValueRange((NumericMetadataProperty)property);
+			//TODO setVisible the gradient style widgets: minOrOnlyStyleLabel, maxStyleLabel, styleWidget2
+		}
+
+		hideFilterWidgets();
+		ValueFilterWidget<?> currentFilterWidget = getFilterWidgetFor(datatype);
+		currentFilterWidget.setVisible(true);
+	}
+	
+	private ValueFilterWidget<?> getFilterWidgetFor(Class<?> datatype)
+	{
+		if (datatype.equals(Boolean.class))
+		{
+			return booleanFilterWidget;
+		}
+		else if (datatype.equals(Number.class))
+		{
+			return numberFilterWidget;
+		}
+		else if (datatype.equals(String.class))
+		{
+			return stringFilterWidget;
 		}
 		else
 		{
-			rangeField.setText(null);
-			minOrOnlyStyleLabel.setVisible(false);
-			maxStyleLabel.setVisible(false);
-			styleWidget2.setVisible(false);
-		}
-		
-		String[] filters = getFilters(datatype);
-		filterField.clear();
-		for (String text : filters)
-		{
-			filterField.addItem(text);
+			return null;
 		}
 	}
 	
@@ -142,28 +216,11 @@ public class DataMapper extends Composite
 		String max = NumberFormat.getFormat("0.####").format(property.getMax());
 		rangeField.setText(min + " to " + max);
 	}
-
-	private String[] getFilters(Class<?> datatype)
+	
+	private void hideFilterWidgets()
 	{
-		//hmm... can't use isAssignableFrom in GWT client code?  TODO: Maybe change MetadataProperty.getDatatype() to return an enum value?
-		
-		String name = datatype.getName();
-		if (name.equals("java.lang.String"))
-		{
-			return new String[] {"", "equals", "does not equal", "contains", "does not contain", "starts with", "ends with"};
-		}
-		
-		else if (datatype.getName().equals("java.lang.Number") || datatype.getName().equals("java.lang.Integer") || datatype.getName().equals("java.lang.Double"))
-		{
-			return new String[] {"", "equals", "greater than", "less than"};
-		}
-		else if (datatype.getName().equals("java.lang.Boolean"))
-		{
-			return new String[] {"", "is true", "is false"};
-		}
-		else
-		{
-			return new String[0];
-		}
+		booleanFilterWidget.setVisible(false);
+		stringFilterWidget.setVisible(false);
+		numberFilterWidget.setVisible(false);
 	}
 }
