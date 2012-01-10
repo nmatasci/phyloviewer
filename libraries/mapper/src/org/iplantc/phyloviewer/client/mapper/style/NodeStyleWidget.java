@@ -36,7 +36,12 @@ public class NodeStyleWidget extends Composite
 			size = Double.NaN;
 		}
 
-		Shape shape = Shape.valueOf(shapeField.getItemText(shapeField.getSelectedIndex()));
+		Shape shape = null;
+		String shapeText = shapeField.getItemText(shapeField.getSelectedIndex());
+		if (shapeText != null && !shapeText.isEmpty())
+		{
+			shape = Shape.valueOf(shapeText);
+		}
 		
 		NodeStyle style = new NodeStyle(color, size, shape);
 		return style;
