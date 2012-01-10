@@ -44,8 +44,8 @@ public class MapperWidgetTest implements EntryPoint
 	{
 		ArrayList<MetadataProperty> properties = new ArrayList<MetadataProperty>();
 		properties.add(new MetadataPropertyImpl("someStringProperty", String.class));
-		properties.add(new NumericMetadataPropertyImpl("someIntegerProperty", Integer.class, 0, 42));
-		properties.add(new NumericMetadataPropertyImpl("someDecimalProperty", Double.class, 0.01, 0.042));
+		properties.add(new NumericMetadataPropertyImpl("someIntegerProperty", Number.class, 0, 42));
+		properties.add(new NumericMetadataPropertyImpl("someDecimalProperty", Number.class, 0.01, 0.042));
 		properties.add(new MetadataPropertyImpl("someBooleanProperty", Boolean.class));
 
 		return properties;
