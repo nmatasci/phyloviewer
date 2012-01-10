@@ -44,7 +44,7 @@ public class DoubleFilter implements ValueFilter<Double>
 		{
 			String minString = minValue == -Double.MAX_VALUE ? "-Inf" : String.valueOf(minValue);
 			String maxString = maxValue == Double.MAX_VALUE ? "Inf" : String.valueOf(maxValue);
-			desc += minString + " and " + maxString; 
+			desc += " " + minString + " and " + maxString; 
 		}
 		
 		return desc;

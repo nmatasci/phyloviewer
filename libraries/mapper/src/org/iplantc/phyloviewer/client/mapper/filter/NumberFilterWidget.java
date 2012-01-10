@@ -55,6 +55,7 @@ public class NumberFilterWidget extends ValueFilterWidget<Double>
 	@Override
 	public void reset()
 	{
+		filterField.setValue(null);
 		ArrayList<DoubleFilter> filters = new ArrayList<DoubleFilter>();
 		filters.add(new DoubleFilter());
 		filterField.setAcceptableValues(filters);
