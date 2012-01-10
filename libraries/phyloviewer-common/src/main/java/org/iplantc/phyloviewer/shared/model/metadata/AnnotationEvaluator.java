@@ -40,4 +40,10 @@ public abstract class AnnotationEvaluator<T> implements ValueMap<INode, T>
 	}
 	
 	public abstract T parseValue(Object annotationValue);
+	
+	@Override
+	public String toString()
+	{
+		return annotationKey;
+	}
 }
