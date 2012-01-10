@@ -1,60 +1,24 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public abstract class BooleanFilter implements ValueFilter<Boolean>
+public class BooleanFilter implements ValueFilter<Boolean>
 {
-	public static final BooleanFilter ALL_PASS = new BooleanFilter()
-	{
-		@Override
-		public Boolean get(Boolean value)
-		{
-			return true;
-		}
-
-		@Override
-		public String getDescription()
-		{
-			return "All";
-		}
-	};
+	public final boolean targetValue;
 	
-	public static final BooleanFilter TRUE = new BooleanFilter()
+	public BooleanFilter(boolean targetValue)
 	{
-		@Override
-		public Boolean get(Boolean value)
-		{
-			return value;
-		}
-
-		@Override
-		public String getDescription()
-		{
-			return "True";
-		}
-	};
+		this.targetValue = targetValue;
+	}
 	
-	public static final BooleanFilter FALSE = new BooleanFilter()
+	@Override
+	public Boolean get(Boolean value)
 	{
-		@Override
-		public Boolean get(Boolean value)
-		{
-			return !value;
-		}
-
-		@Override
-		public String getDescription()
-		{
-			return "False";
-		}
-	};
+		return targetValue == value;
+	}
 	
-	public static List<ValueFilter<Boolean>> allFilters;
-	static {
-		allFilters = new ArrayList<ValueFilter<Boolean>>();
-		allFilters.add(ALL_PASS);
-		allFilters.add(TRUE);
-		allFilters.add(FALSE);
+	@Override
+	public String toString()
+	{
+		return String.valueOf(targetValue);
 	}
 }
