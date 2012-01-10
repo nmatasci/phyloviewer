@@ -8,6 +8,7 @@ import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -19,13 +20,17 @@ public class SavedMapperView extends Composite
 	@UiField HorizontalPanel panel;
 	@UiField InlineLabel filterField;
 	@UiField InlineLabel styleField;
+	@UiField(provided=true) Button removeButton;
+	private FilteredStyleMap styleMap;
 
 	interface SavedMapperViewUiBinder extends UiBinder<Widget,SavedMapperView>
 	{
 	}
 
-	public SavedMapperView(FilteredStyleMap map)
+	public SavedMapperView(FilteredStyleMap map, Button removeButton)
 	{
+		this.styleMap = map;
+		this.removeButton = removeButton;
 		initWidget(uiBinder.createAndBindUi(this));
 		ValueMap<INode, Boolean> filter = map.getFilter();
 		filterField.setText(filter.toString());
@@ -34,4 +39,8 @@ public class SavedMapperView extends Composite
 		styleField.setText(style.toString());
 	}
 
+	public FilteredStyleMap getStyleMap()
+	{
+		return styleMap;
+	}
 }

@@ -11,6 +11,7 @@
   	<g:HorizontalPanel ui:field="panel" addStyleNames='{style.separated}'>
   		<g:InlineLabel ui:field="filterField" />
   		<g:InlineLabel ui:field="styleField"/>
+        <g:Button ui:field="removeButton"/>
   	</g:HorizontalPanel>
   </g:HTMLPanel>
 </ui:UiBinder> 

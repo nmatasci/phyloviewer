@@ -24,6 +24,7 @@ import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -95,9 +96,25 @@ public class DataMapper extends Composite
 		this.styles.addStyleMap(map);
 		
 		//display saved values
-		Widget savedMapping = new SavedMapperView(map);
+		Button removeButton = new Button("remove");
+		final SavedMapperView savedMapping = new SavedMapperView(map, removeButton);
+		removeButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				DataMapper.this.remove(savedMapping);
+			}
+		});
+		
 		savedPanel.add(savedMapping);
 		this.clearInputs();
+	}
+	
+	public void remove(SavedMapperView savedMapper)
+	{
+		FilteredStyleMap styleMap = savedMapper.getStyleMap();
+		this.styles.removeStyleMap(styleMap);
+		savedPanel.remove(savedMapper);
 	}
 	
 	public IStyleMap getStyleMap()
