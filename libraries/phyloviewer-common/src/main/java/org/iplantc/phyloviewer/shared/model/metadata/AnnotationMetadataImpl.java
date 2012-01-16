@@ -1,12 +1,12 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
 
-public class MetadataPropertyImpl implements MetadataProperty
+public class AnnotationMetadataImpl implements AnnotationMetadata
 {
 	private String name;
 	private Class<?> datatype;
 	
-	public MetadataPropertyImpl(String name, Class<?> datatype)
+	public AnnotationMetadataImpl(String name, Class<?> datatype)
 	{
 		this.name = name;
 		this.datatype = datatype;

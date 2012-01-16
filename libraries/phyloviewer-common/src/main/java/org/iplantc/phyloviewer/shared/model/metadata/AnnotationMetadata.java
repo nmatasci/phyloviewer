@@ -1,6 +1,6 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
-public interface MetadataProperty
+public interface AnnotationMetadata
 {
 	public String getName();
 	

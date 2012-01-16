@@ -3,9 +3,9 @@ package org.iplantc.phyloviewer.client.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
-import org.iplantc.phyloviewer.shared.model.metadata.MetadataPropertyImpl;
-import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataPropertyImpl;
+import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadata;
+import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadataImpl;
+import org.iplantc.phyloviewer.shared.model.metadata.NumericAnnotationMetadataImpl;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -22,13 +22,13 @@ public class MapperWidgetTest implements EntryPoint
 		RootLayoutPanel.get().add(mapper);
 	}
 
-	private List<MetadataProperty> getProperties()
+	private List<AnnotationMetadata> getProperties()
 	{
-		ArrayList<MetadataProperty> properties = new ArrayList<MetadataProperty>();
-		properties.add(new MetadataPropertyImpl("someStringProperty", String.class));
-		properties.add(new NumericMetadataPropertyImpl("someIntegerProperty", Number.class, 0, 42));
-		properties.add(new NumericMetadataPropertyImpl("someDecimalProperty", Number.class, 0.01, 0.042));
-		properties.add(new MetadataPropertyImpl("someBooleanProperty", Boolean.class));
+		ArrayList<AnnotationMetadata> properties = new ArrayList<AnnotationMetadata>();
+		properties.add(new AnnotationMetadataImpl("someStringProperty", String.class));
+		properties.add(new NumericAnnotationMetadataImpl("someIntegerProperty", Number.class, 0, 42));
+		properties.add(new NumericAnnotationMetadataImpl("someDecimalProperty", Number.class, 0.01, 0.042));
+		properties.add(new AnnotationMetadataImpl("someBooleanProperty", Boolean.class));
 
 		return properties;
 	}

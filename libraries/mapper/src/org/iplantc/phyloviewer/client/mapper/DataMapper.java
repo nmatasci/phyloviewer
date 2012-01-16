@@ -12,9 +12,9 @@ import org.iplantc.phyloviewer.shared.model.metadata.AllPassFilter;
 import org.iplantc.phyloviewer.shared.model.metadata.AnnotationEvaluator;
 import org.iplantc.phyloviewer.shared.model.metadata.BooleanEvaluator;
 import org.iplantc.phyloviewer.shared.model.metadata.DoubleEvaluator;
-import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
+import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadata;
 import org.iplantc.phyloviewer.shared.model.metadata.NodeValueFilter;
-import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataProperty;
+import org.iplantc.phyloviewer.shared.model.metadata.NumericAnnotationMetadata;
 import org.iplantc.phyloviewer.shared.model.metadata.ValueFilter;
 import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 import org.iplantc.phyloviewer.shared.render.style.ChainedStyleMap;
@@ -57,10 +57,10 @@ public class DataMapper extends Composite
 	@UiField Button saveButton;
 	@UiField Panel savedPanel;
 	
-	private List<MetadataProperty> properties;
+	private List<AnnotationMetadata> properties;
 	private ChainedStyleMap styles;
 
-	public DataMapper(List<MetadataProperty> properties)
+	public DataMapper(List<AnnotationMetadata> properties)
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		this.properties = properties;
@@ -80,9 +80,9 @@ public class DataMapper extends Composite
 	}
 	
 	@UiHandler("propertiesField")
-	void onValueChange(ValueChangeEvent<MetadataProperty> event)
+	void onValueChange(ValueChangeEvent<AnnotationMetadata> event)
 	{
-		MetadataProperty value = event.getValue();
+		AnnotationMetadata value = event.getValue();
 		if (value != null)
 		{
 			selectProperty(value);
@@ -126,7 +126,7 @@ public class DataMapper extends Composite
 	{
 		ValueMap<INode, Boolean> nodeFilter = new AllPassFilter();
 		
-		MetadataProperty property = propertiesField.getValue();
+		AnnotationMetadata property = propertiesField.getValue();
 		
 		if (property != null)
 		{
@@ -189,16 +189,16 @@ public class DataMapper extends Composite
 		numberFilterWidget.reset();
 	}
 
-	private void selectProperty(MetadataProperty property)
+	private void selectProperty(AnnotationMetadata property)
 	{
 		//show the appropriate widgets for the selected property
 		
 		Class<?> datatype = property.getDatatype();
 		datatypeField.setValue(datatype.toString());
 		
-		if(property instanceof NumericMetadataProperty)
+		if(property instanceof NumericAnnotationMetadata)
 		{
-			showValueRange((NumericMetadataProperty)property);
+			showValueRange((NumericAnnotationMetadata)property);
 			//TODO setVisible the gradient style widgets: minOrOnlyStyleLabel, maxStyleLabel, styleWidget2
 		}
 
@@ -227,7 +227,7 @@ public class DataMapper extends Composite
 		}
 	}
 	
-	private void showValueRange(NumericMetadataProperty property)
+	private void showValueRange(NumericAnnotationMetadata property)
 	{
 		String min = NumberFormat.getFormat("0.####").format(property.getMin());
 		String max = NumberFormat.getFormat("0.####").format(property.getMax());

@@ -2,18 +2,18 @@ package org.iplantc.phyloviewer.client.mapper;
 
 import java.io.IOException;
 
-import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
+import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadata;
 
 import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.ValueListBox;
 
-public class PropertyListBox extends ValueListBox<MetadataProperty>
+public class PropertyListBox extends ValueListBox<AnnotationMetadata>
 {
-	static final Renderer<MetadataProperty> renderer = new Renderer<MetadataProperty>()
+	static final Renderer<AnnotationMetadata> renderer = new Renderer<AnnotationMetadata>()
 	{
 
 		@Override
-		public String render(MetadataProperty property)
+		public String render(AnnotationMetadata property)
 		{
 			if(property == null)
 			{
@@ -24,7 +24,7 @@ public class PropertyListBox extends ValueListBox<MetadataProperty>
 		}
 
 		@Override
-		public void render(MetadataProperty property, Appendable appendable) throws IOException
+		public void render(AnnotationMetadata property, Appendable appendable) throws IOException
 		{
 			appendable.append(property.getName());
 		}
