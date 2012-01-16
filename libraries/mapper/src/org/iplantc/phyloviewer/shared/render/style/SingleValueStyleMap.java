@@ -1,4 +1,4 @@
-package org.iplantc.phyloviewer.client.mapper.mocks;
+package org.iplantc.phyloviewer.shared.render.style;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;

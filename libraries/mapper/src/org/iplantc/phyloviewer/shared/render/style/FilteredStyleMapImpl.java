@@ -1,6 +1,5 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-import org.iplantc.phyloviewer.client.mapper.mocks.SingleValueStyleMap;
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.metadata.ValueMap;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;

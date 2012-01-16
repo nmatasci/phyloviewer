@@ -40,7 +40,6 @@ import com.google.gwt.user.client.ui.Widget;
 public class DataMapper extends Composite
 {
 	//TODO: add a checkbox to show/hide the second style widget.  When it is shown, keep the same tab showing on both StyleWidgets, and add some validation to check if both widgets have a value for any edited fields.
-	//TODO: add remove or undo button for saved styles
 	
 	interface DataMapperUiBinder extends UiBinder<Widget,DataMapper> {}
 	private static DataMapperUiBinder uiBinder = GWT.create(DataMapperUiBinder.class);
@@ -72,6 +71,11 @@ public class DataMapper extends Composite
 		styleWidget2.setVisible(false);
 		
 		hideFilterWidgets();
+	}
+	
+	public IStyleMap getStyleMap()
+	{
+		return styles;
 	}
 	
 	@UiHandler("propertiesField")
@@ -110,16 +114,11 @@ public class DataMapper extends Composite
 		this.clearInputs();
 	}
 	
-	public void remove(SavedMapperView savedMapper)
+	private void remove(SavedMapperView savedMapper)
 	{
 		FilteredStyleMap styleMap = savedMapper.getStyleMap();
 		this.styles.removeStyleMap(styleMap);
 		savedPanel.remove(savedMapper);
-	}
-	
-	public IStyleMap getStyleMap()
-	{
-		return styles;
 	}
 	
 	private ValueMap<INode, Boolean> createNodeFilter()

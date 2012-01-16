@@ -1,7 +1,6 @@
 package org.iplantc.phyloviewer.viewer.server.persistence;
 
 import javax.persistence.Persistence;
-import javax.persistence.PersistenceUtil;
 
 import net.sf.beanlib.PropertyInfo;
 import net.sf.beanlib.spi.BeanTransformerSpi;
