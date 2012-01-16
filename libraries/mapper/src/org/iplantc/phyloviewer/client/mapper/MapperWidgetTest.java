@@ -3,7 +3,6 @@ package org.iplantc.phyloviewer.client.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.iplantc.phyloviewer.shared.model.metadata.MetadataInfo;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataPropertyImpl;
 import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataPropertyImpl;
@@ -19,25 +18,8 @@ public class MapperWidgetTest implements EntryPoint
 {
 	public void onModuleLoad()
 	{
-		MetadataInfo mockInfo = getMetadataInfo();
-		
-		Widget mapper = new DataMapper(mockInfo);
+		Widget mapper = new DataMapper(getProperties());
 		RootLayoutPanel.get().add(mapper);
-	}
-
-	private MetadataInfo getMetadataInfo()
-	{
-		final List<MetadataProperty> properties = getProperties();
-		
-		MetadataInfo mockInfo = new MetadataInfo()
-		{
-			@Override
-			public List<MetadataProperty> getProperties()
-			{
-				return properties;
-			}
-		};
-		return mockInfo;
 	}
 
 	private List<MetadataProperty> getProperties()

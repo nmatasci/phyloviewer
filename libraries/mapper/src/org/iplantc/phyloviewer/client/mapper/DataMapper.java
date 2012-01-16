@@ -1,5 +1,7 @@
 package org.iplantc.phyloviewer.client.mapper;
 
+import java.util.List;
+
 import org.iplantc.phyloviewer.client.mapper.filter.BooleanFilterWidget;
 import org.iplantc.phyloviewer.client.mapper.filter.NumberFilterWidget;
 import org.iplantc.phyloviewer.client.mapper.filter.StringFilterWidget;
@@ -10,7 +12,6 @@ import org.iplantc.phyloviewer.shared.model.metadata.AllPassFilter;
 import org.iplantc.phyloviewer.shared.model.metadata.AnnotationEvaluator;
 import org.iplantc.phyloviewer.shared.model.metadata.BooleanEvaluator;
 import org.iplantc.phyloviewer.shared.model.metadata.DoubleEvaluator;
-import org.iplantc.phyloviewer.shared.model.metadata.MetadataInfo;
 import org.iplantc.phyloviewer.shared.model.metadata.MetadataProperty;
 import org.iplantc.phyloviewer.shared.model.metadata.NodeValueFilter;
 import org.iplantc.phyloviewer.shared.model.metadata.NumericMetadataProperty;
@@ -56,16 +57,16 @@ public class DataMapper extends Composite
 	@UiField Button saveButton;
 	@UiField Panel savedPanel;
 	
-	private MetadataInfo info;
+	private List<MetadataProperty> properties;
 	private ChainedStyleMap styles;
 
-	public DataMapper(MetadataInfo info)
+	public DataMapper(List<MetadataProperty> properties)
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		this.info = info;
+		this.properties = properties;
 		this.styles = new ChainedStyleMap();
 		
-		propertiesField.setAcceptableValues(this.info.getProperties());
+		propertiesField.setAcceptableValues(this.properties);
 		minOrOnlyStyleLabel.setVisible(false);
 		maxStyleLabel.setVisible(false);
 		styleWidget2.setVisible(false);
