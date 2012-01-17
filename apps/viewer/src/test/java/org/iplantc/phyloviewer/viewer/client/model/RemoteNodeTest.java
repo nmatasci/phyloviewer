@@ -1,8 +1,7 @@
 package org.iplantc.phyloviewer.viewer.client.model;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
+import static org.iplantc.phyloviewer.viewer.client.model.RemoteNode.rn;
+import static org.junit.Assert.assertEquals;
 
 import org.iplantc.phyloviewer.viewer.server.persistence.PersistenceTest;
 import org.junit.Test;
@@ -77,27 +76,5 @@ public class RemoteNodeTest extends PersistenceTest
 		node.setLabel("label");
 		
 		testPersist(node, RemoteNode.class.getMethod("getId"));
-	}
-
-	private RemoteNode rn(String label, Double branchLength, RemoteNode... children) 
-	{
-		RemoteNode node = new RemoteNode();
-
-		if (label != null)
-		{
-			node.setLabel(label);
-		}
-		
-		if(branchLength != null)
-		{
-			node.setBranchLength(branchLength);
-		}
-		
-		if (children != null)
-		{
-			node.setChildren(Arrays.asList(children));
-		}
-		
-		return node;
 	}
 }

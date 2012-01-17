@@ -10,7 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.iplantc.phyloviewer.shared.model.INode;
@@ -61,7 +61,7 @@ public class RemoteTree extends Tree implements Serializable
 		super.setId(id);
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.DETACH}) //many trees (having different user-assigned names, for example) could point at the same root node
+	@OneToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.DETACH})
 	@Override
 	public RemoteNode getRootNode()
 	{

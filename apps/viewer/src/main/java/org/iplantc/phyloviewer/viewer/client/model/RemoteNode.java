@@ -2,6 +2,7 @@ package org.iplantc.phyloviewer.viewer.client.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -242,5 +243,30 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		{
 			return false;
 		}
+	}
+	
+	/**
+	 * Convenience method for building trees in code.  Mostly for testing.
+	 */
+	public static RemoteNode rn(String label, Double branchLength, RemoteNode... children) 
+	{
+		RemoteNode node = new RemoteNode();
+
+		if (label != null)
+		{
+			node.setLabel(label);
+		}
+		
+		if(branchLength != null)
+		{
+			node.setBranchLength(branchLength);
+		}
+		
+		if (children != null)
+		{
+			node.setChildren(Arrays.asList(children));
+		}
+		
+		return node;
 	}
 }
