@@ -8,6 +8,9 @@ import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.model.INode;
 
+/**
+ * Static utility methods to find which nodes in a tree are within a given region.
+ */
 public class IntersectTreeBox 
 {
 	public static Set<INode> intersect(INode node, ILayoutData layout, Box2D range)

@@ -16,6 +16,11 @@ import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.shared.scene.Drawable;
 import org.iplantc.phyloviewer.shared.scene.DrawableContainer;
 
+/**
+ * IntersectTree finds any rendered elements (nodes, branches, labels, etc.) at a given point. The
+ * intersect() runs the algorithm and creates a set of Hit objects for the hits. The nearest Hit can then
+ * be retrieved with getClosestHit().
+ */
 public class IntersectTree
 {
 	public class Hit
@@ -52,6 +57,13 @@ public class IntersectTree
 	private DrawableContainer drawableContainer;
 	private ArrayList<Hit> hitList = new ArrayList<Hit>();
 
+	/**
+	 * Creates a new IntersectTree
+	 * @param document contains the current tree and its layout
+	 * @param drawableContainer a cache of rendered tree elements (Drawables) for the given document
+	 * @param position the target position
+	 * @param pixelSize the maximum distance from the target position to a Drawable that will create a Hit
+	 */
 	public IntersectTree(IDocument document, DrawableContainer drawableContainer, Vector2 position,
 			double pixelSize)
 	{
