@@ -45,6 +45,9 @@ public class LayoutCladogram implements ILayoutData
 	{
 	}
 
+	/**
+	 * Clears any previous layout data and performs a layout on the given tree.
+	 */
 	public void layout(ITree tree)
 	{
 		if(tree == null)
@@ -82,11 +85,21 @@ public class LayoutCladogram implements ILayoutData
 		this.layoutNode(root, 0, 0.0);
 	}
 
+	/**
+	 * Clear any existing layout data and set the capacity to the given numberOfNodes.
+	 */
 	public void init(int numberOfNodes)
 	{
 		storage.init(numberOfNodes);
 	}
 
+	/**
+	 * Recursively lays out a subtree.
+	 * @param node the root node of the subtree
+	 * @param depth the depth of the given node
+	 * @param distanceFromRoot the (branch length weighted) depth of the given node
+	 * @return the height of the given node (max steps to leaf)
+	 */
 	private int layoutNode(INode node, int depth, double distanceFromRoot)
 	{
 		// Create empty bounding box and vector.
@@ -202,11 +215,20 @@ public class LayoutCladogram implements ILayoutData
 		return storage.keySet();
 	}
 
+	/**
+	 * @return true if this layout uses branch length to set parent-child (x-axis) distance
+	 * @see setUseBranchLengths
+	 */
 	public boolean isUseBranchLengths()
 	{
 		return useBranchLengths;
 	}
 
+	/**
+	 * @param useBranchLengths False (default) if this layout should just use unweighted tree topology to
+	 *            set parent-child (x-axis) distance. (All parent child distances will be the same.) 
+	 *            True if this layout should use each node's branch length to set parent-child distance.
+	 */
 	public void setUseBranchLengths(boolean useBranchLengths)
 	{
 		this.useBranchLengths = useBranchLengths;
