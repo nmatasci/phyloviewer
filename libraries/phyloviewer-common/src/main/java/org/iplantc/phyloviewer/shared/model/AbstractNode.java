@@ -3,7 +3,9 @@ package org.iplantc.phyloviewer.shared.model;
 import java.util.List;
 
 /**
- * Some default implementations of INode methods that don't directly access state.
+ * Some default implementations of INode methods that don't directly access state. Expect subtree
+ * aggregate methods (getNumberOfNodes(), getNumberOfLeafNodes(), findMaximumDepthToLeaf(),
+ * findMaximumDistanceToLeaf()), to traverse the entire subtree.
  */
 public abstract class AbstractNode implements INode
 {

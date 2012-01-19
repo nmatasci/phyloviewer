@@ -4,6 +4,9 @@ import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 
+/**
+ * An IDocument includes an ITree, an ILayoutData to position the nodes, and an IStyleMap to style them.
+ */
 public interface IDocument
 {
 	/**

@@ -7,6 +7,9 @@ import org.iplantc.phyloviewer.shared.render.style.IStyle;
 import org.iplantc.phyloviewer.shared.render.style.IStyleMap;
 import org.iplantc.phyloviewer.shared.render.style.StyleById;
 
+/**
+ * A basic implementation of IDocument.
+ */
 public class Document implements IDocument
 {
 	private ITree tree;
@@ -41,6 +44,10 @@ public class Document implements IDocument
 		this.styleMap = styleMap;
 	}
 
+	/**
+	 * A convenience method to get the style for a given node, or the default style if no style is
+	 * defined for it.
+	 */
 	@Override
 	public IStyle getStyle(INode node)
 	{
@@ -77,18 +84,30 @@ public class Document implements IDocument
 		this.layout = layout;
 	}
 
+	/**
+	 * Check if the children of <code>node</code> are ready to be rendered (i.e. both the children and
+	 * their layout are available locally.)
+	 */
 	@Override
 	public boolean checkForData(final INode node)
 	{
+		//Always true for this implementation.  Subclasses may return false while they fetch the necessary data.
 		return true;
 	}
 
+	/**
+	 * @return true if this Document is ready to begin rendering. 
+	 * 		Returns false if the tree or the layout hasn't been set. Subclasses could impose other conditions.
+	 */
 	@Override
 	public boolean isReady()
 	{
 		return this.getTree() != null && this.getLayout() != null;
 	}
 
+	/**
+	 * A convenience method to check if a node has been given branch decorations in the style map.
+	 */
 	@Override
 	public boolean hasBranchDecoration(int nodeId)
 	{

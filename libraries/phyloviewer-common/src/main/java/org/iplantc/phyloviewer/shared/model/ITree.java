@@ -6,6 +6,9 @@
 
 package org.iplantc.phyloviewer.shared.model;
 
+/**
+ * ITree represents a directed acyclic graph composed of INodes, with a single root node.
+ */
 public interface ITree {
 
 	public abstract void setRootNode(INode node);

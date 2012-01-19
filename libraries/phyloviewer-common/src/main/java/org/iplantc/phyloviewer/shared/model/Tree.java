@@ -2,7 +2,9 @@ package org.iplantc.phyloviewer.shared.model;
 
 import java.io.Serializable;
 
-
+/**
+ * A basic implementation of ITree.
+ */
 public class Tree implements ITree, Serializable {
 	private static final long serialVersionUID = 5545157148705536777L;
 	private INode rootNode;

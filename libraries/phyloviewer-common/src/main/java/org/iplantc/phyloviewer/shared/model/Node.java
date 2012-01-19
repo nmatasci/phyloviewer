@@ -3,6 +3,9 @@ package org.iplantc.phyloviewer.shared.model;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * A basic implementation of INode.
+ */
 public class Node extends AbstractNode implements Serializable
 {
 	private static final long serialVersionUID = 3329649649400777449L;
