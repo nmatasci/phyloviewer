@@ -6,6 +6,9 @@
 
 package org.iplantc.phyloviewer.shared.math;
 
+/**
+ * Represents a point in a 3D Cartesian coordinate system.
+ */
 public class Vector3 {
 
 	private double x = 0.0;

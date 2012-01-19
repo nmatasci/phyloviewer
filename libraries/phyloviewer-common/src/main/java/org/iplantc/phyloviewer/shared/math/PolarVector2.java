@@ -2,6 +2,9 @@ package org.iplantc.phyloviewer.shared.math;
 
 import java.io.Serializable;
 
+/**
+ * Represents a point in a polar coordinate system
+ */
 public class PolarVector2 implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private double radius = 0.0;
@@ -28,10 +31,18 @@ public class PolarVector2 implements Serializable {
 		setAngle(v.getX(), v.getY());
 	}
 	
+	/**
+	 * @return the cartesian representation for this position.
+	 */
 	public Vector2 toCartesian() {
 		return toCartesian(new Vector2(0.0,0.0));
 	}
 	
+	/**
+	 * @param center
+	 * @return the cartesian representation for this position, where the center of the polar coordinate
+	 *         system is at the given offset in the cartesian system.
+	 */
 	public Vector2 toCartesian(Vector2 center) {
 		double x = this.getX() + center.getX();
 		double y = this.getY() + center.getY();

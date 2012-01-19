@@ -2,17 +2,30 @@ package org.iplantc.phyloviewer.shared.math;
 
 import java.io.Serializable;
 
+/**
+ * Represents a bounding "box" in a polar coordinate system. As implied by the name, this box will
+ * actually be a sector (angular slice) of a ring-shaped region.
+ */
 public class AnnularSector implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private PolarVector2 min;
 	private PolarVector2 max;
 	
+	/**
+	 * Creates a new AnnularSector with invalid bounds.
+	 */
 	public AnnularSector() {
+		//FIXME what is this constructor useful for?
 		this.min = new PolarVector2(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 		this.max = new PolarVector2(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
 	}
 	
+	/**
+	 * Creates a new AnnularSector with the given bounds.
+	 * @param min the smallest angle and radius of the region
+	 * @param max the largest angle and radius of the region
+	 */
 	public AnnularSector(PolarVector2 min, PolarVector2 max) {
 		if (min == max) {
 			max = new PolarVector2(min);
@@ -21,6 +34,9 @@ public class AnnularSector implements Serializable {
 		this.max = max;
 	}
 	
+	/**
+	 * Creates a new AnnularSector that just contains the given point.
+	 */
 	public AnnularSector(PolarVector2 initPoint) {
 		this(initPoint, new PolarVector2(initPoint));
 	}
@@ -41,6 +57,9 @@ public class AnnularSector implements Serializable {
 		this.max = max;
 	}
 	
+	/**
+	 * Expands this AnnularSector to include the given region
+	 */
 	public void expandBy(AnnularSector other) {
 		if (!other.isValid()) {
 			return;
@@ -57,11 +76,17 @@ public class AnnularSector implements Serializable {
 		max.setAngle(maxAngle);
 	}
 
+	/**
+	 * Expands this AnnularSector to include the given point in Cartesian coordinates.
+	 */
 	public void expandBy(Vector2 v) {
 		PolarVector2 pv = new PolarVector2(v);
 		this.expandBy(pv);
 	}
 	
+	/**
+	 * Expands this AnnularSector to include the given point
+	 */
 	public void expandBy(PolarVector2 pv) {
 		if (!pv.isValid()) {
 			return;
@@ -73,20 +98,32 @@ public class AnnularSector implements Serializable {
 		max.setRadius(Math.max(max.getRadius(), pv.getRadius()));
 	}
 
+	/**
+	 * @return true if this AnnularSector contains the given Cartesian point
+	 */
 	public boolean contains(Vector2 position) {
 		PolarVector2 pv = new PolarVector2(position);
 		return this.contains(pv);
 	}
 	
+	/**
+	 * @return true if this AnnularSector contains the given point
+	 */
 	public boolean contains(PolarVector2 pv) {
 		return pv.isValid() && this.containsRadius(pv.getRadius()) && this.containsAngle(pv.getAngle());
 	}
 	
+	/**
+	 * @return true if this AnnularSector intersects the given AnnularSector
+	 */
 	public boolean intersects(AnnularSector other) {
 		return Math.max ( min.getRadius(), other.getMin().getRadius() ) <= Math.min ( max.getRadius(), other.getMax().getRadius() ) &&
         Math.max ( min.getAngle(), other.getMin().getAngle() ) <= Math.min ( max.getAngle(), other.getMax().getAngle() );
 	}
 
+	/**
+	 * @return the smallest (Cartesian) rectangle that contains this AnnularSector
+	 */
 	public Box2D cartesianBounds() {
 		
 		Vector2 min = this.getMin().toCartesian();
@@ -106,7 +143,7 @@ public class AnnularSector implements Serializable {
 	}
 	
 	/** 
-	 * Should be tight cartesian bounds of the outside arc of this AnnularSector
+	 * @return the smallest Cartesian rectangle containing the outside (max. radius) arc of this AnnularSector.
 	 */
 	public Box2D getOuterArcBounds() {
 		double[] anglesToCheck = {0.0, Math.PI/2, Math.PI, 3 * Math.PI/2, 2 * Math.PI, this.min.getAngle(), this.max.getAngle()};

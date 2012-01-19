@@ -8,6 +8,9 @@ package org.iplantc.phyloviewer.shared.math;
 
 import java.util.Arrays;
 
+/**
+ * Represents a 2D affine transformation matrix.
+ */
 public class Matrix33 {
 
 	private double[][] m=new double[3][3];
@@ -18,26 +21,55 @@ public class Matrix33 {
 				 0, 0, 1);
 	}
 	
+	/**
+	 * Create a transformation matrix with the given elements:
+	 * <pre>
+	 * |m00, m01, m02|
+	 * |m10, m11, m12|
+	 * |m20, m21, m22|
+	 * </pre>
+	 * @param m00 scale in the x direction
+	 * @param m01 shearing in the x direction
+	 * @param m02 translation in the x direction
+	 * @param m10 shear in in the y direction
+	 * @param m11 scale in the y direction
+	 * @param m12 translation in the y direction
+	 * @param m20 should always be zero 
+	 * @param m21 should always be zero
+	 * @param m22 should always be one
+	 */
 	public Matrix33(double m00, double m01, double m02, 
 	                double m10, double m11, double m12,
 	                double m20, double m21, double m22) {
+		//FIXME why do we allow the caller to set the last row?  It should always be 0,0,1 for the math we're doing, right?
+		
 		this.set(m00,m01,m02,
 				 m10,m11,m12,
 				 m20,m21,m22);
 	}
 	
+	/**
+	 * @return a translation matrix for the given x and y translations
+	 */
 	public static Matrix33 makeTranslate(double x, double y) {
 		return new Matrix33(1,0,x,
 				            0,1,y,
 				            0,0,1);
 	}
 	
+	/**
+	 * @return a scaling matrix for the given x and y scales
+	 */
 	public static Matrix33 makeScale(double sx, double sy ) {
 		return new Matrix33(sx,0,0,
 				            0,sy,0,
 				            0,0,1);
 	}
 	
+	/**
+	 * Directly set matrix elements.  
+	 * @see Matrix33#Matrix33(double, double, double, double, double, double, double, double, double)
+	 */
 	public void set(double m00, double m01, double m02, 
 			        double m10, double m11, double m12,
 			        double m20, double m21, double m22 ) {	
@@ -46,6 +78,10 @@ public class Matrix33 {
 		m[2][0] = m20; m[2][1] = m21; m[2][2] = m22;
 	}
 		
+	/**
+	 * Transform the given Vector2 with this matrix.
+	 * @return a new transformed Vector2
+	 */
 	public Vector2 transform(Vector2 vector) {
 		double x = m[0][0] * vector.getX() + m[0][1] * vector.getY() + m[0][2];
 		double y = m[1][0] * vector.getX() + m[1][1] * vector.getY() + m[1][2];
@@ -53,12 +89,19 @@ public class Matrix33 {
 		return new Vector2 ( x, y );
 	}
 	
+	/**
+	 * Transform the given Box2D with this matrix.
+	 * @return a new transformed Box2D
+	 */
 	public Box2D transform(Box2D box) {
 		Vector2 min = transform(box.getMin());
 		Vector2 max = transform(box.getMax());
 		return new Box2D(min, max);
 	}
 	
+	/**
+	 * @return a new Matrix33 resulting from multiplying this matrix by the given matrix.
+	 */
 	public Matrix33 multiply(Matrix33 rhs) {
 		double m00 = this.m[0][0] * rhs.m[0][0] + this.m[0][1] * rhs.m[1][0] + this.m[0][2] * rhs.m[2][0];
 		double m01 = this.m[0][0] * rhs.m[0][1] + this.m[0][1] * rhs.m[1][1] + this.m[0][2] * rhs.m[2][1];
@@ -90,7 +133,7 @@ public class Matrix33 {
 		double det = this.determinant();
 		
 		if ( det == 0.0 )
-			throw new RuntimeException("This matrix is not invertable");
+			throw new RuntimeException("This matrix is not invertible");
 		
 		// Make three column vectors
 		Vector3 v0 = new Vector3(m[0][0], m[1][0], m[2][0]);

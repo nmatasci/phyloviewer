@@ -7,6 +7,9 @@ package org.iplantc.phyloviewer.shared.math;
 
 import java.io.Serializable;
 
+/**
+ * Represents a rectangular region in 2D Cartesian space.
+ */
 public class Box2D implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -111,6 +114,9 @@ public class Box2D implements Serializable
 		this.max = max;
 	}
 
+	/**
+	 * Expands this box to include the given point
+	 */
 	public void expandBy(Vector2 v)
 	{
 		if(v.getX() < min.getX())
@@ -124,6 +130,9 @@ public class Box2D implements Serializable
 			max.setY(v.getY());
 	}
 
+	/**
+	 * Expands this box to include the bounds of the given box
+	 */
 	public void expandBy(Box2D bb)
 	{
 		if(false == bb.valid())
@@ -140,6 +149,9 @@ public class Box2D implements Serializable
 			max.setY(bb.getMax().getY());
 	}
 
+	/**
+	 * Expands all four sides of this box outward by the given amount
+	 */
 	public void expandBy(double d)
 	{
 		min.setX(min.getX() - d);
@@ -148,13 +160,18 @@ public class Box2D implements Serializable
 		max.setY(max.getY() + d);
 	}
 
-	// Return true if the given box intersects this one.
+	/**
+	 * @return true if the given box intersects this one.
+	 */
 	public boolean intersects(Box2D bb)
 	{
 		return Math.max(min.getX(), bb.getMin().getX()) <= Math.min(max.getX(), bb.getMax().getX())
 				&& Math.max(min.getY(), bb.getMin().getY()) <= Math.min(max.getY(), bb.getMax().getY());
 	}
 
+	/**
+	 * @return true if this box contains the given position.
+	 */
 	public boolean contains(Vector2 position)
 	{
 		return this.valid()
@@ -186,7 +203,7 @@ public class Box2D implements Serializable
 	}
 
 	/**
-	 * @return the box defined by the given corners (any two opposite corners of the box)
+	 * @return the box defined by the given corners (any two opposite corners of the box), i.e. the smallest valid box that includes both points.
 	 */
 	public static Box2D createBox(Vector2 v0, Vector2 v1)
 	{

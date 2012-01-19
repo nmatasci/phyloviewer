@@ -7,6 +7,9 @@ package org.iplantc.phyloviewer.shared.math;
 
 import java.io.Serializable;
 
+/**
+ * Represents a point in a 2D Cartesian coordinate system.
+ */
 public class Vector2 implements Serializable
 {
 	private static final long serialVersionUID = 4538356799839918857L;
@@ -102,6 +105,9 @@ public class Vector2 implements Serializable
 		return "{\"x\":" + this.getX() + ",\"y\":" + this.getY() + "}";
 	}
 
+	/**
+	 * Convert this to a unit (length 1) vector in the same direction.
+	 */
 	public void normalize()
 	{
 		double length = this.length();
