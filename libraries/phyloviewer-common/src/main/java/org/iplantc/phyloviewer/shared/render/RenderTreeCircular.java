@@ -1,8 +1,8 @@
 package org.iplantc.phyloviewer.shared.render;
 
-import org.iplantc.phyloviewer.shared.layout.CircularCoordinates;
 import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.math.Box2D;
+import org.iplantc.phyloviewer.shared.math.CircularCoordinates;
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.scene.DrawableBuilderCircular;
 import org.iplantc.phyloviewer.shared.scene.LODSelectorCircular;

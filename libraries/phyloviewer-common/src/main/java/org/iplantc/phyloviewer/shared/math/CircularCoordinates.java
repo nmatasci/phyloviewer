@@ -1,11 +1,11 @@
-package org.iplantc.phyloviewer.shared.layout;
+package org.iplantc.phyloviewer.shared.math;
 
-import org.iplantc.phyloviewer.shared.math.AnnularSector;
-import org.iplantc.phyloviewer.shared.math.Box2D;
-import org.iplantc.phyloviewer.shared.math.PolarVector2;
-import org.iplantc.phyloviewer.shared.math.Vector2;
+import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.model.INode;
 
+/**
+ * Static methods to calculate positions and bounding boxes in polar coordinates.
+ */
 public class CircularCoordinates
 {
 	// These parameters will place the nodes in a unit square at (0,0)

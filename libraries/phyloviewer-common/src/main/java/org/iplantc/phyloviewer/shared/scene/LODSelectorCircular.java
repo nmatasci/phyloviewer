@@ -1,8 +1,8 @@
 package org.iplantc.phyloviewer.shared.scene;
 
-import org.iplantc.phyloviewer.shared.layout.CircularCoordinates;
 import org.iplantc.phyloviewer.shared.layout.ILayoutData;
 import org.iplantc.phyloviewer.shared.math.AnnularSector;
+import org.iplantc.phyloviewer.shared.math.CircularCoordinates;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.INode;
 
