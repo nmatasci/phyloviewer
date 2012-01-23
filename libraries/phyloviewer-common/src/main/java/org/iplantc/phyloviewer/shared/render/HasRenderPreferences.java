@@ -1,6 +1,5 @@
-package org.iplantc.phyloviewer.client.tree.viewer.render;
+package org.iplantc.phyloviewer.shared.render;
 
-import org.iplantc.phyloviewer.shared.render.RenderPreferences;
 
 public interface HasRenderPreferences
 {
