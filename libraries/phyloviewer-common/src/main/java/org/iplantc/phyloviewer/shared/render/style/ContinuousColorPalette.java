@@ -1,6 +1,8 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
-
+/**
+ * Maps numeric values to an RGBA color range. Values are interpolated over a straight line through RGBA space.
+ */
 public class ContinuousColorPalette implements IColorPalette {
 	private double min;
 	private int[] minColor = new int[4];

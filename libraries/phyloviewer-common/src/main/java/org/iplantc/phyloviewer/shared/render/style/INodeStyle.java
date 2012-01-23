@@ -2,6 +2,7 @@ package org.iplantc.phyloviewer.shared.render.style;
 
 public interface INodeStyle
 {
+	/** Node shapes */
 	public enum Shape
 	{
 		CIRCLE,
@@ -9,32 +10,27 @@ public interface INodeStyle
 	}
 	
 	/**
-	 * Get the shape to use
-	 * @return
+	 * @return the shape to use
 	 */
 	public Shape getShape();
 	
 	/**
-	 * Get the color of the node.
-	 * @return
+	 * @return the color of the node.
 	 */
 	public abstract String getColor();
 
 	/**
 	 * Set the color
-	 * @param color
 	 */
 	public abstract void setColor(String color);
 
 	/**
-	 * Get the point size.
-	 * @return
+	 * @return the point size.
 	 */
 	public abstract double getPointSize();
 
 	/**
 	 * Set the point size.
-	 * @param size
 	 */
 	public abstract void setPointSize(double size);
 }

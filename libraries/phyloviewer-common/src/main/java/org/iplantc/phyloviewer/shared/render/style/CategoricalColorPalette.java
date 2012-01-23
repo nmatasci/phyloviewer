@@ -2,14 +2,13 @@ package org.iplantc.phyloviewer.shared.render.style;
 
 import java.util.ArrayList;
 
-
 /**
  * Maps values to a finite set of colors.
  */
 public class CategoricalColorPalette implements IColorPalette {
 	private final String[] colors;
 	private final ArrayList<Object> map;
-	//TODO a HashMap would probably be better here.  See if Adam thinks it's okay in this case.
+	//TODO a HashMap would probably be better here.
 	
 	/**
 	 * Create a new CategoricalColorPalette with a given set of colors, each

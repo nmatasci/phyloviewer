@@ -17,6 +17,9 @@ public class CompositeStyle implements IStyle
 	private String baseStyleId;
 	private boolean isInheritable;
 	
+	/**
+	 * Creates a new CompositeStyle for the given baseStyle and mainStyle.
+	 */
 	public CompositeStyle(IStyle mainStyle, IStyle baseStyle)
 	{
 		nodeStyle = new CompositeNodeStyle(mainStyle.getNodeStyle(), baseStyle.getNodeStyle());
@@ -28,6 +31,9 @@ public class CompositeStyle implements IStyle
 		this.baseStyleId = baseStyle.getId();
 	}
 	
+	/**
+	 * Sets the fallback style for all of the element styles
+	 */
 	public void setBaseStyle(IStyle baseStyle)
 	{
 		//set element base styles

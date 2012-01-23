@@ -2,6 +2,9 @@ package org.iplantc.phyloviewer.shared.render.style;
 
 import java.io.Serializable;
 
+/**
+ * Basic implementation of IStyle
+ */
 public class Style implements IStyle, Serializable {
 	private static final long serialVersionUID = 1L;
 	private String id;

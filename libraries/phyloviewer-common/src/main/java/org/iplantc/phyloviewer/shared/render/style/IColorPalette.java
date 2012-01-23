@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
+/**
+ * Maps values to some set of colors
+ */
 public interface IColorPalette {
 	
 	/**

@@ -1,36 +1,37 @@
 package org.iplantc.phyloviewer.shared.render.style;
 
+/**
+ * All of the styling needed for drawing a node.
+ */
 public interface IStyle
 {
 	/**
-	 * Get the id for this style.
-	 * @return
+	 * @return the id for this style.
 	 */
 	public abstract String getId();
 
 	/**
-	 * Get the style for the node.
-	 * @return
+	 * @return the style for the node.
 	 */
 	public abstract INodeStyle getNodeStyle();
 
 	/**
-	 * Get the style for the label.
-	 * @return
+	 * @return the style for the label.
 	 */
 	public abstract ILabelStyle getLabelStyle();
 
 	/**
-	 * Get the style for the glyph.
-	 * @return
+	 * @return the style for the glyph.
 	 */
 	public abstract IGlyphStyle getGlyphStyle();
 
 	/**
-	 * Get the style for the branch.
-	 * @return
+	 * @return the style for the branch.
 	 */
 	public abstract IBranchStyle getBranchStyle();
 
+	/**
+	 * @return true if this style should be inherited by a node's subtree
+	 */
 	public abstract boolean isInheritable();
 }
