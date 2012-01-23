@@ -6,6 +6,9 @@ import org.iplantc.phyloviewer.shared.math.CircularCoordinates;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.INode;
 
+/**
+ * An ILODSelector for circular tree drawing
+ */
 public class LODSelectorCircular implements ILODSelector
 {
 	@Override

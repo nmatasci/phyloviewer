@@ -7,6 +7,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * A Drawable composed of other Drawables
+ */
 public class CompositeDrawable extends Drawable
 {
 	private ArrayList<Drawable> drawables;
@@ -51,7 +54,10 @@ public class CompositeDrawable extends Drawable
 		return success;
 	}
 	
-	public void updateBoundingBox()
+	/**
+	 * Updates the bounding box of this CompositeDrawable.
+	 */
+	protected void updateBoundingBox()
 	{
 		this.boundingBox = new Box2D();
 		

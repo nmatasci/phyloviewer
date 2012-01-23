@@ -46,10 +46,10 @@ public interface IGraphics
 
 	/**
 	 * Draws text.
-	 * @param position the text baseline start position
-	 * @param offset an offset from the given position (TODO: this parameter doesn't seem necessary)
+	 * @param position the text baseline start position, in object space
+	 * @param offset an offset from the given position, in screen pixels
 	 * @param text the text to render
-	 * @param angle the direction of the text baseline
+	 * @param angle the rotation of the text baseline about the start position, in radians
 	 */
 	public abstract void drawText(Vector2 position, Vector2 offset, String text, double angle);
 
@@ -57,11 +57,11 @@ public interface IGraphics
 	 * Draws a filled area bounded by a circular arc and two lines starting at each end of the arc which
 	 * meet at the given peak point. Used for collapsed subtrees in circular drawing.
 	 * 
-	 * @param center the center of the circular layout.
+	 * @param center the center of the circular arc.
 	 * @param peak the inner point of the wedge.
 	 * @param radius the outer radius
-	 * @param startAngle the start of the outer arc
-	 * @param endAngle the end of the outer arc
+	 * @param startAngle the start of the outer arc, in radians
+	 * @param endAngle the end of the outer arc, in radians
 	 */
 	public abstract void drawWedge(Vector2 center, Vector2 peak, double radius, double startAngle,
 			double endAngle);

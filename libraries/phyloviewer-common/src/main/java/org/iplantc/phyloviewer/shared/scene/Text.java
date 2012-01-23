@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * A Drawable for text.
+ */
 public class Text extends Drawable
 {
 	String text;
@@ -13,11 +16,21 @@ public class Text extends Drawable
 	double angle = 0.0;
 	boolean dirtyBoundingBox;
 
+	/**
+	 * Create a horizontal Text element
+	 */
 	public Text(String text, Vector2 position, Vector2 pixelOffset)
 	{
 		this.init(text, position, pixelOffset, 0.0);
 	}
 
+	/**
+	 * Create a rotated text element
+	 * @param text the text to render
+	 * @param position the text baseline start position, in object space
+	 * @param pixelOffset an offset from the given position, in screen pixels
+	 * @param angle the rotation of the text baseline about the start position, in radians
+	 */
 	public Text(String text, Vector2 position, Vector2 pixelOffset, double angle)
 	{
 		this.init(text, position, pixelOffset, angle);

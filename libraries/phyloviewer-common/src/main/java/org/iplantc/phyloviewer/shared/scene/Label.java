@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * A Drawable for text enclosed in a rectangular border.
+ */
 public class Label extends CompositeDrawable
 {
 	private Text text;

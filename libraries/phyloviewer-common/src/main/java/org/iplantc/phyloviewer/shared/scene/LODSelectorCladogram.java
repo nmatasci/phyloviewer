@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.model.INode;
 
+/**
+ * An ILODSelector for left-to-right cladogram tree drawing
+ */
 public class LODSelectorCladogram implements ILODSelector
 {
 	@Override

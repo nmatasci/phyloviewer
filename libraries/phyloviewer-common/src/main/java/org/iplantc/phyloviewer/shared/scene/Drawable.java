@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * Represents tree elements that can be drawn.
+ */
 public abstract class Drawable
 {
 	/**
@@ -33,6 +36,9 @@ public abstract class Drawable
 	{
 	}
 
+	/**
+	 * @return the bounds of this drawable
+	 */
 	public Box2D getBoundingBox()
 	{
 		return boundingBox;
@@ -43,6 +49,9 @@ public abstract class Drawable
 		this.boundingBox = boundingBox;
 	}
 
+	/**
+	 * @return the Context of this drawable
+	 */
 	public Context getContext()
 	{
 		return context;
@@ -53,6 +62,11 @@ public abstract class Drawable
 		this.context = context;
 	}
 	
+	/**
+	 * An integer indicating the type of object being drawn. Used for filtering user interface actions.
+	 * 
+	 * @return a bitwise or of the following flags: TYPE_POINT, TYPE_LINE, TYPE_POLYGON, TYPE_TEXT
+	 */
 	public abstract int getDrawableType();
 
 	public boolean intersect(Vector2 position, double distanceSquared)
@@ -60,5 +74,8 @@ public abstract class Drawable
 		return false;
 	}
 
+	/**
+	 * Draw this Drawable to the given IGraphics with the given style.
+	 */
 	public abstract void draw(IGraphics graphics, IStyle style);
 }

@@ -9,6 +9,9 @@ import org.iplantc.phyloviewer.shared.render.style.INodeStyle;
 import org.iplantc.phyloviewer.shared.render.style.INodeStyle.Shape;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * A Drawable for nodes
+ */
 public class Point extends Drawable
 {
 	Vector2 point;

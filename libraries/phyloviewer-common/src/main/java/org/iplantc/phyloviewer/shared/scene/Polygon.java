@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * A drawable for general polygons.
+ */
 public class Polygon extends Drawable
 {
 	protected Vector2 vertices[];
@@ -26,12 +29,7 @@ public class Polygon extends Drawable
 	}
 
 	/**
-	 * Create a triangle from the 3 vertices.
-	 * 
-	 * @param v0
-	 * @param v1
-	 * @param v2
-	 * @return
+	 * @return a new Polygon with the 3 given vertices.
 	 */
 	public static Polygon createTriangle(Vector2 v0, Vector2 v1, Vector2 v2)
 	{

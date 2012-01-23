@@ -4,6 +4,9 @@ import org.iplantc.phyloviewer.shared.math.Vector2;
 import org.iplantc.phyloviewer.shared.render.IGraphics;
 import org.iplantc.phyloviewer.shared.render.style.IStyle;
 
+/**
+ * A Drawable for circular arcs
+ */
 public class Arc extends Drawable
 {
 	Vector2 center;

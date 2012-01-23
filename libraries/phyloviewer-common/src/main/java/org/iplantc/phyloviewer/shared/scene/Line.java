@@ -82,7 +82,7 @@ public class Line extends Drawable
 
 		Vector2 w = position.subtract(p);
 
-		double vsq = v.dot(v);
+		double vsq = v.dot(v); //kurie: FIXME: It seems like v.dot(v) would always be 1.0, right? Since v was normalized?
 		double wsq = w.dot(w);
 		double proj = w.dot(v);
 		return wsq - proj * proj / vsq;
