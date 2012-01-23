@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
+/**
+ * An interface for node and tree annotations. 
+ */
 public interface Annotation
 {
 

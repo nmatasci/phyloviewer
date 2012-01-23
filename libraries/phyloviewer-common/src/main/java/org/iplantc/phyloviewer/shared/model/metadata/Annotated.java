@@ -2,7 +2,9 @@ package org.iplantc.phyloviewer.shared.model.metadata;
 
 import java.util.Set;
 
-
+/**
+ * Methods for objects that have annotations
+ */
 public interface Annotated
 {
 	public Set<Annotation> getAnnotations();

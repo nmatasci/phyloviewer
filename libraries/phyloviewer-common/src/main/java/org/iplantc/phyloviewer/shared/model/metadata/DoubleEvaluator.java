@@ -1,5 +1,9 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
+/**
+ * An AnnotationEvaluator that takes nodes and returns doubles for some annotation key.
+ * String values will be parsed as doubles if possible.
+ */
 public class DoubleEvaluator extends AnnotationEvaluator<Double>
 {
 	public DoubleEvaluator(String annotationKey)
@@ -7,7 +11,7 @@ public class DoubleEvaluator extends AnnotationEvaluator<Double>
 		super(annotationKey);
 	}
 
-	public Double parseValue(Object o)
+	protected Double parseValue(Object o)
 	{
 		Double value = null;
 		

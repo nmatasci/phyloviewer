@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
+/**
+ * An AnnotationEvaluator that takes nodes and returns booleans for some annotation key
+ */
 public class BooleanEvaluator extends AnnotationEvaluator<Boolean>
 {
 	public BooleanEvaluator(String annotationKey)
@@ -8,7 +11,7 @@ public class BooleanEvaluator extends AnnotationEvaluator<Boolean>
 	}
 
 	@Override
-	public Boolean parseValue(Object annotationValue)
+	protected Boolean parseValue(Object annotationValue)
 	{
 		if (annotationValue instanceof Boolean)
 		{

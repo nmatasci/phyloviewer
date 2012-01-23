@@ -1,6 +1,8 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
-
+/**
+ * Implementation of AnnotationMetadata
+ */
 public class AnnotationMetadataImpl implements AnnotationMetadata
 {
 	private String name;

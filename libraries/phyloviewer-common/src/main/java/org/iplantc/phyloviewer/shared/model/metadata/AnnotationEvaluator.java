@@ -11,6 +11,9 @@ public abstract class AnnotationEvaluator<T> implements ValueMap<INode, T>
 {
 	String annotationKey;
 	
+	/**
+	 * Create a new AnnotationEvaluator that finds annotations matching a given annotationKey.
+	 */
 	public AnnotationEvaluator(String annotationKey)
 	{
 		this.annotationKey = annotationKey;
@@ -39,7 +42,7 @@ public abstract class AnnotationEvaluator<T> implements ValueMap<INode, T>
 		return null;
 	}
 	
-	public abstract T parseValue(Object annotationValue);
+	protected abstract T parseValue(Object annotationValue);
 	
 	@Override
 	public String toString()

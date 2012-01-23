@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
+/**
+ * Implementation of NumericAnnotationMetadata
+ */
 public class NumericAnnotationMetadataImpl extends AnnotationMetadataImpl implements NumericAnnotationMetadata
 {
 	private double min;

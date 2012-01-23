@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.shared.model.metadata;
 
+/**
+ * Metadata about all annotations of some type on a tree.
+ */
 public interface AnnotationMetadata
 {
 	public String getName();
