@@ -25,6 +25,9 @@ import org.iplantc.phyloviewer.shared.scene.Text;
 import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * <canvas> render target for RenderTree
+ */
 public class CanvasGraphics extends Graphics
 {
 	private static Logger rootLogger = Logger.getLogger("");
@@ -36,11 +39,17 @@ public class CanvasGraphics extends Graphics
 	private double pointSize = Defaults.POINT_SIZE;
 	String textColor = "black";
 
+	/**
+	 * Creates a new CanvasGraphics that draws to the given canvas.
+	 */
 	public CanvasGraphics(Canvas canvas)
 	{
 		this.canvas = canvas;
 	}
 
+	/**
+	 * @return the canvas element
+	 */
 	public Widget getWidget()
 	{
 		return canvas;
@@ -56,14 +65,20 @@ public class CanvasGraphics extends Graphics
 		canvas.clear();
 	}
 	
+	/**
+	 * Clears the structure that stores previously drawn text bounds
+	 */
 	public void clearDrawnTextExtents()
 	{
+		/*
+		 * TODO This is only needed because the DetailView draws to the same canvas with two different
+		 * CanvasGraphics (main canvas and the overlay). Make them draw to two separate canvases and get
+		 * rid of this
+		 */
+
 		drawnTextExtents.clear();
 	}
 
-	/**
-	 * Draw a point at given position.
-	 */
 	@Override
 	public void drawPoint(Vector2 position)
 	{

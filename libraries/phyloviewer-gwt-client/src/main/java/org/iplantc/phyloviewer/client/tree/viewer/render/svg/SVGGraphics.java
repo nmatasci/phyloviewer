@@ -9,6 +9,8 @@ import org.iplantc.phyloviewer.shared.render.Graphics;
 import org.iplantc.phyloviewer.shared.scene.Text;
 
 /**
+ * A scalable vector graphics target for RenderTree
+ * 
  * SVGGraphics... embrace the redundancy.
  */
 public class SVGGraphics extends Graphics
@@ -27,6 +29,9 @@ public class SVGGraphics extends Graphics
 	
 	protected double pointSize;
 
+	/**
+	 * Creates a new SVGGraphics with an empty svg element
+	 */
 	public SVGGraphics()
 	{
 		init();
@@ -180,6 +185,9 @@ public class SVGGraphics extends Graphics
 		openAndCloseElement("path", path, stroke, fill, lineWidth);
 	}
 
+	/**
+	 * Get the text of the current svg document
+	 */
 	@Override
 	public String toString()
 	{
@@ -210,6 +218,10 @@ public class SVGGraphics extends Graphics
 		this.pointSize = pointSize;
 	}
 
+	/**
+	 * Set the font family for text elements
+	 * @see http://www.w3.org/TR/SVG/text.html#FontPropertiesUsedBySVG
+	 */
 	public void setFontFamily(String fontFamily)
 	{
 		this.fontFamily[1] = fontFamily;
@@ -220,11 +232,19 @@ public class SVGGraphics extends Graphics
 		return fontFamily[1];
 	}
 
+	/**
+	 * Set the font size for text elements
+	 * @see http://www.w3.org/TR/SVG/text.html#FontPropertiesUsedBySVG
+	 */
 	public void setFontSize(String fontSize)
 	{
 		this.fontSize[1] = fontSize;
 	}
 	
+	/**
+	 * Set the font size for text elements
+	 * @see http://www.w3.org/TR/SVG/text.html#FontPropertiesUsedBySVG
+	 */
 	public void setFontSize(double fontSize)
 	{
 		this.fontSize[1] = String.valueOf(fontSize);
