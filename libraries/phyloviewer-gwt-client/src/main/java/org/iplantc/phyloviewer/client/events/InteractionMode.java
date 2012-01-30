@@ -3,12 +3,22 @@ package org.iplantc.phyloviewer.client.events;
 import com.google.gwt.event.dom.client.HandlesAllKeyEvents;
 import com.google.gwt.event.dom.client.HandlesAllMouseEvents;
 
+/**
+ * A related set of event handlers and styles.
+ * Contains a mouse handler, a keyboard handler and a css style name
+ */
 public class InteractionMode
 {
 	private HandlesAllKeyEvents keyHandler;
 	private HandlesAllMouseEvents mouseHandler;
 	private String styleName;
 	
+	/**
+	 * Create a new InteractionMode with the given handlers
+	 * @param keyHandler
+	 * @param mouseHandler
+	 * @param styleName
+	 */
 	public InteractionMode(HandlesAllKeyEvents keyHandler, HandlesAllMouseEvents mouseHandler, String styleName)
 	{
 		this.keyHandler = keyHandler;

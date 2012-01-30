@@ -7,10 +7,16 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 
+/**
+ * A key event handler for SelectionMode
+ */
 public class SelectionKeyHandler extends HandlesAllKeyEvents
 {
 	private final View view;
 	
+	/**
+	 * Creates a new SelectionKeyHandler that manipulates the given view
+	 */
 	public SelectionKeyHandler(View view)
 	{
 		this.view = view;

@@ -4,12 +4,16 @@ import org.iplantc.phyloviewer.client.tree.viewer.View;
 import org.iplantc.phyloviewer.shared.model.INode;
 
 /**
- * Highlights the selected nodes in this view
+ * Highlights the selected nodes in a view
  */
 public class HighlightSelectionHandler implements NodeSelectionHandler
 {
 	private final View view;
 
+	/**
+	 * Create a new HighlightSelectionHandler that highlights selected nodes in the given view
+	 * @param view
+	 */
 	public HighlightSelectionHandler(View view)
 	{
 		this.view = view;

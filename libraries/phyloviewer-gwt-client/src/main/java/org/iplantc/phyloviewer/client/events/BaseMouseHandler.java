@@ -20,6 +20,10 @@ import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * Base class for mouse handlers, so subclasses don't have to implement unneeded methods. Most methods just
+ * log mouse events. Also keeps track of which buttons are down and whether there is a click-and-drag in progress.
+ */
 public class BaseMouseHandler extends HandlesAllMouseEvents implements ClickHandler, DoubleClickHandler
 {
 	/** The largest button code returned by event.getNativeButton() */
@@ -36,6 +40,9 @@ public class BaseMouseHandler extends HandlesAllMouseEvents implements ClickHand
 	
 	private boolean[] isDragging = new boolean[MAX_BUTTON + 1];
 	
+	/**
+	 * Create a new BaseMouseHandler for the given widget
+	 */
 	public BaseMouseHandler(Widget targetWidget)
 	{
 		this.targetWidget = targetWidget;
@@ -126,6 +133,10 @@ public class BaseMouseHandler extends HandlesAllMouseEvents implements ClickHand
 		Logger.getLogger("").log(Level.FINEST, "MouseWheel delta: " + event.getDeltaY());
 	}
 	
+	/**
+	 * @return the last {@link MouseDownEvent} for the given button, null if the button is not down
+	 * @see MouseEvent#getNativeButton()
+	 */
 	public SavedMouseEvent getCurrentMouseDownEvent(int button) 
 	{
 		if (button > MAX_BUTTON || button < 0)
@@ -138,11 +149,17 @@ public class BaseMouseHandler extends HandlesAllMouseEvents implements ClickHand
 		}
 	}
 	
+	/**
+	 * @return the last {@link MouseMoveEvent}
+	 */
 	public SavedMouseEvent getLastMouseMove()
 	{
 		return lastMouseMove;
 	}
 	
+	/**
+	 * @return the position of the last {@link MouseMoveEvent}
+	 */
 	public Vector2 getLastMousePosition()
 	{
 		if (lastMouseMove == null) 
@@ -153,6 +170,10 @@ public class BaseMouseHandler extends HandlesAllMouseEvents implements ClickHand
 		return lastMouseMove.getLocation();
 	}
 	
+	/**
+	 * @return true if a click-and-drag is in progress for the given mouse button
+	 * @see MouseEvent#getNativeButton()
+	 */
 	public boolean isDragging(int button)
 	{
 		return isDragging[button];
@@ -189,8 +210,7 @@ public class BaseMouseHandler extends HandlesAllMouseEvents implements ClickHand
 		public final boolean isMetaKeyDown;
 		public final boolean isShiftKeyDown;
 		
-		@SuppressWarnings("unchecked")
-		public SavedMouseEvent(MouseEvent event)
+		public SavedMouseEvent(@SuppressWarnings("rawtypes") MouseEvent event)
 		{
 			nativeButton = event.getNativeButton();
 			x = event.getX();

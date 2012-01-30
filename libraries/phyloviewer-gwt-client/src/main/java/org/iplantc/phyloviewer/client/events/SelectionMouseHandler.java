@@ -20,6 +20,9 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 
+/**
+ * A mouse handler for SelectionMode
+ */
 public class SelectionMouseHandler extends BaseMouseHandler implements HasNodeSelectionHandlers
 {
 	//TODO listen for tree changes on the view and clear the selection
@@ -136,6 +139,9 @@ public class SelectionMouseHandler extends BaseMouseHandler implements HasNodeSe
 		return getEventBus().addHandlerToSource(NodeSelectionEvent.TYPE, this, handler);
 	}
 	
+	/**
+	 * Add a SelectionAreaChangeHandler that listens for SelectionAreaChangeEvents from this mouse handler
+	 */
 	public HandlerRegistration addSelectionAreaHandler(SelectionAreaChangeHandler handler)
 	{
 		return getEventBus().addHandlerToSource(SelectionAreaChangeEvent.TYPE, this, handler);

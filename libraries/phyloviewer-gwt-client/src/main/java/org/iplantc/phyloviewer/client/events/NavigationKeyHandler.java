@@ -7,10 +7,16 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 
+/**
+ * A key event handler for NavigationMode
+ */
 public class NavigationKeyHandler extends HandlesAllKeyEvents
 {
 	private final View view;
 	
+	/**
+	 * Create a NavigationKeyHandler that manipulates the given View
+	 */
 	public NavigationKeyHandler(View view)
 	{
 		this.view = view;

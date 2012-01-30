@@ -14,6 +14,9 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
 
+/**
+ * A mouse handler for NavigationMode
+ */
 public class NavigationMouseHandler extends BaseMouseHandler
 {
 	// TODO listen for tree changes on the view and clear currentNodeShown
@@ -21,6 +24,10 @@ public class NavigationMouseHandler extends BaseMouseHandler
 
 	private INode currentNodeShown = null;
 
+	/**
+	 * Create a new NavigationMouseHandler that manipulates the given view
+	 * @param view
+	 */
 	public NavigationMouseHandler(DetailView view)
 	{
 		super(view);
