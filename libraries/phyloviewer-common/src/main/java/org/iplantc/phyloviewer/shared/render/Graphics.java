@@ -17,6 +17,7 @@ public abstract class Graphics implements IGraphics
 	protected Matrix33 objectToScreenMatrix = new Matrix33();
 	protected Matrix33 screenToObjectMatrix = new Matrix33();
 
+	/** The screen bounds in object space */
 	private Box2D screenBounds = new Box2D();
 	
 	protected abstract void setPointSize(double pointSize);
@@ -78,9 +79,6 @@ public abstract class Graphics implements IGraphics
 		return screenToObjectMatrix;
 	}
 
-	/**
-	 * Set the view matrix
-	 */
 	@Override
 	public void setViewMatrix(Matrix33 matrix)
 	{
@@ -89,6 +87,10 @@ public abstract class Graphics implements IGraphics
 		updateMatrix();
 	}
 
+	/**
+	 * Updates the objectToScreenMatrix, screenToObjectMatrix and screenBounds based on the current
+	 * viewMatrix, projectionMatrix and viewport.
+	 */
 	protected void updateMatrix()
 	{
 		objectToScreenMatrix = viewMatrix.multiply(projectionMatrix.multiply(viewport

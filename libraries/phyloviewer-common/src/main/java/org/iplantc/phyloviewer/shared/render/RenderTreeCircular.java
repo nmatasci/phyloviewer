@@ -7,6 +7,9 @@ import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.scene.DrawableBuilderCircular;
 import org.iplantc.phyloviewer.shared.scene.LODSelectorCircular;
 
+/**
+ * Renderer customized for circular tree drawing. 
+ */
 public class RenderTreeCircular extends RenderTree
 {
 	public RenderTreeCircular()

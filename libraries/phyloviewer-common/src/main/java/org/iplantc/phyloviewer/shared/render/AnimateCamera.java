@@ -7,6 +7,10 @@ package org.iplantc.phyloviewer.shared.render;
 
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 
+/**
+ * Animates a view matrix linearly from one view matrix to another.
+ * While !isDone(), getNextMatrix() returns the next matrix value.
+ */
 public class AnimateCamera
 {
 	Matrix33 initialMatrix;
@@ -14,6 +18,12 @@ public class AnimateCamera
 	double u;
 	double stepSize;
 
+	/**
+	 * Creates a new AnimateCamera
+	 * @param initialCamera the starting view matrix
+	 * @param finalCamera the ending view matrix
+	 * @param numberOfSteps
+	 */
 	public AnimateCamera(Matrix33 initialCamera, Matrix33 finalCamera, int numberOfSteps)
 	{
 		this.initialMatrix = initialCamera;
@@ -22,11 +32,18 @@ public class AnimateCamera
 		this.stepSize = (0 != numberOfSteps ? 1.0 / numberOfSteps : 1);
 	}
 
+	/**
+	 * @return true if getNextMatrix has been called numberOfSteps or more times
+	 */
 	public boolean isDone()
 	{
 		return u >= 1.0;
 	}
 
+	/**
+	 * @return the next interpolated matrix value. If more than numberOfSteps has already elapsed, then
+	 *         the final matrix value is returned.
+	 */
 	public Matrix33 getNextMatrix()
 	{
 		if(this.initialMatrix == null || this.finalMatrix == null)

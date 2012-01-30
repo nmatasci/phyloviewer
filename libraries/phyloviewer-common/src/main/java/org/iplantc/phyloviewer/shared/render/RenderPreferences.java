@@ -12,6 +12,9 @@ import org.iplantc.phyloviewer.shared.render.style.LabelStyle;
 import org.iplantc.phyloviewer.shared.render.style.NodeStyle;
 import org.iplantc.phyloviewer.shared.render.style.Style;
 
+/**
+ * Contains user rendering settings, e.g. the current collection of nodes and branches that are highlighted and subtrees that are forced to collapse.
+ */
 public class RenderPreferences
 {
 	private boolean collapseOverlaps = true;

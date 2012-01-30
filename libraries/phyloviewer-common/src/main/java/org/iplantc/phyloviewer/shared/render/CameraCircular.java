@@ -5,6 +5,9 @@ import org.iplantc.phyloviewer.shared.math.CircularCoordinates;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 import org.iplantc.phyloviewer.shared.math.Vector2;
 
+/**
+ * A Camera for viewing circular trees.  Pannable and zoomable in both directions.
+ */
 public class CameraCircular extends Camera
 {
 	static final double labelMargin = 150;
@@ -14,11 +17,13 @@ public class CameraCircular extends Camera
 		this.setPannable(true, true);
 	}
 	
+	@Override
 	public Camera create()
 	{
 		return new CameraCircular();
 	}
 
+	@Override
 	public Matrix33 getMatrix(int width, int height)
 	{
 		double scale = Math.min(width, height) - labelMargin;
@@ -34,6 +39,7 @@ public class CameraCircular extends Camera
 		return t.multiply(s).multiply(this.getViewMatrix());
 	}
 
+	@Override
 	public void zoomToBoundingBox(Box2D boundingBox)
 	{
 		Box2D bounds = CircularCoordinates.convertBoundingBox(boundingBox);

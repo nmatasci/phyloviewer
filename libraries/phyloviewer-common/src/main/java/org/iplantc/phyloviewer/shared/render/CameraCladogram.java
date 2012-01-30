@@ -3,6 +3,10 @@ package org.iplantc.phyloviewer.shared.render;
 import org.iplantc.phyloviewer.shared.math.Box2D;
 import org.iplantc.phyloviewer.shared.math.Matrix33;
 
+/**
+ * A Camera for standard tree drawings, with the root at the left and leaves at the right.
+ * Pannable and zoomable only in the y direction.
+ */
 public class CameraCladogram extends Camera
 {
 	static final double zoomAboutX = 0.8;

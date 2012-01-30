@@ -22,8 +22,12 @@ import org.iplantc.phyloviewer.shared.scene.IDrawableBuilder;
 import org.iplantc.phyloviewer.shared.scene.ILODSelector;
 import org.iplantc.phyloviewer.shared.scene.ILODSelector.LODLevel;
 
+/**
+ * Base class for tree rendering.  
+ */
 public abstract class RenderTree
 {
+	//TODO does this class really have a reason to be abstract anymore?  There are no abstract methods and RenderTreeCladogram just sets some defaults for the fields.
 	private RenderPreferences renderPreferences = new RenderPreferences();
 	IDocument document;
 	IDrawableBuilder builder;
@@ -62,6 +66,9 @@ public abstract class RenderTree
 		return drawableContainer;
 	}
 
+	/**
+	 * Render the current document to the given graphics context, transformed by the given view matrix.
+	 */
 	public void renderTree(IGraphics graphics, Matrix33 viewMatrix)
 	{
 		ITree tree = document != null ? document.getTree() : null;
@@ -100,6 +107,16 @@ public abstract class RenderTree
 		renderPreferences = preferences;
 	}
 
+	/**
+	 * Recursively renders a node and it subtree, down to the currently available depth. Stops and
+	 * renders a placeholder glyph when child data is not available, or when there's not enough screen
+	 * space to render the children.
+	 * 
+	 * @param node the node to draw
+	 * @param layout the layout data for the tree
+	 * @param graphics the rendering target
+	 * @param style the rendering style for the node (passed in by the parent because style may be inherited)
+	 */
 	protected void renderNode(INode node, ILayoutData layout, IGraphics graphics, IStyle style)
 	{
 		if(graphics.isCulled(this.getBoundingBox(node, layout)))
@@ -155,7 +172,12 @@ public abstract class RenderTree
 		}
 	}
 
-	public Box2D getBoundingBox(INode node, ILayoutData layout)
+	/**
+	 * Get the bounding box for a subtree. 
+	 * Override in subclasses for non-rectangular drawing.
+	 * @return the bounding box for the subtree of the given node
+	 */
+	protected Box2D getBoundingBox(INode node, ILayoutData layout)
 	{
 		return layout.getBoundingBox(node);
 	}
@@ -166,6 +188,13 @@ public abstract class RenderTree
 		drawable.draw(graphics, style);
 	}
 
+	/**
+	 * Renders the outgoing branches of a node and calls renderNode() to render the children
+	 * @param parent the parent node
+	 * @param layout the tree layout data
+	 * @param graphics the rendering target
+	 * @param parentStyle the parent's styling may be combined with the child nodes' styles if parentStyle.isInheritable()
+	 */
 	protected void renderChildren(INode parent, ILayoutData layout, IGraphics graphics, IStyle parentStyle)
 	{
 		List<? extends INode> children = parent.getChildren();
@@ -193,6 +222,9 @@ public abstract class RenderTree
 		}
 	}
 
+	/**
+	 * Renders a placeholder glyph for a subtree.
+	 */
 	protected void renderPlaceholder(INode node, ILayoutData layout, IGraphics graphics, IStyle style)
 	{
 		Drawable[] drawables = drawableContainer.getGlyphDrawables(node, document, layout);
@@ -202,6 +234,9 @@ public abstract class RenderTree
 		}
 	}
 
+	/**
+	 * @return a new CompositeStyle that is a composite of the given style and the highlight style.
+	 */
 	private IStyle addHighlight(IStyle style)
 	{
 		IStyle highlightStyle = renderPreferences.getHighlightStyle();
@@ -229,6 +264,7 @@ public abstract class RenderTree
 	}
 	
 	/**
+	 * Returns a new inherited CompositeStyle of parent and child, if parentStyle.isInheritable()
 	 * @param parentStyle may be null
 	 * @param style may be null
 	 * @param defaultStyle may not be null
