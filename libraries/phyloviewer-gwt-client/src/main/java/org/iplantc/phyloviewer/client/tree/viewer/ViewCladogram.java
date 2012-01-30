@@ -19,12 +19,14 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
  * @author adamk
  * 
  */
-
 public class ViewCladogram extends AnimatedView
 {
 	private DetailView detailView;
 	private OverviewView overviewView;
 
+	/**
+	 * Create a new ViewCladogram with the given dimensions 
+	 */
 	public ViewCladogram(int width, int height)
 	{
 		super();
@@ -104,7 +106,7 @@ public class ViewCladogram extends AnimatedView
 	}
 
 	@Override
-	public boolean isReady()
+	protected boolean isReady()
 	{
 		return overviewView.isReady() && detailView.isReady();
 	}
@@ -141,6 +143,9 @@ public class ViewCladogram extends AnimatedView
 		overviewView.addSelectionHandler(refireHandler);
 	}
 
+	/**
+	 * @return the DetailView component of the view
+	 */
 	public DetailView getDetailView()
 	{
 		return this.detailView;

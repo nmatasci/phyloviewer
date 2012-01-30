@@ -33,6 +33,15 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.RequiresResize;
 
+/**
+ * Abstract base class for tree views.
+ * 
+ * Basic usage:
+ * Use setDocument() to set the document to view
+ * Use requestRender() to render the current document
+ * 
+ * Also, listens for RenderEvents on its EventBus and renders when it receives one.
+ */
 public abstract class View extends FocusPanel implements RequiresResize, HasDocument,
 		HasNodeSelectionHandlers, HasRenderPreferences
 {
@@ -70,6 +79,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		return document;
 	}
 
+	/**
+	 * Set the document to be rendered. Fires a DocumentChangeEvent.
+	 */
 	@Override
 	public void setDocument(IDocument document)
 	{
@@ -107,26 +119,35 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		return eventBus.addHandlerToSource(NodeSelectionEvent.TYPE, this, handler);
 	}
 
+	/**
+	 * A convenience method for getting the tree from the current document
+	 */
 	public ITree getTree()
 	{
 		return this.getDocument() != null ? this.getDocument().getTree() : null;
 	}
 
-	public Camera getCamera()
+	protected Camera getCamera()
 	{
 		return camera;
 	}
 
-	public void setCamera(Camera camera)
+	protected void setCamera(Camera camera)
 	{
 		this.camera = camera;
 	}
 
+	/**
+	 * A convenience method for getting the layout from the current document
+	 */
 	public ILayoutData getLayout()
 	{
 		return document != null ? document.getLayout() : null;
 	}
 
+	/**
+	 * Zoom to fit the entire tree
+	 */
 	public void zoomToFit()
 	{
 		if(null != this.getTree())
@@ -135,6 +156,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
+	/**
+	 * Zoom to fit a subtree rooted at the given node
+	 */
 	public void zoomToFitSubtree(final INode subtree)
 	{
 		if(subtree != null)
@@ -143,6 +167,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
+	/**
+	 * Zoom to fit a subtree rooted at the node with the given nodeId
+	 */
 	public void zoomToFitSubtree(final int nodeId)
 	{
 		ILayoutData layout = this.getLayout();
@@ -155,6 +182,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
+	/**
+	 * Zoom to fit a given rectangle
+	 */
 	public void zoomToBoundingBox(Box2D boundingBox)
 	{
 		if(null != this.getCamera())
@@ -164,16 +194,28 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
-	public abstract void resize(int width, int height);
+	protected abstract void resize(int width, int height);
 
+	/**
+	 * Render immediately. (Not recommended.  Use requestRender() instead.)
+	 */
 	public abstract void render();
+	
+	/**
+	 * Render to the given graphics target
+	 */
 	public abstract void renderTo(IGraphics g);
 
 	/**
-	 * This gets called by TreeWidget before every render, so it must return quickly
+	 * @return true if this view is ready to render
 	 */
-	public abstract boolean isReady();
+	protected abstract boolean isReady();
 
+	/**
+	 * Request that this view render its document. Rendering is scheduled to happen after the current
+	 * browser event loop returns. Multiple calls to requestRender() during a single event loop will
+	 * result in a single render.
+	 */
 	public void requestRender()
 	{
 
@@ -200,6 +242,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
+	/**
+	 * @return a URL for a static image of the current view
+	 */
 	public abstract String exportImageURL();
 
 	public void setEventBus(EventBus eventBus)
@@ -242,6 +287,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		this.layoutType = type;
 	}
 
+	/**
+	 * Fires an event from this View on its EventBus
+	 */
 	protected void dispatch(GwtEvent<?> event)
 	{
 		if(eventBus != null)
@@ -250,6 +298,9 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
+	/**
+	 * Adds a RenderEvent listener on this View's event bus
+	 */
 	protected void initEventListeners()
 	{
 		if(eventBus != null)
@@ -265,12 +316,20 @@ public abstract class View extends FocusPanel implements RequiresResize, HasDocu
 		}
 	}
 
+	/**
+	 * Pans the camera and re-renders
+	 * @see Camera#pan(double, double)
+	 */
 	public void pan(double xAmount, double yAmount)
 	{
 		getCamera().pan(xAmount, yAmount);
 		dispatch(new RenderEvent());
 	}
 
+	/**
+	 * Zooms the camera and re-renders
+	 * @see Camera#zoom(double)
+	 */
 	public void zoom(double amount)
 	{
 		getCamera().zoom(amount);

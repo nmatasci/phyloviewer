@@ -7,6 +7,9 @@ import org.iplantc.phyloviewer.shared.render.Camera;
 
 import com.google.gwt.user.client.Timer;
 
+/**
+ * A View that animates some of the camera moves
+ */
 public abstract class AnimatedView extends View
 {
 	private int numberOfAnimationSteps = 6;
@@ -48,6 +51,10 @@ public abstract class AnimatedView extends View
 		this.dispatch(new RenderEvent());
 	}
 
+	/**
+	 * Starts animating this AnimatedView's camera from its current view matrix to the given camera's
+	 * view matrix.
+	 */
 	protected void startAnimation(Camera finalCamera)
 	{
 		animator = new AnimateCamera(getCamera().getViewMatrix(), finalCamera.getViewMatrix(),
@@ -55,6 +62,7 @@ public abstract class AnimatedView extends View
 		renderTimer.scheduleRepeating(30);
 	}
 
+	@Override
 	public void zoomToBoundingBox(Box2D boundingBox)
 	{
 		Camera finalCamera = getCamera().create();
@@ -68,6 +76,9 @@ public abstract class AnimatedView extends View
 		return numberOfAnimationSteps;
 	}
 
+	/**
+	 * Set the number of steps until the animation reaches the final state.
+	 */
 	public void setNumberOfAnimationSteps(int numberOfAnimationSteps)
 	{
 		this.numberOfAnimationSteps = numberOfAnimationSteps;

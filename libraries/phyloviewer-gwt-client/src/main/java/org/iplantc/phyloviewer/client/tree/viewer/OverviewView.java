@@ -33,6 +33,9 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+/**
+ * A View that shows an overview image of the tree
+ */
 public class OverviewView extends AnimatedView
 {
 	private static final String MESSAGE_ERROR_LOADING_IMAGE = "Error loading image.";
@@ -149,12 +152,10 @@ public class OverviewView extends AnimatedView
 		this.requestRender();
 	}
 
+	/**
+	 * Update the overview image
+	 */
 	public void updateImage()
-	{
-		this.retrieveOverviewImage();
-	}
-
-	private void retrieveOverviewImage()
 	{
 		this.downloadingImage = null;
 
@@ -296,13 +297,13 @@ public class OverviewView extends AnimatedView
 		this.height = height;
 		canvas.setWidth(width);
 		canvas.setHeight(height);
-		retrieveOverviewImage(); // FIXME: limit the rate of these requests. Most browsers are going to
+		updateImage(); // FIXME: limit the rate of these requests. Most browsers are going to
 									// have many resize events as the user drags the window border
 									// around.
 	}
 
 	@Override
-	public boolean isReady()
+	protected boolean isReady()
 	{
 		return true;
 	}

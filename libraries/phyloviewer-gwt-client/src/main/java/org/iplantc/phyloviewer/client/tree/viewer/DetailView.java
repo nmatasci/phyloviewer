@@ -24,8 +24,10 @@ import org.iplantc.phyloviewer.client.events.LabelClickEvent;
 import org.iplantc.phyloviewer.client.events.LabelClickHandler;
 import org.iplantc.phyloviewer.client.events.LeafClickEvent;
 import org.iplantc.phyloviewer.client.events.LeafClickHandler;
+import org.iplantc.phyloviewer.client.events.NavigationMode;
 import org.iplantc.phyloviewer.client.events.NodeClickEvent;
 import org.iplantc.phyloviewer.client.events.NodeClickHandler;
+import org.iplantc.phyloviewer.client.events.SelectionMode;
 import org.iplantc.phyloviewer.client.tree.viewer.canvas.Canvas;
 import org.iplantc.phyloviewer.client.tree.viewer.render.canvas.CanvasGraphics;
 import org.iplantc.phyloviewer.shared.layout.ILayoutData;
@@ -65,6 +67,9 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 
+/**
+ * The main tree view class.
+ */
 public class DetailView extends AnimatedView implements Broadcaster
 {
 	private int renderCount;
@@ -169,6 +174,7 @@ public class DetailView extends AnimatedView implements Broadcaster
 		});
 	}
 
+	@Override
 	public void render()
 	{
 		try
@@ -206,6 +212,7 @@ public class DetailView extends AnimatedView implements Broadcaster
 		}
 	}
 	
+	@Override
 	public void renderTo(IGraphics g)
 	{
 		if(this.isReady())
@@ -222,19 +229,15 @@ public class DetailView extends AnimatedView implements Broadcaster
 		}
 	}
 
+	@Override
 	public void resize(int width, int height)
 	{
 		graphics.setSize(width, height);
 		overlayGraphics.setSize(width, height);
-		setCanvasSize(width, height);
-	}
-
-	protected void setCanvasSize(int width, int height)
-	{
 		canvas.setWidth(width);
 		canvas.setHeight(height);
 	}
-
+	
 	protected int getHeight()
 	{
 		return canvas.getHeight();
@@ -268,7 +271,7 @@ public class DetailView extends AnimatedView implements Broadcaster
 	}
 
 	@Override
-	public boolean isReady()
+	protected boolean isReady()
 	{
 		boolean documentReady = this.getDocument() != null && this.getDocument().isReady();
 		boolean ready = documentReady && graphics != null && getCamera() != null;
@@ -301,11 +304,13 @@ public class DetailView extends AnimatedView implements Broadcaster
 		textDrawable.draw(overlayGraphics, overlayStyle);
 	}
 
+	@Override
 	public String exportImageURL()
 	{
 		return canvas.toDataURL();
 	}
 
+	@Override
 	public void setRenderPreferences(RenderPreferences rp)
 	{
 		super.setRenderPreferences(rp);
@@ -347,6 +352,11 @@ public class DetailView extends AnimatedView implements Broadcaster
 		return intersector;
 	}
 
+	/**
+	 * Find nodes within a given rectangle
+	 * @param screenBox the rectangle, in screen coordinates
+	 * @return the set of nodes in the rectangle
+	 */
 	public Set<INode> getNodesIn(Box2D screenBox)
 	{
 		Set<INode> nodes = Collections.emptySet();
@@ -363,6 +373,11 @@ public class DetailView extends AnimatedView implements Broadcaster
 		return nodes;
 	}
 
+	/**
+	 * Transforms a screen location to the tree layout coordinate system
+	 * @param position the position
+	 * @return the corresponding position in layout space
+	 */
 	public Vector2 getPositionInLayoutSpace(Vector2 position)
 	{
 		if(graphics != null)
@@ -374,6 +389,11 @@ public class DetailView extends AnimatedView implements Broadcaster
 		return position;
 	}
 
+	/**
+	 * Transforms a screen rectangle to the tree layout coordinate system
+	 * @param box the rectangle
+	 * @return the corresponding rectangle in tree layout space
+	 */
 	public Box2D getBoxInLayoutSpace(Box2D box)
 	{
 		Vector2 min = getPositionInLayoutSpace(box.getMin());
@@ -381,6 +401,11 @@ public class DetailView extends AnimatedView implements Broadcaster
 		return new Box2D(min, max);
 	}
 	
+	/**
+	 * Switch the user interface interaction mode
+	 * @see NavigationMode
+	 * @see SelectionMode
+	 */
 	public void setInteractionMode(InteractionMode mode)
 	{
 		if (currentInteractionMode != null)
@@ -605,11 +630,17 @@ public class DetailView extends AnimatedView implements Broadcaster
 		}
 	}
 
+	/**
+	 * @return true if this DetailView should display elapsed rendering time statistics
+	 */
 	public boolean isDrawRenderStats()
 	{
 		return drawRenderStats;
 	}
 
+	/**
+	 * Set whether this DetailView should display elapsed rendering time statistics
+	 */
 	public void setDrawRenderStats(boolean drawRenderStats)
 	{
 		this.drawRenderStats = drawRenderStats;
@@ -768,11 +799,19 @@ public class DetailView extends AnimatedView implements Broadcaster
 		this.eventMask = 0;
 	}
 	
+	/**
+	 * Adds a drawable to the overlay graphics
+	 * @return true if it was added
+	 */
 	public boolean addOverlay(Drawable d)
 	{
 		return overlays.add(d);
 	}
 	
+	/**
+	 * Removes a drawable from the overlay graphics
+	 * @return true if it was removed
+	 */
 	public boolean removeOverlay(Drawable d)
 	{
 		return overlays.remove(d);
