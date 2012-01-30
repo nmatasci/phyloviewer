@@ -34,11 +34,18 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ResizeComposite;
 
+/**
+ * A widget that displays a tree.  Can be set to different {@link ViewType}s using {@link TreeWidget#setViewType(ViewType) setViewType()}.
+ * Has a RenderPreferences that controls how its child views display trees.
+ */
 public class TreeWidget extends ResizeComposite implements HasDocument, HasNodeSelectionHandlers,
 		HasRenderPreferences
 {
-	public RenderPreferences renderPreferences = new RenderPreferences();
+	private RenderPreferences renderPreferences = new RenderPreferences();
 
+	/**
+	 * The set of view types available for this TreeWidget
+	 */
 	public enum ViewType
 	{
 		VIEW_TYPE_CLADOGRAM, VIEW_TYPE_RADIAL
@@ -50,6 +57,11 @@ public class TreeWidget extends ResizeComposite implements HasDocument, HasNodeS
 	private IDocument document;
 	private SearchHighlighter highlighter;
 
+	/**
+	 * Create a new TreeWidget, with a VIEW_TYPE_CLADOGRAM ViewType by default.
+	 * @param searchService
+	 * @param eventBus
+	 */
 	public TreeWidget(SearchServiceAsyncImpl searchService, EventBus eventBus)
 	{
 		this.eventBus = eventBus;
@@ -90,6 +102,10 @@ public class TreeWidget extends ResizeComposite implements HasDocument, HasNodeS
 		return eventBus.addHandlerToSource(NodeSelectionEvent.TYPE, this, handler);
 	}
 
+	/**
+	 * Set the view type
+	 * @see ViewType
+	 */
 	public void setViewType(ViewType type)
 	{
 		int width = Math.max(10, getOffsetWidth());
@@ -242,27 +258,34 @@ public class TreeWidget extends ResizeComposite implements HasDocument, HasNodeS
 		newView.requestRender();
 	}
 
+	/**
+	 * Make the widget render immediately
+	 */
 	public void render()
 	{
 		view.render();
 	}
 
+	/**
+	 * @return a URL to a static image of the current view
+	 */
 	public String exportImageURL()
 	{
 		return this.view.exportImageURL();
 	}
 
+	/**
+	 * @return the View
+	 * @deprecated
+	 */
 	public View getView()
 	{
 		return view;
 	}
 
 	/**
-	 * Make the bounding box fill the viewport.
-	 * 
-	 * @param box
+	 * Make the given box fill the viewport.
 	 */
-
 	public void show(Box2D box)
 	{
 		view.zoomToBoundingBox(box);
@@ -279,6 +302,6 @@ public class TreeWidget extends ResizeComposite implements HasDocument, HasNodeS
 	{
 		this.renderPreferences = rp;
 		highlighter.setRenderPreferences(rp);
-		getView().setRenderPreferences(rp);
+		view.setRenderPreferences(rp);
 	}
 }

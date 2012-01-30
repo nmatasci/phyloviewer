@@ -17,6 +17,10 @@ import org.iplantc.phyloviewer.viewer.client.services.CombinedServiceAsync;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+/**
+ * A Document that is paged in from the server as needed. Use checkForData to see if the children of a
+ * node are loaded on the client.
+ */
 public class PagedDocument extends Document implements Serializable
 {
 	private static final long serialVersionUID = -1787841507150753540L;
@@ -29,6 +33,13 @@ public class PagedDocument extends Document implements Serializable
 	private transient EventBus eventBus;
 	private transient Set<Integer> pendingRequests = new HashSet<Integer>();
 
+	/**
+	 * Create a new PagedDocument. Needs a tree and root node layout because the renderer assumes that at
+	 * least that data is available at the first render.
+	 * 
+	 * @param tree the tree
+	 * @param rootLayout the tree's root node LayoutResponse
+	 */
 	public PagedDocument(RemoteTree tree, LayoutResponse rootLayout)
 	{
 		super();
@@ -46,6 +57,17 @@ public class PagedDocument extends Document implements Serializable
 		this.layoutID = rootLayout.layoutID;
 	}
 
+	/**
+	 * Check if the children of <code>node</code> are ready to be rendered (i.e. both the children and
+	 * their layout are available locally.)
+	 * 
+	 * This method also makes a request to fetch the data from the server, so that it will be available
+	 * some time in the future. A RenderEvent is fired when the request returns, but it can also be
+	 * called repeatedly to check the same node (e.g. on every render) without triggering additional
+	 * requests.
+	 * 
+	 * @return true if the children are available
+	 */
 	@Override
 	public boolean checkForData(final INode node)
 	{
@@ -119,6 +141,9 @@ public class PagedDocument extends Document implements Serializable
 		return eventBus;
 	}
 
+	/**
+	 * Set the EventBus this PagedDocument fires RenderEvents on
+	 */
 	public void setEventBus(EventBus eventBus)
 	{
 		this.eventBus = eventBus;
@@ -129,6 +154,9 @@ public class PagedDocument extends Document implements Serializable
 		return combinedService;
 	}
 
+	/**
+	 * Set the CombinedServiceAsync this PagedDocument uses to fetch nodes and layouts
+	 */
 	public void setCombinedService(CombinedServiceAsync combinedService)
 	{
 		this.combinedService = combinedService;
@@ -145,6 +173,10 @@ public class PagedDocument extends Document implements Serializable
 		return layoutID;
 	}
 
+	/**
+	 * Set the layout id this PagedDocument uses when requesting layout data
+	 * @param layoutID
+	 */
 	public void setLayoutID(String layoutID)
 	{
 		this.layoutID = layoutID;

@@ -68,7 +68,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
- * Entry point classes define <code>onModuleLoad()</code>.
+ * The EntryPoint class for phyloviewer.  Builds the user interface and sets up remote services.
  */
 public class Phyloviewer implements EntryPoint
 {
@@ -193,7 +193,7 @@ public class Phyloviewer implements EntryPoint
 				try
 				{
 					IStyleMap styleMap = StyleServiceClient.parseJSON(style);
-					widget.getView().getDocument().setStyleMap(styleMap);
+					widget.getDocument().setStyleMap(styleMap);
 					widget.render();
 				}
 				catch(StyleServiceException e)
@@ -237,10 +237,10 @@ public class Phyloviewer implements EntryPoint
 		});
 
 		// create some styling widgets for the context menu
-		NodeStyleWidget nodeStyleWidget = new NodeStyleWidget(widget.getView().getDocument());
-		BranchStyleWidget branchStyleWidget = new BranchStyleWidget(widget.getView().getDocument());
-		GlyphStyleWidget glyphStyleWidget = new GlyphStyleWidget(widget.getView().getDocument());
-		LabelStyleWidget labelStyleWidget = new LabelStyleWidget(widget.getView().getDocument());
+		NodeStyleWidget nodeStyleWidget = new NodeStyleWidget(widget.getDocument());
+		BranchStyleWidget branchStyleWidget = new BranchStyleWidget(widget.getDocument());
+		GlyphStyleWidget glyphStyleWidget = new GlyphStyleWidget(widget.getDocument());
+		LabelStyleWidget labelStyleWidget = new LabelStyleWidget(widget.getDocument());
 
 		// replace their default TextBoxes with ColorBoxes, which jscolor.js will add a color picker to
 		nodeStyleWidget.setColorWidget(createColorBox());
@@ -532,7 +532,7 @@ public class Phyloviewer implements EntryPoint
 			@Override
 			public void onSuccess(IStyleMap style)
 			{
-				IDocument document = widget.getView().getDocument();
+				IDocument document = widget.getDocument();
 				if (document != null) {
 					document.setStyleMap(style);
 					widget.render();

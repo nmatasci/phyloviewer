@@ -11,6 +11,9 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+/**
+ * A PopupPanel with a text area and an OK button. Fires a ValueChangeEvent containing the text and hides itself when the OK button is pressed.
+ */
 public class TextInputPopup extends PopupPanel implements HasValueChangeHandlers<String>
 {
 	final TextArea textBox = new TextArea();
