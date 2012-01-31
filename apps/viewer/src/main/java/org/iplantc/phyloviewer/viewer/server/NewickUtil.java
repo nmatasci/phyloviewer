@@ -16,9 +16,17 @@ import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
 
+/**
+ * Static utility methods for parsing and converting newick strings into ITrees
+ */
 public class NewickUtil
 {
 
+	/**
+	 * Parses the given newick string and converts it to a tree of RemoteNodes.
+	 * @return the root of the converted tree
+	 * @throws ParserException if unable to parse the newick string
+	 */
 	public static RemoteNode rootNodeFromNewick(String newick) throws ParserException {
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "parsing newick");
 		org.iplantc.phyloparser.model.Tree tree = NewickUtil.phyloparserTreeFromNewick(newick);
@@ -35,6 +43,11 @@ public class NewickUtil
 		return root;
 	}
 
+	/**
+	 * Parses the given newick string and converts it to a RemoteTree with the given name.
+	 * @return the converted tree
+	 * @throws ParserException if unable to parse the newick string
+	 */
 	public static RemoteTree treeFromNewick(String newick, String name) throws ParserException
 	{
 		RemoteTree tree = new RemoteTree(name);
@@ -46,6 +59,10 @@ public class NewickUtil
 		return tree;
 	}
 
+	/**
+	 * Parses the given newick string into phyloparser models.
+	 * @throws ParserException if the newick string cannot be parsed
+	 */
 	public static org.iplantc.phyloparser.model.Tree phyloparserTreeFromNewick(String newick) throws ParserException
 	{
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Parsing newick string");
@@ -73,6 +90,12 @@ public class NewickUtil
 		return tree;
 	}
 
+	/**
+	 * Creates a AnnotatedNode tree based on the given tree of phyloparser model Nodes, copying any NHX
+	 * annotations as LiteralMetaAnnotations with property name "NHX".
+	 * 
+	 * @return the root node of the new tree
+	 */
 	public static AnnotatedNode convertDataModels(org.iplantc.phyloparser.model.Node parserNode) 
 	{
 		ArrayList<RemoteNode> children = new ArrayList<RemoteNode>(parserNode.getChildren().size());

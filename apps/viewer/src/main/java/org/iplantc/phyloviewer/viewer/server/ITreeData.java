@@ -6,6 +6,9 @@ import org.iplantc.phyloviewer.shared.model.ITree;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteNode;
 import org.iplantc.phyloviewer.viewer.client.services.TreeDataException;
 
+/**
+ * An interface for tree and node data access objects.
+ */
 public interface ITreeData
 {
 

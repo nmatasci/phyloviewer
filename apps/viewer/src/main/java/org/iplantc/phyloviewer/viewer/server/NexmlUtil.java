@@ -26,9 +26,16 @@ import org.nexml.model.Network;
 import org.nexml.model.TreeBlock;
 import org.xml.sax.SAXException;
 
+/**
+ * Static utility methods for parsing and converting nexml strings and documents into ITrees
+ */
 public class NexmlUtil
 {
 
+	/**
+	 * Parses the given string into a nexml model Document.
+	 * @see DocumentFactory#parse(String)
+	 */
 	public static org.nexml.model.Document parse(String nexml) throws UnsupportedEncodingException,
 			ParserConfigurationException, SAXException, IOException
 	{
@@ -80,6 +87,9 @@ public class NexmlUtil
 		return null;
 	}
 
+	/**
+	 * Create a new AnnotatedTree based on the given nexml model Tree.
+	 */
 	public static AnnotatedTree convertDataModels(org.nexml.model.Tree<Edge> in) {
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "converting nexml to RemoteTree");
 		AnnotatedTree out = new AnnotatedTree();

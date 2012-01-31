@@ -1,5 +1,8 @@
 package org.iplantc.phyloviewer.viewer.server;
 
+/**
+ * Indicates a problem that prevents a tree from being imported.
+ */
 public class ImportException extends Exception
 {
 	private static final long serialVersionUID = 1L;
