@@ -42,36 +42,64 @@ import org.xml.sax.SAXException;
  */
 public class ParseTree
 {
-	File treeBackupDir = new File(".");
+	private File treeBackupDir = new File(".");
 	private IImportTreeData importer;
 	private ImportTreeLayout layoutImporter;
 	
+	/**
+	 * Creates a new ParseTree that uses the given tree and layout importers to save the tree data.
+	 */
 	public ParseTree(IImportTreeData importer, ImportTreeLayout layoutImporter) {
 		this.importer = importer;
 		this.layoutImporter = layoutImporter;
 	}
 	
+	/**
+	 * Set the object used to persist tree and node data
+	 */
 	public void setImporter(IImportTreeData importer)
 	{
 		this.importer = importer;
 	}
 
+	/**
+	 * Set the object used to persist tree layout data
+	 */
 	public void setLayoutImporter(ImportTreeLayout layoutImporter)
 	{
 		this.layoutImporter = layoutImporter;
 	}
 
+	/**
+	 * Set the directory used to store request backup files. If the database is later cleared, e.g. for
+	 * schema changes, the requests can be replayed from this directory using replayBackups(). The
+	 * default is the current working directory.
+	 * 
+	 * @see ParseTree#replayBackups()
+	 * @see ParseTree#main(String[])
+	 */
 	public void setTreeBackupDir(String treeBackupPath)
 	{
 		treeBackupDir = new File(treeBackupPath); 
 		treeBackupDir.mkdir();
 	}
 	
+	/**
+	 * @return the tree backup directory
+	 */
 	public File getTreeBackupDir()
 	{
 		return treeBackupDir;
 	}
 	
+	/**
+	 * Parse the given tree request parameters and persist the tree. In cases where the request has more
+	 * than one tree, it only imports a single tree.
+	 * 
+	 * @param parameters the HttpServletRequest parameters for one request. Maps parameter names to
+	 *            values.
+	 * @return the tree ID
+	 */
 	public String saveTree(Map<String, String[]> parameters) throws ParserException, SAXException, Exception {
 		String id = importTree(parameters);
 		
@@ -83,6 +111,9 @@ public class ParseTree
 		return id;
 	}
 	
+	/**
+	 * Reload the tree upload requests saved in the backup directory. Used to repopulate the database.
+	 */
 	public void replayBackups() throws ParserException, SAXException, Exception {
 		System.out.println("Replaying backups from " + treeBackupDir.getAbsolutePath());
 		File[] files = treeBackupDir.listFiles();
@@ -226,6 +257,10 @@ public class ParseTree
 		return id;
 	}
 
+	/**
+	 * Run from the command line to repopulate the database from saved backups.
+	 * @param args if args[0] is replay, it reloads the backups.
+	 */
 	public static void main(String[] args) throws ParserException, SAXException, Exception {
 		if (args.length > 0 && args[0].equals("replay")) {
 			String server = "localhost";

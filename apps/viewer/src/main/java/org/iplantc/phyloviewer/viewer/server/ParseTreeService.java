@@ -30,11 +30,27 @@ import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 import org.iplantc.phyloviewer.viewer.server.persistence.ImportTreeLayout;
 import org.xml.sax.SAXException;
 
+/**
+ * A servlet that accepts tree uploads and returns a URL to view the tree.
+ */
 public class ParseTreeService extends HttpServlet {
 	private static final long serialVersionUID = -2532260393364629170L;
 	private ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
 	private ParseTree parseTree;
 
+	/**
+	 * Accepts a tree for parsing and storage, and returns a URL to view the tree.  
+	 * May return before the tree has finished importing.
+	 * 
+	 * @param request has the following parameters:
+	 * <pre>
+	 * newickData or nexml: a string representing the tree data
+	 * name (optional): the label that is given to the newick tree. 
+	 * 	Nexml documents already have an attribute for tree label, so they don't use this parameter.
+	 * </pre>
+	 * 
+	 * @param response contains the URL to view the tree
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	{
 		Logger.getLogger("org.iplantc.phyloviewer").log(Level.FINE, "Received tree post request");

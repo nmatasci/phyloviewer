@@ -9,6 +9,9 @@ import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+/**
+ * Implementation of CombinedService.
+ */
 public class CombinedServiceImpl extends RemoteServiceServlet implements CombinedService
 {
 	private static final long serialVersionUID = 2839219371009200675L;
@@ -21,7 +24,7 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 		return (ILayoutData) this.getServletContext().getAttribute(Constants.LAYOUT_DATA_KEY);
 	}
 
-	public List<RemoteNode> getChildren(int parentID) throws TreeDataException {
+	private List<RemoteNode> getChildren(int parentID) throws TreeDataException {
 		return this.getTreeData().getChildren(parentID);
 	}
 
@@ -37,11 +40,12 @@ public class CombinedServiceImpl extends RemoteServiceServlet implements Combine
 		return response;
 	}
 
+	@Override
 	public LayoutResponse getLayout(RemoteNode node, String layoutID) {		
 		return this.getLayoutData().getLayout(node, layoutID);
 	}
 	
-	public LayoutResponse[] getLayout(List<RemoteNode> nodes, String layoutID) {
+	private LayoutResponse[] getLayout(List<RemoteNode> nodes, String layoutID) {
 		LayoutResponse[] response = new LayoutResponse[nodes.size()];
 		
 		for (int i = 0; i < nodes.size(); i++) {

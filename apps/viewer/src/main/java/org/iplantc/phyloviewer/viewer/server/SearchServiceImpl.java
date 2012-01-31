@@ -14,6 +14,9 @@ import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+/**
+ * An implementation of SearchService
+ */
 public class SearchServiceImpl extends RemoteServiceServlet implements SearchService
 {
 	private static final long serialVersionUID = -7938571144166651105L;

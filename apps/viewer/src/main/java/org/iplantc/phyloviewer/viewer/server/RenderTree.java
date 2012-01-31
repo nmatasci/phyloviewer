@@ -18,13 +18,22 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
+/**
+ * A servlet that returns scaled tree overview images
+ */
 public class RenderTree extends HttpServlet {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2634082637401140976L;
 
+	/**
+	 * Returns an overview image for a given tree and layout, scaled to the given dimensions
+	 * @param request has the following params:
+	 * <pre>
+	 *treeID: the tree id
+	 *layoutID: the layout id
+	 *width: the desired image width
+	 *height: the desired image height
+	 *  <pre>
+	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) {
 
@@ -68,6 +77,9 @@ public class RenderTree extends HttpServlet {
 		}
 	}
 
+	/**
+	 * @return the overview image for the given tree and layout, scaled to the given dimensions
+	 */
 	public BufferedImage renderTreeImage(byte[] treeID, String layoutID,
 			int width, int height) {
 

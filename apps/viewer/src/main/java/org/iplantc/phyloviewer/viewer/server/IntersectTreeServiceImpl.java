@@ -18,11 +18,10 @@ import org.postgis.Polygon;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+/**
+ * Implementation of TreeIntersectService
+ */
 public class IntersectTreeServiceImpl extends RemoteServiceServlet implements TreeIntersectService {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3415482053977170710L;
 
 	@Override

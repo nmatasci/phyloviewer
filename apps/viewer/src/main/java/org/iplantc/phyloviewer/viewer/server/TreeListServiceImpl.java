@@ -9,11 +9,10 @@ import org.iplantc.phyloviewer.viewer.server.persistence.Constants;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+/**
+ * An implementation of TreeListService
+ */
 public class TreeListServiceImpl extends RemoteServiceServlet implements TreeListService {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1593366473133954060L;
 
 	@Override
