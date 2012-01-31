@@ -12,6 +12,11 @@ import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 
+/**
+ * A display widget that listens for node selection events and updates itself to display information
+ * about the selected node. Only displays when single nodes are selected.
+ * Has css class "nodeTable"
+ */
 public class NodeTable extends FlexTable implements NodeSelectionHandler
 {
 	public NodeTable()

@@ -11,6 +11,9 @@ import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.TextBox;
 
+/**
+ * An AbstractElementStyleWidget implementation that edits the INodeStyle.
+ */
 public class NodeStyleWidget extends AbstractElementStyleWidget
 {
 	private static final int LABEL_COLUMN = 0;
@@ -43,6 +46,9 @@ public class NodeStyleWidget extends AbstractElementStyleWidget
 		}
 	};
 	
+	/**
+	 * Creates a new NodeStyleWidget that edits styles in the given document
+	 */
 	public NodeStyleWidget(IDocument document)
 	{
 		super(document);
@@ -53,12 +59,18 @@ public class NodeStyleWidget extends AbstractElementStyleWidget
 		setSizeWidget(new DoubleBox());
 	}
 	
+	/**
+	 * Set the color editing widget.  Default is a TextBox.
+	 */
 	public void setColorWidget(HasValue<String> widget)
 	{
 		colorUpdater.attachTo(widget);
 		setWidget(COLOR_ROW, WIDGET_COLUMN, widget);
 	}
 	
+	/**
+	 * Set the node size editing widget.  Default is a DoubleBox
+	 */
 	public void setSizeWidget(HasValue<Double> widget)
 	{
 		sizeUpdater.attachTo(widget);

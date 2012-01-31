@@ -10,8 +10,9 @@ import org.iplantc.phyloviewer.viewer.client.services.SearchServiceAsyncImpl.Sea
 
 /**
  * Listens to a SearchServiceAsyncImpl for search results and highlights the ancestors of the result
- * nodes in the tree. Also listens to the nodes in a view's tree for new children and highlights them if
- * they are ancestors of the search result nodes.
+ * nodes in the tree (even if the highlighted nodes themselves haven't been loaded yet). Also listens to
+ * the nodes in a view's tree for new children and highlights them if they are ancestors of the search
+ * result nodes.
  */
 public class SearchHighlighter implements SearchResultListener
 {
@@ -20,28 +21,47 @@ public class SearchHighlighter implements SearchResultListener
 	private final SearchServiceAsyncImpl searchService;
 	private RenderPreferences renderPreferences;
 
+	/**
+	 * Creates a new SearchHighlighter that listens to the given SearchServiceAsyncImpl for search
+	 * results to highlight
+	 */
 	public SearchHighlighter(SearchServiceAsyncImpl searchService)
 	{
 		this.searchService = searchService;
 		searchService.addSearchResultListener(this);
 	}
 
+	/**
+	 * Removes listeners and clears highlights
+	 */
 	public void dispose()
 	{
 		searchService.removeSearchResultListener(this);
 		this.clear();
 	}
 
+	/**
+	 * Sets the view that this listener will update when it changes highlights
+	 * @deprecated
+	 */
 	public void setView(View view)
 	{
 		this.view = view;
 	}
 
+	/**
+	 * Set the RenderPreferences that this highlighter adds highlights to
+	 * @deprecated
+	 */
 	public void setRenderPreferences(RenderPreferences renderPreferences)
 	{
 		this.renderPreferences = renderPreferences;
 	}
 
+	/**
+	 * Sets the tree that this highlighter highlights
+	 * @deprecated
+	 */
 	public void setTree(ITree tree)
 	{
 		this.tree = tree;
@@ -87,7 +107,8 @@ public class SearchHighlighter implements SearchResultListener
 	}
 
 	/**
-	 * Removes this listener from all of the nodes of the tree
+	 * Clears highlights
+	 * @deprecated
 	 */
 	public void clear()
 	{

@@ -39,6 +39,9 @@ public class ColorBox extends TextBox
 		colorNameMap.put("aqua", "#00FFFF");
 	}
 	
+	/**
+	 * Create a new ColorBox
+	 */
 	public ColorBox()
 	{
 		this.addStyleName("color");

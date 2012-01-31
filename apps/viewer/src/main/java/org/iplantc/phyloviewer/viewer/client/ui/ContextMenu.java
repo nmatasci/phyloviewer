@@ -20,12 +20,18 @@ public class ContextMenu extends StackLayoutPanel
 {
 	private HasNodeSelectionHandlers targetWidget;
 	
+	/**
+	 * Create a new ContextMenu that listens for events from the given widget
+	 */
 	public ContextMenu(HasNodeSelectionHandlers targetWidget)
 	{
 		super(Unit.EM);
 		this.targetWidget = targetWidget;
 	}
 	
+	/**
+	 * @return the widget that this ContextMenu is listening for events from
+	 */
 	public HasNodeSelectionHandlers getTargetWidget()
 	{
 		return targetWidget;
@@ -36,6 +42,7 @@ public class ContextMenu extends StackLayoutPanel
 	 * through this insert (before going into a private insert method), so I can make the new child
 	 * handle events here. If StackLayoutPanel changes, more drastic measures may be required.
 	 */
+	@Override
 	public void insert(Widget child, Widget header, double headerSize, int beforeIndex)
 	{
 		handleDocumentChanges(child);

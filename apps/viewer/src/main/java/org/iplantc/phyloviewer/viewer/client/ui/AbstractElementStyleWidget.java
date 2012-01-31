@@ -23,25 +23,35 @@ import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * An abstract base class for widgets that display and edit styling for node rendering elements.
+ */
 public abstract class AbstractElementStyleWidget extends FlexTable implements NodeSelectionHandler, DocumentChangeHandler
 {
 	private IDocument document;
 	private Set<INode> nodes = Collections.emptySet();
 	private ArrayList<HasValue<?>> widgets = new ArrayList<HasValue<?>>();
 	
+	/**
+	 * Create a new AbstractElementStyleWidget that edits styles in the given document
+	 */
 	public AbstractElementStyleWidget(IDocument document)
 	{	
 		this.document = document; 
 	}
 	
+	/**
+	 * Set the document that this widget edits styles in
+	 */
 	public void setDocument(IDocument document)
 	{
 		this.document = document;
 	}
 	
 	/**
+	 * Gets the current style for a given node.
 	 * @param node the node to get a style for
-	 * @param create create a style for the node if it doesn't exist.
+	 * @param create if true, creates a style for the node if it doesn't exist.
 	 * @return the style (or null if !create and the style doesn't exist in the document).
 	 */
 	public IStyle getStyle(INode node, boolean create)
@@ -59,6 +69,9 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 		return style;
 	}
 	
+	/**
+	 * @return the currently selected set of nodes that this widget is editing styles for
+	 */
 	public Set<INode> getNodes()
 	{
 		return nodes;
@@ -89,6 +102,10 @@ public abstract class AbstractElementStyleWidget extends FlexTable implements No
 		this.document = event.getDocument();
 	}
 	
+	/**
+	 * Subclasses should update the style data displayed in their editor, showing a single node's current
+	 * style.
+	 */
 	public abstract void updateValues(INode node);
 	
 	private void updateWidgets(Set<INode> selectedNodes)
