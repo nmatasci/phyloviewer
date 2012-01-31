@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.iplantc.phyloviewer.viewer.server.AnnotationData;
 import org.iplantc.phyloviewer.viewer.server.IImportTreeData;
 import org.iplantc.phyloviewer.viewer.server.ITreeData;
 import org.postgresql.ds.PGPoolingDataSource;
@@ -59,6 +60,9 @@ public class DatabaseListener implements ServletContextListener
 		ImportTreeLayout layoutImporter = new ImportTreeLayout(pool);
 		layoutImporter.setImageDirectory(imagePath);
 		servletContext.setAttribute(Constants.IMPORT_TREE_LAYOUT_KEY, layoutImporter);
+		
+		AnnotationData annotationData = new AnnotationDataImpl(emf);
+		servletContext.setAttribute(AnnotationData.class.getName(), annotationData);
 	}
 
 	@Override

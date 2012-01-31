@@ -10,15 +10,18 @@ import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadata;
 import org.iplantc.phyloviewer.viewer.client.model.AnnotatedNode;
 import org.iplantc.phyloviewer.viewer.client.model.LiteralMetaAnnotation;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
+import org.junit.Before;
 import org.junit.Test;
 
-public class AnnotationDataTest extends PersistenceTest
+public class AnnotationDataImplTest extends PersistenceTest
 {
-
-	@Test
-	public void testGetAnnotationMetadataRemoteTree()
-	{
-		RemoteTree tree = new RemoteTree();
+	private RemoteTree tree;
+	
+	@Before
+	public void before() {
+		//persist an annotated tree.
+		
+		tree = new RemoteTree();
 		
 		AnnotatedNode root = new AnnotatedNode();
 		AnnotatedNode child = new AnnotatedNode();
@@ -44,13 +47,19 @@ public class AnnotationDataTest extends PersistenceTest
 		root.addAnnotation(annotation2);
 		child.addAnnotation(annotation3);
 		
+		tree.getRootNode().reindex();
+		
 		EntityManager em = PersistenceTest.entityManagerFactory.createEntityManager();
 		em.getTransaction().begin();
 		em.persist(tree);
 		em.getTransaction().commit();
 		em.close();
-		
-		AnnotationData data = new AnnotationData(PersistenceTest.entityManagerFactory);
+	}
+	
+	@Test
+	public void testGetAnnotationMetadataRemoteTree()
+	{
+		AnnotationDataImpl data = new AnnotationDataImpl(PersistenceTest.entityManagerFactory);
 		List<AnnotationMetadata> metadata = data.getAnnotationMetadata(tree);
 		assertTrue(metadata.size() == 2);
 		//TODO implement AnnotationMetadataImpl.equals() so I can test whether the list contains the expected elements
@@ -59,7 +68,17 @@ public class AnnotationDataTest extends PersistenceTest
 	@Test
 	public void testGetAnnotationMetadataRemoteTreeString()
 	{
-		fail("Not yet implemented");
+		AnnotationDataImpl data = new AnnotationDataImpl(PersistenceTest.entityManagerFactory);
+		
+		AnnotationMetadata metadata = data.getAnnotationMetadata(tree, "someStringProperty");
+		assertNotNull(metadata);
+		assertEquals("someStringProperty", metadata.getName());
+		assertEquals(String.class, metadata.getDatatype());
+		
+		metadata = data.getAnnotationMetadata(tree, "someDoubleProperty");
+		assertNotNull(metadata);
+		assertEquals("someDoubleProperty", metadata.getName());
+		assertEquals(Double.class, metadata.getDatatype());
 	}
 
 }

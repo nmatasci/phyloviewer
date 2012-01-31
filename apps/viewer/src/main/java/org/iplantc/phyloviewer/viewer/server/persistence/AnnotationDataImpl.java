@@ -10,13 +10,20 @@ import javax.persistence.Query;
 import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadata;
 import org.iplantc.phyloviewer.shared.model.metadata.AnnotationMetadataImpl;
 import org.iplantc.phyloviewer.viewer.client.model.RemoteTree;
-import org.iplantc.phyloviewer.viewer.client.services.AnnotationService;
+import org.iplantc.phyloviewer.viewer.server.AnnotationData;
 
-public class AnnotationData implements AnnotationService
+/**
+ * JPA implementation of AnnotationData
+ */
+public class AnnotationDataImpl implements AnnotationData
 {
 	private EntityManagerFactory emf;
 	
-	public AnnotationData(EntityManagerFactory emf)
+	/**
+	 * Create a new AnnotationDataImpl
+	 * @param emf the EntityManagerFactory used to interact with the persistence unit.
+	 */
+	public AnnotationDataImpl(EntityManagerFactory emf)
 	{
 		this.emf = emf;
 	}
@@ -28,9 +35,10 @@ public class AnnotationData implements AnnotationService
 		EntityManager em = emf.createEntityManager();
 		
 		String query = "SELECT DISTINCT a.property, a.datatype"
-				+ " FROM AnnotatedNode n, IN (n.annotations) a "; 
-				//+ " WHERE n.topology.rootNode = :rootNode"; //TODO
+				+ " FROM AnnotatedNode n, IN (n.annotations) a "
+				+ " WHERE n.topology.rootNode.id = :rootNodeID"; 
 		Query q = em.createQuery(query);
+		q.setParameter("rootNodeID", tree.getRootNode().getId());
 		
 		@SuppressWarnings("unchecked")
 		List<Object[]> results = q.getResultList();
@@ -53,9 +61,10 @@ public class AnnotationData implements AnnotationService
 	public AnnotationMetadata getAnnotationMetadata(RemoteTree tree, String propertyOrRel)
 	{
 		// TODO Auto-generated method stub
+		// hmm... the method signature may need to change.  the propertyOrRel could possibly refer to annotations with more than one datatype.  It would be silly, but it could happen.
 		return null;
 	}
-	
+
 	private Class<?> getClassFor(String datatype)
 	{
 		if (datatype == null || datatype.isEmpty())
