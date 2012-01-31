@@ -12,7 +12,10 @@ import javax.persistence.OneToMany;
 import org.iplantc.phyloviewer.shared.model.metadata.Annotated;
 import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
 
-
+/**
+ * A RemoteNode with Annotations
+ * @see Annotation
+ */
 @Entity
 public class AnnotatedNode extends RemoteNode implements Serializable, Annotated
 {
@@ -25,23 +28,24 @@ public class AnnotatedNode extends RemoteNode implements Serializable, Annotated
 	{
 	}
 
+	@Override
 	public Set<Annotation> getAnnotations()
 	{
 		return annotations;
 	}
 
+	@Override
 	public void setAnnotations(Set<Annotation> annotations)
 	{
 		this.annotations = annotations;
 	}
 
-    /**
-     * @see org.nexml.model.Annotatable#getAnnotations(java.lang.String)
-     */
+	@Override
     public Set<Annotation> getAnnotations(String propertyOrRel) {
     	return AnnotationEntity.getAnnotations(propertyOrRel, this.annotations);
     }
     
+	@Override
     public void addAnnotation(Annotation annotation) {
     	if (this.annotations == null) {
     		this.annotations = new HashSet<Annotation>();

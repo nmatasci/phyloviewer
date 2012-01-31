@@ -6,6 +6,10 @@ import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
+/**
+ * A structure for tree topology stats for a node. Allows the data to be calculated once when the tree is
+ * build, then persisted and serialized to the client.
+ */
 @Embeddable
 public class NodeTopology implements Serializable
 {
@@ -45,6 +49,9 @@ public class NodeTopology implements Serializable
 		this.setRootNode(topology.getRootNode());
 	}
 	
+	/**
+	 * @return the number of children this node has
+	 */
 	public int getNumChildren()
 	{
 		return numChildren;
@@ -55,6 +62,9 @@ public class NodeTopology implements Serializable
 		this.numChildren = numChildren;
 	}
 
+	/**
+	 * @return the number of nodes in this node's subtree
+	 */
 	public int getNumNodes()
 	{
 		return numNodes;
@@ -65,6 +75,9 @@ public class NodeTopology implements Serializable
 		this.numNodes = numNodes;
 	}
 
+	/**
+	 * @return the number of leaf nodes in this node's subtree
+	 */
 	public int getNumLeaves()
 	{
 		return numLeaves;
@@ -75,6 +88,10 @@ public class NodeTopology implements Serializable
 		this.numLeaves = numLeaves;
 	}
 
+	/**
+	 * @return the height of the node in the tree (i.e. the length of the longest path from this node to
+	 *         a leaf)
+	 */
 	public int getHeight()
 	{
 		return height;
@@ -85,6 +102,10 @@ public class NodeTopology implements Serializable
 		this.height = height;
 	}
 
+	/**
+	 * @return the depth of this node in the tree (i.e. the length of the path from the root to this
+	 *         node).
+	 */
 	public int getDepth()
 	{
 		return depth;
@@ -95,6 +116,10 @@ public class NodeTopology implements Serializable
 		this.depth = depth;
 	}
 
+	/**
+	 * The left index is a number that is smaller than the left index of all nodes in this node's subtree. Used, with getRightIndex(), for fast subtree checks.
+	 * @return the left index
+	 */
 	public int getLeftIndex()
 	{
 		return leftIndex;
@@ -105,6 +130,10 @@ public class NodeTopology implements Serializable
 		this.leftIndex = leftIndex;
 	}
 
+	/**
+	 * The right index is a number that is larger than the right index of all nodes in this node's subtree. Used, with getLeftIndex(), for fast subtree checks.
+	 * @return the right index
+	 */
 	public int getRightIndex()
 	{
 		return rightIndex;
@@ -115,16 +144,26 @@ public class NodeTopology implements Serializable
 		this.rightIndex = rightIndex;
 	}
 	
+	/**
+	 * @return true if this subtree contains the node described by the given NodeTopology
+	 */
 	public boolean subtreeContains(NodeTopology topology)
 	{
 		return subtreeContains(topology.getLeftIndex());
 	}
 	
+	/**
+	 * @return true if this subtree contains the node described by the given traversalIndex (either a getRightIndex() or a getLeftIndex()))
+	 */
 	public boolean subtreeContains(int traversalIndex)
 	{
 		return traversalIndex >= this.getLeftIndex() && traversalIndex <= this.getRightIndex();
 	}
 
+	/**
+	 * @return the weighted height of this node (i.e. the length of the longest weighted path from this
+	 *         node to a leaf.)
+	 */
 	public double getBranchLengthHeight()
 	{
 		return branchLengthHeight;
@@ -135,6 +174,10 @@ public class NodeTopology implements Serializable
 		this.branchLengthHeight = branchLengthHeight;
 	}
 
+	/**
+	 * @return an alternative label for an unlabeled internal node, which one may assume to be
+	 *         arbitrarily chosen from a descendant node
+	 */
 	public String getAltLabel()
 	{
 		return altLabel;
@@ -145,6 +188,9 @@ public class NodeTopology implements Serializable
 		this.altLabel = altLabel;
 	}
 
+	/**
+	 * @return the root node of this node's tree
+	 */
 	public RemoteNode getRootNode()
 	{
 		return rootNode;

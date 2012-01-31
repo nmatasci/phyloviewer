@@ -20,6 +20,10 @@ import javax.persistence.Table;
 import org.iplantc.phyloviewer.shared.model.AbstractNode;
 import org.iplantc.phyloviewer.shared.model.INode;
 
+/**
+ * A serializable, persistent INode implementation that stores it's topology information in a
+ * NodeTopology so methods like getNumberOfLeafNodes() can be calculated on the client.
+ */
 @Entity
 @Table(name="node")
 public class RemoteNode extends AbstractNode implements INode, Serializable {
@@ -79,16 +83,29 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		return topology.getBranchLengthHeight();
 	}
 
+	/**
+	 * Get the NodeTopology. By default, it's an empty new NodeTopology(). When the full tree is local
+	 * (e.g. on the server), it is updated by calling reindex()
+	 * 
+	 * @return this node's NodeTopology.
+	 * @see RemoteNode#reindex()
+	 */
 	public NodeTopology getTopology()
 	{
 		return topology;
 	}
 
+	/**
+	 * Set this node's NodeTopology
+	 */
 	public void setTopology(NodeTopology topology)
 	{
 		this.topology = topology;
 	}
 	
+	/**
+	 * Add a child node
+	 */
 	public void addChild(RemoteNode child)
 	{
 		if (this.children == null) 
@@ -100,6 +117,7 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		child.setParent(this);
 		
 		this.topology.setNumChildren(this.children.size());
+		//TODO: update the rest of the NodeTopology based on child NodeTopology?
 	}
 	
 	@Override
@@ -108,6 +126,9 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		return children;
 	}
 	
+	/**
+	 * Set the child list for this node to the given list
+	 */
 	public void setChildren(List<RemoteNode> children)
 	{
 		this.children = children;
@@ -119,9 +140,11 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 			}
 			
 			this.topology.setNumChildren(children.size());
+			//TODO: update the rest of the NodeTopology based on child NodeTopology?
 		}
 	}
 	
+	@Override
 	public int getId()
 	{
 		return id;
@@ -132,26 +155,31 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 		this.id = id;
 	}
 
+	@Override
 	public String getLabel()
 	{
 		return label;
 	}
 
+	@Override
 	public void setLabel(String label)
 	{
 		this.label = label;
 	}
 
+	@Override
 	public Double getBranchLength()
 	{
 		return branchLength;
 	}
 
+	@Override
 	public void setBranchLength(Double branchLength)
 	{
 		this.branchLength = branchLength;
 	}
 
+	@Override
 	public RemoteNode getParent()
 	{
 		return parent;
@@ -161,7 +189,8 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	{
 		this.parent = parent;
 	}
-	
+
+	@Override
 	public String getMetaDataString()
 	{
 		return null;
@@ -247,6 +276,17 @@ public class RemoteNode extends AbstractNode implements INode, Serializable {
 	
 	/**
 	 * Convenience method for building trees in code.  Mostly for testing.
+	 * <br><br>
+	 * Example:
+	 *<pre>
+	 *RemoteNode root = rn(null, 0.0,
+	 *    rn("Protomyces_inouyei", 1.0),
+	 *    rn(null, 2.0,
+	 *        rn("Taphrina_wiesneri", 3.0),
+	 *        rn("Taphrina_deformans", 4.0)
+	 *    )
+	 *);
+	 *</pre>
 	 */
 	public static RemoteNode rn(String label, Double branchLength, RemoteNode... children) 
 	{

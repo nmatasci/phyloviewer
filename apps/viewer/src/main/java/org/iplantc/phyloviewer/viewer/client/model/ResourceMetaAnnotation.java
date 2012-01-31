@@ -12,6 +12,10 @@ import javax.persistence.OneToMany;
 import org.iplantc.phyloviewer.shared.model.metadata.Annotated;
 import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
 
+/**
+ * An AnnotationEntity for nested annotations and remote resources.
+ * @see http://nexml.org/nexml/html/doc/schema-1/meta/annotations/#ResourceMeta
+ */
 @SuppressWarnings("serial")
 @Entity
 public class ResourceMetaAnnotation extends AnnotationEntity implements Annotated
@@ -37,6 +41,9 @@ public class ResourceMetaAnnotation extends AnnotationEntity implements Annotate
     	this.rel = relValue;
     }
 
+    /**
+     * @return the href for a remote resource
+     */
 	public String getHref()
 	{
 		return href;
@@ -59,11 +66,13 @@ public class ResourceMetaAnnotation extends AnnotationEntity implements Annotate
 		this.annotations = annotations;
 	}
 	
+	@Override
 	public Set<Annotation> getAnnotations(String propertyOrRel)
 	{
 		return AnnotationEntity.getAnnotations(propertyOrRel, this.annotations);
 	}
 
+	@Override
 	public void addAnnotation(Annotation annotation)
 	{
     	if (this.annotations == null) {

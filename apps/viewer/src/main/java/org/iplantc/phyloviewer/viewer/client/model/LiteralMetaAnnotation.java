@@ -2,6 +2,11 @@ package org.iplantc.phyloviewer.viewer.client.model;
 
 import javax.persistence.Entity;
 
+/**
+ * An AnnotationEntity for simple annotation values.
+ * Based on nexml Annotation
+ * @see http://nexml.org/nexml/html/doc/schema-1/meta/annotations/#LiteralMeta
+ */
 @SuppressWarnings("serial")
 @Entity
 public class LiteralMetaAnnotation extends AnnotationEntity
@@ -38,11 +43,19 @@ public class LiteralMetaAnnotation extends AnnotationEntity
         this.property = propertyValue;
     }
 
+    /**
+     * @return the data type of this annotation
+     * @see org.nexml.model.Annotation#getXsdType()
+     */
 	public String getDatatype()
 	{
 		return datatype;
 	}
 
+	/**
+	 * Set the data type of this annotation
+	 * @see org.nexml.model.Annotation#getXsdType()
+	 */
 	public void setDatatype(String datatype)
 	{
 		this.datatype = datatype;

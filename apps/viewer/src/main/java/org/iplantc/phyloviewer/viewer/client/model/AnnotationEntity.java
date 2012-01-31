@@ -12,6 +12,10 @@ import javax.persistence.Table;
 
 import org.iplantc.phyloviewer.shared.model.metadata.Annotation;
 
+/**
+ * An abstract Annotation superclass for serializable, persistent annotations
+ * @see Annotation
+ */
 @Entity
 @Table(name="annotation")
 public abstract class AnnotationEntity implements Serializable, Annotation
@@ -29,12 +33,6 @@ public abstract class AnnotationEntity implements Serializable, Annotation
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.iplantc.phyloviewer.viewer.client.model.Annotation#getKey()
-	 */
-	@Override
-	public abstract String getKey();
-	
 	public int getId()
 	{
 		return id;
@@ -45,20 +43,24 @@ public abstract class AnnotationEntity implements Serializable, Annotation
 		this.id = id;
 	}
 
-    /* (non-Javadoc)
-	 * @see org.iplantc.phyloviewer.viewer.client.model.Annotation#getPredicateNamespace()
-	 */
     @Override
 	public String getPredicateNamespace()
 	{
 		return predicateNamespace;
 	}
 
+	/**
+	 * Sets the namespace URI for the predicate (either the "property" or "rel" attribute in the case of
+	 * annotations with URLs or nested annotations).
+	 */
 	public void setPredicateNamespace(String predicateNamespace)
 	{
 		this.predicateNamespace = predicateNamespace;
 	}
 	
+	/**
+	 * @return all annotations in a set matching the given key.
+	 */
     public static Set<Annotation> getAnnotations(String key, Set<Annotation> annotations) {
     	Set<Annotation> subset = new HashSet<Annotation>();
     	if ( key == null ) {

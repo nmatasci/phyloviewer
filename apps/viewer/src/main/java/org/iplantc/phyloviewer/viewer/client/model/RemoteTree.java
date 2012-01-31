@@ -15,7 +15,11 @@ import javax.persistence.Table;
 
 import org.iplantc.phyloviewer.shared.model.INode;
 import org.iplantc.phyloviewer.shared.model.Tree;
+import org.iplantc.phyloviewer.viewer.server.ParseTree;
 
+/**
+ * A persistent, serializable implementation of ITree
+ */
 @Entity
 @Table(name="tree")
 public class RemoteTree extends Tree implements Serializable
@@ -85,6 +89,11 @@ public class RemoteTree extends Tree implements Serializable
 		this.name = name;
 	}
 
+	/**
+	 * @return this tree's unique identifier. When trees are re-imported, this identifier should not
+	 *         change.
+	 * @see ParseTree#saveTree(java.util.Map)
+	 */
 	public byte[] getHash()
 	{
 		return hash;
@@ -95,21 +104,35 @@ public class RemoteTree extends Tree implements Serializable
 		this.hash = hash;
 	}
 
+	/**
+	 * @return whether this tree should be listed publicly
+	 */
 	public boolean isPublic()
 	{
 		return isPublic;
 	}
 
+	
+	/**
+	 * Set whether this tree should be listed publicly
+	 */
 	public void setPublic(boolean isPublic)
 	{
 		this.isPublic = isPublic;
 	}
 
+	/**
+	 * @return true if the import process (nodes, annotations, layouts, overview image) is complete for
+	 *         this tree
+	 */
 	public boolean isImportComplete()
 	{
 		return importComplete;
 	}
 
+	/**
+	 *  Set whether the import process is complete forthis tree
+	 */
 	public void setImportComplete(boolean importComplete)
 	{
 		this.importComplete = importComplete;
