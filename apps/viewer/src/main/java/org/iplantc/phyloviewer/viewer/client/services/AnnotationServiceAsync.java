@@ -16,6 +16,6 @@ public interface AnnotationServiceAsync
 	void getAnnotationMetadata(RemoteTree tree, AsyncCallback<List<AnnotationMetadata>> callback);
 
 	void getAnnotationMetadata(RemoteTree tree, String propertyOrRel,
-			AsyncCallback<AnnotationMetadata> callback);
+			AsyncCallback<List<AnnotationMetadata>> callback);
 
 }

@@ -16,10 +16,11 @@ public interface AnnotationData
 	public List<AnnotationMetadata> getAnnotationMetadata(RemoteTree tree);
 	
 	/**
-	 * 
-	 * @return metadata for all annotations in the given tree matching the given property
+	 * @return metadata for all annotations in the given tree matching the given property. There should
+	 *         be just one element in this list, but it's possible to have annotations with the same
+	 *         propertyOrRel but different datatypes, in which case there would be more than one element.
 	 */
-	public AnnotationMetadata getAnnotationMetadata(RemoteTree tree, String propertyOrRel);
+	public List<AnnotationMetadata> getAnnotationMetadata(RemoteTree tree, String propertyOrRel);
 	
 	//public Set<Annotation> getAnnotations(AnnotatedNode node); TODO
 }

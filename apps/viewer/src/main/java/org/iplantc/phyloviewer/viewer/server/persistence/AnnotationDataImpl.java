@@ -48,7 +48,6 @@ public class AnnotationDataImpl implements AnnotationData
 			String name = (String) result[0];
 			Class<?> clazz = getClassFor((String)result[1]);
 			//TODO get bounds for numeric data and make a NumericAnnotationMetadata for it
-			//TODO get all distinct values for string annotations?
 			AnnotationMetadata metadata = new AnnotationMetadataImpl(name, clazz);
 			list.add(metadata);
 		}
@@ -58,11 +57,18 @@ public class AnnotationDataImpl implements AnnotationData
 	}
 
 	@Override
-	public AnnotationMetadata getAnnotationMetadata(RemoteTree tree, String propertyOrRel)
+	public List<AnnotationMetadata> getAnnotationMetadata(RemoteTree tree, String propertyOrRel)
 	{
-		// TODO Auto-generated method stub
-		// hmm... the method signature may need to change.  the propertyOrRel could possibly refer to annotations with more than one datatype.  It would be silly, but it could happen.
-		return null;
+		List<AnnotationMetadata> filteredList = new ArrayList<AnnotationMetadata>();
+		
+		List<AnnotationMetadata> list = getAnnotationMetadata(tree);
+		for (AnnotationMetadata element : list) {
+			if (element.getName().equals(propertyOrRel)) {
+				filteredList.add(element);
+			}
+		}
+		
+		return filteredList;
 	}
 
 	private Class<?> getClassFor(String datatype)

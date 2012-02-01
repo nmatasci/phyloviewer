@@ -48,7 +48,7 @@ public class AnnotationServiceImpl extends RemoteServiceServlet implements Annot
 	}
 
 	@Override
-	public AnnotationMetadata getAnnotationMetadata(RemoteTree tree, String propertyOrRel)
+	public List<AnnotationMetadata> getAnnotationMetadata(RemoteTree tree, String propertyOrRel)
 	{
 		return data.getAnnotationMetadata(tree, propertyOrRel);
 	}

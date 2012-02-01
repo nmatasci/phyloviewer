@@ -70,15 +70,19 @@ public class AnnotationDataImplTest extends PersistenceTest
 	{
 		AnnotationDataImpl data = new AnnotationDataImpl(PersistenceTest.entityManagerFactory);
 		
-		AnnotationMetadata metadata = data.getAnnotationMetadata(tree, "someStringProperty");
+		List<AnnotationMetadata> metadata = data.getAnnotationMetadata(tree, "someStringProperty");
 		assertNotNull(metadata);
-		assertEquals("someStringProperty", metadata.getName());
-		assertEquals(String.class, metadata.getDatatype());
+		assertEquals(1, metadata.size());
+		AnnotationMetadata metadatum = metadata.get(0);
+		assertEquals("someStringProperty", metadatum.getName());
+		assertEquals(String.class, metadatum.getDatatype());
 		
 		metadata = data.getAnnotationMetadata(tree, "someDoubleProperty");
 		assertNotNull(metadata);
-		assertEquals("someDoubleProperty", metadata.getName());
-		assertEquals(Double.class, metadata.getDatatype());
+		assertEquals(1, metadata.size());
+		metadatum = metadata.get(0);
+		assertEquals("someDoubleProperty", metadatum.getName());
+		assertEquals(Double.class, metadatum.getDatatype());
 	}
 
 }
