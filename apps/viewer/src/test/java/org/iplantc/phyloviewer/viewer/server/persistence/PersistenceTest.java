@@ -15,7 +15,7 @@ import javax.persistence.Persistence;
  */
 public abstract class PersistenceTest
 {
-	protected static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "org.iplantc.phyloviewer.test.postgres" );
+	protected static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "org.iplantc.phyloviewer.test" );
 
 	public <T, K> void testPersist(T entity, Method getId)
 	{
