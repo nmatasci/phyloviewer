@@ -1,0 +1,179 @@
+/**
+ * Copyright (c) 2009, iPlant Collaborative, Texas Advanced Computing Center This software is licensed
+ * under the CC-GNU GPL version 2.0 or later. License: http://creativecommons.org/licenses/GPL/2.0/
+ */
+
+package org.iplantc.phyloviewer.shared.scene.intersect;
+
+import java.util.ArrayList;
+
+import org.iplantc.phyloviewer.shared.layout.ILayoutData;
+import org.iplantc.phyloviewer.shared.math.Box2D;
+import org.iplantc.phyloviewer.shared.math.Vector2;
+import org.iplantc.phyloviewer.shared.model.IDocument;
+import org.iplantc.phyloviewer.shared.model.INode;
+import org.iplantc.phyloviewer.shared.model.ITree;
+import org.iplantc.phyloviewer.shared.scene.Drawable;
+import org.iplantc.phyloviewer.shared.scene.DrawableContainer;
+
+/**
+ * IntersectTree finds any rendered elements (nodes, branches, labels, etc.) at a given point. The
+ * intersect() runs the algorithm and creates a set of Hit objects for the hits. The nearest Hit can then
+ * be retrieved with getClosestHit().
+ */
+public class IntersectTree
+{
+	public class Hit
+	{
+		private INode node;
+		private Drawable drawable;
+
+		Hit(INode node, Drawable drawable)
+		{
+			this.node = node;
+			this.drawable = drawable;
+		}
+
+		public INode getNode()
+		{
+			return node;
+		}
+
+		public int getNodeId()
+		{
+			return node != null ? node.getId() : -1;
+		}
+
+		public Drawable getDrawable()
+		{
+			return drawable;
+		}
+	}
+
+	private ITree tree;
+	private Vector2 position;
+	private double distanceForHitSquared;
+	private ILayoutData layout;
+	private DrawableContainer drawableContainer;
+	private ArrayList<Hit> hitList = new ArrayList<Hit>();
+
+	/**
+	 * Creates a new IntersectTree
+	 * @param document contains the current tree and its layout
+	 * @param drawableContainer a cache of rendered tree elements (Drawables) for the given document
+	 * @param position the target position
+	 * @param pixelSize the maximum distance from the target position to a Drawable that will create a Hit
+	 */
+	public IntersectTree(IDocument document, DrawableContainer drawableContainer, Vector2 position,
+			double pixelSize)
+	{
+		if(document != null)
+		{
+			this.tree = document.getTree();
+			this.layout = document.getLayout();
+		}
+
+		this.drawableContainer = drawableContainer;
+		this.position = position;
+		distanceForHitSquared = pixelSize * pixelSize;
+	}
+
+	/**
+	 * Get the hit object that was closest to the position.
+	 * 
+	 * @return
+	 */
+	public Hit getClosestHit()
+	{
+		Hit closest = null;
+		double minDistance = Double.MAX_VALUE;
+		for(Hit hit : hitList)
+		{
+			Box2D box = hit.drawable.getBoundingBox();
+			Vector2 center = box.getCenter();
+			double distance = center.distance(position);
+			if(distance < minDistance)
+			{
+				minDistance = distance;
+				closest = hit;
+			}
+		}
+
+		return closest;
+	}
+
+	/**
+	 * Perform the intersection test.
+	 */
+	public void intersect()
+	{
+		if(tree != null && tree.getRootNode() != null && layout != null && drawableContainer != null)
+		{
+			this.visit(tree.getRootNode());
+		}
+	}
+
+	private void visit(INode node)
+	{
+		if(node == null || this.position == null)
+		{
+			return;
+		}
+
+		if(layout.containsNode(node))
+		{
+			intersectNode(node);
+
+			// If the position is contained in the boundingbox, continue the traversal.
+			Box2D bbox = layout.getBoundingBox(node).clone();
+			bbox.expandBy(0.2);
+			if(bbox.contains(position))
+			{
+				this.traverse(node);
+			}
+		}
+	}
+
+	private void intersectNode(INode node)
+	{
+		Drawable[] drawables = drawableContainer.getNodeDrawables(node);
+		this.testIntersection(node, drawables);
+
+		Drawable drawable = drawableContainer.getTextDrawable(node);
+		this.testIntersection(node, drawable);
+	}
+
+	private void testIntersection(INode node, Drawable[] drawables)
+	{
+		if(drawables != null)
+		{
+			for(Drawable drawable : drawables)
+			{
+				testIntersection(node, drawable);
+			}
+		}
+	}
+
+	private void testIntersection(INode node, Drawable drawable)
+	{
+		if(drawable != null && drawable.intersect(position, distanceForHitSquared))
+		{
+			Hit hit = new Hit(node, drawable);
+			hitList.add(hit);
+		}
+	}
+
+	private void traverse(INode node)
+	{
+		if(node.getChildren() != null)
+		{
+			for(INode child : node.getChildren())
+			{
+				Drawable[] drawables = drawableContainer.getBranchDrawables(child);
+				this.testIntersection(child, drawables);
+
+				this.visit(child);
+			}
+		}
+	}
+}

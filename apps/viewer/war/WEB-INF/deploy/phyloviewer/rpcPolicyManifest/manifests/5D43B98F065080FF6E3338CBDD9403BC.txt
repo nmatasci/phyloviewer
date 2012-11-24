@@ -1,0 +1,2 @@
+serviceClass: org.iplantc.phyloviewer.viewer.client.services.CombinedService
+path: 0C074F179E01DC0BBEC3740B2978D74D.gwt.rpc
