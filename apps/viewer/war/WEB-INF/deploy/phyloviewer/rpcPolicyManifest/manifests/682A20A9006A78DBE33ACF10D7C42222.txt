@@ -1,2 +1,0 @@
-serviceClass: org.iplantc.phyloviewer.client.services.TreeImage
-path: 086E62F8D70AEE70894827087AE21BFC.gwt.rpc

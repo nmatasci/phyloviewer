@@ -1,2 +1,0 @@
-serviceClass: org.iplantc.phyloviewer.viewer.client.services.TreeListService
-path: 680393E296F6BD2ED9EE8853EB38CE20.gwt.rpc

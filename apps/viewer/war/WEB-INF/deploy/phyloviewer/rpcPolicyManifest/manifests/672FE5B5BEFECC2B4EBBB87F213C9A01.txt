@@ -1,2 +1,0 @@
-serviceClass: org.iplantc.phyloviewer.client.services.TreeIntersectService
-path: 9A81432F7B4F4702F05707566EE36C9A.gwt.rpc

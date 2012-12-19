@@ -1,2 +1,0 @@
-serviceClass: org.iplantc.phyloviewer.viewer.client.services.SearchService
-path: 98B0F558363ED44C0DED7DCBF07A76BB.gwt.rpc
