@@ -82,6 +82,10 @@
     <servlet-name>annotation</servlet-name>
     <servlet-class>org.iplantc.phyloviewer.viewer.server.AnnotationServiceImpl</servlet-class>
   </servlet>
+    <servlet>
+    <servlet-name>fileupload</servlet-name>
+    <servlet-class>org.iplantc.phyloviewer.viewer.server.FileUpload</servlet-class>
+  </servlet>
   
   <!-- Servlet Mappings -->
   <servlet-mapping>
@@ -123,6 +127,10 @@
   <servlet-mapping>
     <servlet-name>annotation</servlet-name>
     <url-pattern>/phyloviewer/annotation</url-pattern>
+  </servlet-mapping>
+    <servlet-mapping>
+    <servlet-name>fileupload</servlet-name>
+    <url-pattern>/phyloviewer/fileUpload</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->

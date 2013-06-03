@@ -58,6 +58,7 @@ public class Document implements IDocument
 				IStyle style = this.styleMap.get(node);
 				if(style != null)
 				{
+//					System.out.println(style.getId());
 					return style;
 				}
 			}

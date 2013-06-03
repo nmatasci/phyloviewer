@@ -57,6 +57,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -73,7 +75,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class Phyloviewer implements EntryPoint
 {
 
-	TreeWidget widget;
+	public TreeWidget widget;
 
 	List<ITree> trees;
 
@@ -85,6 +87,7 @@ public class Phyloviewer implements EntryPoint
 	
 	String layoutType = "LAYOUT_TYPE_CLADOGRAM"; //determines whether we fetch layouts with branch lengths (LAYOUT_TYPE_PHYLOGRAM) or without (LAYOUT_TYPE_CLADOGRAM).  TODO make this an Enum in the shared package.
 
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -189,7 +192,6 @@ public class Phyloviewer implements EntryPoint
 			public void onValueChange(ValueChangeEvent<String> event)
 			{
 				String style = event.getValue();
-				
 				try
 				{
 					IStyleMap styleMap = StyleServiceClient.parseJSON(style);
@@ -205,7 +207,7 @@ public class Phyloviewer implements EntryPoint
 
 		styleTextPopup.setModal(true);
 
-		styleMenu.addItem("Import Tree Styling", new Command()
+		styleMenu.addItem("Import Tree Styling (copy and paste JSON)", new Command()
 		{
 			@Override
 			public void execute()
@@ -222,6 +224,92 @@ public class Phyloviewer implements EntryPoint
 				});
 			}
 		});
+
+
+		final FileUploadPopup styleUploadPopup = new FileUploadPopup();
+		styleUploadPopup.addValueChangeHandler(new ValueChangeHandler<String>()
+		{
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event)
+			{
+				try
+				{
+			    	String style = event.getValue();
+			    	IStyleMap styleMap = StyleServiceClient.parseJSON(style);
+					widget.getDocument().setStyleMap(styleMap);
+					widget.render();
+				}
+				catch(Exception e)
+				{
+					Window.alert("Problem with widget: styleUploadPopup.");
+				}
+			}
+		});
+
+		styleUploadPopup.setModal(true);
+	    
+	    styleMenu.addItem("Import Tree Styling (upload file)", new Command()
+		{
+			@Override
+			public void execute()
+			{
+				styleUploadPopup.setPopupPositionAndShow(new PopupPanel.PositionCallback()
+				{
+					@Override
+					public void setPosition(int offsetWidth, int offsetHeight)
+					{
+						int left = (Window.getClientWidth() - offsetWidth) / 2;
+						int top = (Window.getClientHeight() - offsetHeight) / 2;
+						styleUploadPopup.setPopupPosition(left, top);
+					}
+				});
+			}
+		});
+
+
+		final MetadataDialoguePopup styleMetadataDialoguePopup = new MetadataDialoguePopup();
+		styleMetadataDialoguePopup.addValueChangeHandler(new ValueChangeHandler<String>()
+		{
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event)
+			{
+				String style = event.getValue();
+				try
+				{
+					//String style = event.getValue();
+					IStyleMap styleMap = StyleServiceClient.parseJSON(style);
+					widget.getDocument().setStyleMap(styleMap);
+					widget.render();
+				}
+				//catch(StyleServiceException e)
+				catch(Exception e)
+				{
+					Window.alert("Unable to upload document.");
+				}
+			}
+		});
+
+		styleMetadataDialoguePopup.setModal(true);
+	    
+	    styleMenu.addItem("Tree Style Editing Panel", new Command()
+		{
+			@Override
+			public void execute()
+			{
+				styleMetadataDialoguePopup.setPopupPositionAndShow(new PopupPanel.PositionCallback()
+				{
+					@Override
+					public void setPosition(int offsetWidth, int offsetHeight)
+					{
+						int left = (Window.getClientWidth() - offsetWidth) / 2;
+						int top = (Window.getClientHeight() - offsetHeight) / 2;
+						styleMetadataDialoguePopup.setPopupPosition(left, top);
+						//initColorPicker();
+					}
+				});
+			}
+		});
+
 
 		// Make a search box
 		final SuggestBox searchBox = new SuggestBox(searchService);
@@ -340,8 +428,11 @@ public class Phyloviewer implements EntryPoint
 				updateStyle();
 			}
 		});
+		
+		
 	}
 
+	
 	private ColorBox createColorBox()
 	{
 		ColorBox colorBox = new ColorBox();
@@ -349,7 +440,8 @@ public class Phyloviewer implements EntryPoint
 		return colorBox;
 	}
 
-	private final native void initColorPicker()
+	//private final native void initColorPicker()
+	native void initColorPicker()
 	/*-{
 		$wnd.jscolor.init();
 	}-*/;
@@ -502,7 +594,10 @@ public class Phyloviewer implements EntryPoint
 			{	
 				Phyloviewer.this.trees = new ArrayList<ITree>();
 				for (ITree tree : trees) {
+//					System.out.println(tree.getId() + ":" + tree.getName());
+//					((RemoteTree)tree).setPublic(true);
 					if ( ((RemoteTree)tree).isPublic() ) {
+//						System.out.println(tree.getId() + ":" + tree.getName());
 						lb.addItem(tree.getName());
 						Phyloviewer.this.trees.add(tree);
 					}

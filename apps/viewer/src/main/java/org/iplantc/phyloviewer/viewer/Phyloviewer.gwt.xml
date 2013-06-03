@@ -9,6 +9,8 @@
   <inherits name="org.iplantc.phyloviewer.common"/>
   <inherits name="org.iplantc.phyloviewer.client"/>
 
+  <inherits name="gwtupload.GWTUpload"/>
+  
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
   <!-- any one of the following lines.                            -->

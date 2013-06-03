@@ -21,22 +21,22 @@ public class ColorBox extends TextBox
 	 */
 	static 
 	{
-		colorNameMap.put("black", "#000000");
-		colorNameMap.put("silver", "#C0C0C0");
-		colorNameMap.put("gray", "#808080");
-		colorNameMap.put("white", "#FFFFFF");
-		colorNameMap.put("maroon", "#800000");
-		colorNameMap.put("red", "#FF0000");
-		colorNameMap.put("purple", "#800080");
-		colorNameMap.put("fuchsia", "#FF00FF");
-		colorNameMap.put("green", "#008000");
-		colorNameMap.put("lime", "#00FF00");
-		colorNameMap.put("olive", "#808000");
-		colorNameMap.put("yellow", "#FFFF00");
-		colorNameMap.put("navy", "#000080");
-		colorNameMap.put("blue", "#0000FF");
-		colorNameMap.put("teal", "#008080");
-		colorNameMap.put("aqua", "#00FFFF");
+		colorNameMap.put( "black"   , "#000000" ) ;
+		colorNameMap.put( "silver"  , "#C0C0C0" ) ;
+		colorNameMap.put( "gray"    , "#808080" ) ;
+		colorNameMap.put( "white"   , "#FFFFFF" ) ;
+		colorNameMap.put( "maroon"  , "#800000" ) ;
+		colorNameMap.put( "red"     , "#FF0000" ) ;
+		colorNameMap.put( "purple"  , "#800080" ) ;
+		colorNameMap.put( "fuchsia" , "#FF00FF" ) ;
+		colorNameMap.put( "green"   , "#008000" ) ;
+		colorNameMap.put( "lime"    , "#00FF00" ) ;
+		colorNameMap.put( "olive"   , "#808000" ) ;
+		colorNameMap.put( "yellow"  , "#FFFF00" ) ;
+		colorNameMap.put( "navy"    , "#000080" ) ;
+		colorNameMap.put( "blue"    , "#0000FF" ) ;
+		colorNameMap.put( "teal"    , "#008080" ) ;
+		colorNameMap.put( "aqua"    , "#00FFFF" ) ;
 	}
 	
 	/**
