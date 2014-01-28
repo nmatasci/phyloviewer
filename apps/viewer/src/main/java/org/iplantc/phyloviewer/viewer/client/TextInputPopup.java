@@ -34,8 +34,19 @@ public class TextInputPopup extends PopupPanel implements HasValueChangeHandlers
 			}
 		});
 
+		Button cancelButton = new Button("Cancel", new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				TextInputPopup.this.hide();
+			}
+		});
+
+		
 		vPanel.add(textBox);
 		vPanel.add(okButton);
+		vPanel.add(cancelButton);
 		this.add(vPanel);
 	}
 
